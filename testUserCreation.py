@@ -6,16 +6,14 @@ email addresses, etc.).
 
 import unittest
 
+# Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
-# Set up database
-from pymongo import MongoClient
-client = MongoClient('localhost:20771')
-database = client['test']
-
-OSF_HOME = 'http://www.openscienceframework.org/'
+# Project imports
+import util
+import config
 
 class testUserCreation(unittest.TestCase):
     
@@ -56,11 +54,11 @@ class testUserCreation(unittest.TestCase):
         # Browse to account creation page
         self.driver.get('http://localhost:5000/account')
 
-        self._clear_users()
+        util.clear_users()
 
     def tearDown(self):
-
-        self._clear_users()
+        
+        util.clear_users()
 
     def _fill_form(self, form_data):
         """Fill out form fields in registration page.
@@ -154,10 +152,15 @@ class testUserCreation(unittest.TestCase):
 
         # Submit form
         self._submit_and_check(form_data, 'email address is invalid')
-
+    
     def testValidAccount(self):
         
+        # Submit original form data
         self._submit_and_check(self.form_data, 'you may now login')
+        
+        # Make sure we can log in
+        util.login(self.driver, self.form_data['username'], self.form_data['password'])
+        self.assertTrue('dashboard' in self.driver.current_url)
 
 # Run tests
 if __name__ == '__main__':
