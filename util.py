@@ -57,6 +57,8 @@ def create_project(driver, project_title, project_description):
     submit_button = driver.find_element_by_xpath(
         '//button[@class="btn primary"][@type="submit"]')
     submit_button.click()
+    return driver.current_url
+
 
 
 def clear_users():
