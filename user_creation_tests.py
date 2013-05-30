@@ -12,7 +12,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
-import util
 import config
 
 class testUserCreation(unittest.TestCase):
