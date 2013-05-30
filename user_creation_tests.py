@@ -15,7 +15,7 @@ from selenium.common.exceptions import NoSuchElementException
 import util
 import config
 
-class testUserCreation(unittest.TestCase):
+class UserCreationTests(unittest.TestCase):
     
     # Default form data
     """

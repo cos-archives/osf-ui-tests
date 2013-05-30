@@ -13,7 +13,8 @@ from selenium.webdriver.common.keys import Keys
 import util
 import config
 
-class AccountProfileTest(unittest.TestCase):
+
+class AccountProfileTests(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
