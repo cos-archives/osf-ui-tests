@@ -10,7 +10,12 @@ from pymongo import MongoClient
 client = MongoClient(config.mongo_uri)
 
 def fill_form(form, fields):
-    """
+    """Fill out form fields and click submit button.
+
+    Args:
+        form : webdriver element
+        fields : dict of id -> value pairs for form
+
     """
     
     # Enter field values
@@ -21,7 +26,7 @@ def fill_form(form, fields):
     form.find_element_by_xpath('.//button[@type="submit"]').click()
 
 def login(driver, login_data):
-    """Log in to OSF
+    """Login to OSF
 
     Args:
         driver : selenium.webdriver instance
@@ -48,6 +53,7 @@ def create_user(driver, registration_data=config.registration_data):
     Args:
         driver : selenium.webdriver instance
         registration_data : dict of id -> value pairs for registration form
+                            default: config.registration_data
 
     Examples:
         > create_user(driver, {
