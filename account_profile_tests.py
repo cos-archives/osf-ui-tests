@@ -5,56 +5,50 @@ Date: 29May13
 """
 import unittest
 
+# Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+# Project imports
+import util
+import config
 
 class AccountProfileTest(unittest.TestCase):
+    
+    @classmethod
+    def setUpClass(cls):
+        
+        # Start WebDriver
+        cls.driver = webdriver.Firefox()
+
+        # Wait for elements to appear
+        cls.driver.implicitly_wait(30)
+        
+        # Create test user
+        util.create_user(cls.driver)
+        
+        # Login to test account
+        util.login(cls.driver)
+    
+    @classmethod
+    def tearDownClass(cls):
+        
+        # Close WebDriver
+        cls.driver.close()
 
     # initialize a Firefox webdriver
     def setUp(self):
-        # setup browser and test user data
-        self.driver = webdriver.Firefox()
-        self.user_email = 'test@test.com'
-        self.user_password = 'testtest'
-        self.user_name = 'Testy McTester'
 
-        # ensure driver allows page source to load before getting fields
-        self.driver.implicitly_wait(30)
-
-        # load OSF homepage
-        self.driver.get('http://localhost:5000')
-        # load login page
-        self.driver.find_element_by_xpath('//a[@href="/account"]').click()
-
-        # grab the username and password fields
-        username_field = self.driver.find_elements_by_xpath('//form[@name="signin"]//input[@id="username"]')
-        password_field = self.driver.find_elements_by_xpath('//form[@name="signin"]//input[@id="password"]')
-
-        # enter the username / password
-        username_field[0].send_keys(self.user_email)
-        password_field[0].send_keys(self.user_password)
-
-        # locate and click login button
-        submit_buttons = self.driver.find_elements_by_xpath('//button[@type="submit"]')
-        submit_button = [b for b in submit_buttons if b.text.lower() == 'sign in'][0]
-        submit_button.click()
-
-        # grab the profile button and load the page
-        profile_button = self.driver.find_element_by_link_text('My Public Profile')
-        profile_button.click()
-
-    # close the Firefox webdriver
-    def tearDown(self):
-        self.driver.close()
+        # Browse to profile
+        util.goto_profile(self.driver)
 
     def test_access_profile(self):
         """
         tests user ability to access page and verifies name on profile page
         matches expected test data
         """
-        profile_name = self.driver.find_element_by_id('profile-dfullname').text
-        self.assertTrue(self.user_name in profile_name)
+        profile_name = self.driver.find_element_by_id('profile-fullname').text
+        self.assertTrue(config.registration_data['username'] in profile_name)
 
     def test_change_name(self):
         """
@@ -71,11 +65,10 @@ class AccountProfileTest(unittest.TestCase):
             '//div[@class="popover-content"]//input[@class="span2"]')
 
         # delete the current name
-        for i in range(len(self.user_name)):
-            edit_profile_name_field.send_keys(Keys.BACK_SPACE)
+        edit_profile_name_field.clear()
 
         # enter the reverse user name
-        edit_profile_name_field.send_keys(self.user_name[::-1])
+        edit_profile_name_field.send_keys(config.registration_data['username'][::-1])
 
         # find and click submit new name
         edit_profile_name_submit_button = self.driver.find_element_by_xpath(
@@ -86,7 +79,7 @@ class AccountProfileTest(unittest.TestCase):
         # refresh page and assert change was made
         self.driver.refresh()
         profile_name = self.driver.find_element_by_id('profile-dfullname').text
-        self.assertTrue(self.user_name[::-1] in profile_name)
+        self.assertTrue(config.registration_data['username'][::-1] in profile_name)
 
         # return the username back to its original -- same as above
         edit_profile_name_button = self.driver.find_element_by_id(
@@ -94,9 +87,8 @@ class AccountProfileTest(unittest.TestCase):
         edit_profile_name_button.click()
         edit_profile_name_field = self.driver.find_element_by_xpath(
             '//div[@class="popover-content"]//input[@class="span2"]')
-        for i in range(len(self.user_name)):
-            edit_profile_name_field.send_keys(Keys.BACK_SPACE)
-        edit_profile_name_field.send_keys(self.user_name)
+        edit_profile_name_field.clear()
+        edit_profile_name_field.send_keys(config.registration_data['username'])
         edit_profile_name_submit_button = self.driver.find_element_by_xpath(
             '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
         )
@@ -105,7 +97,7 @@ class AccountProfileTest(unittest.TestCase):
         # refresh page and assert username is back to the original
         self.driver.refresh()
         profile_name = self.driver.find_element_by_id('profile-dfullname').text
-        self.assertTrue(self.user_name in profile_name)
+        self.assertTrue(config.registration_data['username'] in profile_name)
 
     @unittest.skip("not an implemented feature in OSF codebase")
     def test_change_location(self):
@@ -127,7 +119,7 @@ class AccountProfileTest(unittest.TestCase):
         # assert name still matches username
         profile_name = self.driver.find_element_by_id('profile-dfullname'
         ).text
-        self.assertTrue(self.user_name in profile_name)
+        self.assertTrue(config.registration_data['username'] in profile_name)
 
     @unittest.skip("not implemented")
     def test_check_public_project_updates(self):
@@ -135,6 +127,3 @@ class AccountProfileTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
