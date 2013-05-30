@@ -41,56 +41,27 @@ class testUserCreation(unittest.TestCase):
         # Close Selenium
         cls.driver.close()
     
-    def _clear_users(self):
-        """Clear all users from test database. Otherwise account creation
-        test will fail after running once.
-
-        """
-        
-        database['user'].remove()
-
     def setUp(self):
         
         # Browse to account creation page
         self.driver.get('http://localhost:5000/account')
-
-        util.clear_users()
+        
+        # Delete users
+        util.clear_user(self.form_data['username'])
 
     def tearDown(self):
         
-        util.clear_users()
+        # Delete users
+        util.clear_user(self.form_data['username'])
 
-    def _fill_form(self, form_data):
-        """Fill out form fields in registration page.
-
-        Args:
-            form_data : Dictionary mapping input IDs to values
-            
-        """
-        
-        # Enter form data into fields
-        for field in form_data:
-            xpath = '//form[@name="registration"]//*[@id="%s"]' % (field)
-            self.driver.find_element_by_xpath(xpath).send_keys(form_data[field])
-        
-        # Find submit button
-        submit_button = self.driver.find_element_by_xpath('//form[@name="registration"]//button')
-        
-        # Submit form
-        submit_button.click()
-    
-    def _submit_and_check(self, form_data, alert_text):
-        """Submit form data and check for appropriate alert box. Asserts
-        that there is exactly one matching alert box.
+    def _check_alerts(self, alert_text):
+        """Check page for alert boxes. Asserts that there is exactly
+        one matching alert.
 
         Args:
-            form_data : Dictionary of field values (see _fill_form)
             alert_text : Text to search for in alert box
 
         """
-        
-        # Submit form
-        self._fill_form(form_data)
         
         # Find alerts
         alerts = self.driver.find_elements_by_xpath('//div[contains(@class, "alert")]')
@@ -98,6 +69,22 @@ class testUserCreation(unittest.TestCase):
         
         # Must be exactly one matching alert
         self.assertEquals(len(alerts), 1)
+        
+    def _submit_and_check(self, form_data, alert_text):
+        """Submit form data and check for appropriate alert box. Asserts
+        that there is exactly one matching alert box.
+
+        Args:
+            form_data : Dictionary of field values (see util.fill_form)
+            alert_text : Text to search for in alert box
+
+        """
+        
+        # Submit form
+        util.fill_form(self.driver, form_data)
+        
+        # Check alerts
+        self._check_alerts(alert_text)
     
     def testNoPassword(self):
         
@@ -153,13 +140,26 @@ class testUserCreation(unittest.TestCase):
         # Submit form
         self._submit_and_check(form_data, 'email address is invalid')
     
+    def testWrongPassword(self):
+        
+        util.login(self.driver, {
+            'username' : 'bad@email.addr', 
+            'password' : 'wrongpass'
+        })
+        
+        # 
+        self._check_alerts('log-in failed')
+
     def testValidAccount(self):
         
         # Submit original form data
         self._submit_and_check(self.form_data, 'you may now login')
         
         # Make sure we can log in
-        util.login(self.driver, self.form_data['username'], self.form_data['password'])
+        util.login(self.driver, {
+            'username' : self.form_data['username'], 
+            'password' : self.form_data['password']
+        })
         self.assertTrue('dashboard' in self.driver.current_url)
 
 # Run tests
