@@ -1,19 +1,43 @@
+"""
+
+"""
+
 import unittest
 
+# Selenium imports
 from selenium import webdriver
-from pymongo import MongoClient
+from selenium.webdriver.common.keys import Keys
 
-from util import login, create_project, clear_project
+# Project imports
+import util
+import config
 
 class create_new_node(unittest.TestCase):
 
     def setUp(self):
-        username = "samson@gmail.com"
-        password = "jeans123"
+        
+        # Start WebDriver
         self.driver = webdriver.Firefox()
-        login(self.driver, username, password)
-        self.url = create_project(
-            self.driver, "Sam's Great Project", "This is a great project")
+
+        # Wait for elements to appear
+        self.driver.implicitly_wait(30)
+
+        # Create test user
+        util.create_user(self.driver)
+        
+        # Login to test account
+        util.login(self.driver)
+
+        # Create project and store URL
+        self.url = util.create_project(self.driver)
+
+    def tearDown(self):
+
+        # Delete test project
+        util.delete_project(self.driver)
+
+        # Close WebDriver
+        self.driver.close()
 
     def test_new_node(self):
         self.driver.get(self.url)
@@ -33,7 +57,6 @@ class create_new_node(unittest.TestCase):
         submit_btn.click()
         self.assertEqual(self.driver.find_element_by_link_text(title).text, title)
 
-    def tearDown(self):
-        self.driver.close()
-        clear_project("Sam's Great Project")
-
+# Run tests
+if __name__ == '__main__':
+    unittest.main()

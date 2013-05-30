@@ -12,11 +12,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import util
 import config
 
 class testUserCreation(unittest.TestCase):
     
     # Default form data
+    """
     form_data = {
         'fullname' : 'raymond occupant',
         'username' : 'raymond@occupant.com',
@@ -24,6 +26,7 @@ class testUserCreation(unittest.TestCase):
         'password' : 'secret',
         'password2' : 'secret',
     }
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -46,12 +49,14 @@ class testUserCreation(unittest.TestCase):
         self.driver.get('http://localhost:5000/account')
         
         # Delete users
-        util.clear_user(self.form_data['username'])
+        util.clear_user(config.registration_data['username'])
+        #util.clear_user(self.form_data['username'])
 
     def tearDown(self):
         
         # Delete users
-        util.clear_user(self.form_data['username'])
+        util.clear_user(config.registration_data['username'])
+        #util.clear_user(self.form_data['username'])
 
     def _check_alerts(self, alert_text):
         """Check page for alert boxes. Asserts that there is exactly
@@ -62,9 +67,10 @@ class testUserCreation(unittest.TestCase):
 
         """
         
-        # Find alerts
-        alerts = self.driver.find_elements_by_xpath('//div[contains(@class, "alert")]')
-        alerts = [alert for alert in alerts if alert_text.lower() in alert.text.lower()]
+        alerts = util.get_alert_boxes(self.driver, alert_text)
+        ## Find alerts
+        #alerts = self.driver.find_elements_by_xpath('//div[contains(@class, "alert")]')
+        #alerts = [alert for alert in alerts if alert_text.lower() in alert.text.lower()]
         
         # Must be exactly one matching alert
         self.assertEquals(len(alerts), 1)
@@ -88,7 +94,8 @@ class testUserCreation(unittest.TestCase):
     def testNoPassword(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['password'] = ''
     
         # Submit form
@@ -97,7 +104,8 @@ class testUserCreation(unittest.TestCase):
     def testNoEmail(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['username'] = ''
     
         # Submit form
@@ -106,7 +114,8 @@ class testUserCreation(unittest.TestCase):
     def testPasswordMismatch(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['password2'] = form_data['password2'] + 'junk'
 
         # Submit form
@@ -115,7 +124,8 @@ class testUserCreation(unittest.TestCase):
     def testEmailMismatch(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['username2'] = form_data['username2'] + 'junk'
 
         # Submit form
@@ -124,7 +134,8 @@ class testUserCreation(unittest.TestCase):
     def testShortPassword(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['password'] = 'short'
 
         # Submit form
@@ -133,7 +144,8 @@ class testUserCreation(unittest.TestCase):
     def testInvalidEmail(self):
         
         # Alter form data
-        form_data = self.form_data.copy()
+        form_data = config.registration_data.copy()
+        #form_data = self.form_data.copy()
         form_data['username'] = 'invalidemail'
 
         # Submit form
@@ -141,10 +153,7 @@ class testUserCreation(unittest.TestCase):
     
     def testWrongPassword(self):
         
-        util.login(self.driver, {
-            'username' : 'bad@email.addr', 
-            'password' : 'wrongpass'
-        })
+        util.login(self.driver, 'bad@email.addr', 'wrongpass')
         
         # 
         self._check_alerts('log-in failed')
@@ -152,13 +161,15 @@ class testUserCreation(unittest.TestCase):
     def testValidAccount(self):
         
         # Submit original form data
-        self._submit_and_check(self.form_data, 'you may now login')
+        self._submit_and_check(config.registration_data, 'you may now login')
+        #self._submit_and_check(self.form_data, 'you may now login')
         
         # Make sure we can log in
-        util.login(self.driver, {
-            'username' : self.form_data['username'], 
-            'password' : self.form_data['password']
-        })
+        util.login(
+            self.driver,
+            config.registration_data['username'],
+            config.registration_data['password']
+        )
         self.assertTrue('dashboard' in self.driver.current_url)
 
 # Run tests
