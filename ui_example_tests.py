@@ -27,7 +27,8 @@ from selenium.common.exceptions import NoSuchElementException
 import util
 import config
 
-class sampleOSFUITests(unittest.TestCase):
+
+class SampleOSFUITests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
