@@ -12,3 +12,8 @@ OSF-UI-Tests
 * Try to create a user without a password
 * --or--
 * Try to create a user with a short password
+
+### Guidelines for adding tests
+* Factor common functions into util.py
+* Put database info (user names, project titles) in config.py
+* Make sure that all database entries created during tests are cleared during teardown
