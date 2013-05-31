@@ -2,6 +2,8 @@
 Miscellaneous utility functions for smokescreen tests
 """
 
+import time
+
 # Project imports
 import config
 
@@ -116,7 +118,7 @@ def goto_profile(driver):
     # grab the profile button and load the page
     driver.find_element_by_link_text('My Public Profile').click()
 
-def goto_project(driver, project_title):
+def goto_project(driver, project_title=config.project_title):
     """goes to a logged in user's specific project
 
     Args:
@@ -129,6 +131,7 @@ def goto_project(driver, project_title):
 
     # grab the project button and load the page
     driver.find_element_by_link_text(project_title).click()
+    return driver.current_url
 
 def goto_settings(driver, project_name):
     
@@ -203,6 +206,24 @@ def create_project(driver, project_title=config.project_title, project_descripti
     # Return project URL
     return driver.current_url
 
+def make_project_public(driver, url):
+
+    driver.get(url)
+    link = driver.find_element_by_link_text("Make public")
+    link.click()
+    time.sleep(3) #wait until modal box finishes moving
+    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
+
+def make_project_private(driver, url):
+
+    driver.get(driver.current_url)
+    link = driver.find_element_by_link_text("Make private")
+    link.click()
+    time.sleep(3) #wait until modal box finishes moving
+    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
+
 def clear_user(username=config.registration_data['username']):
     """Clear user from database
 
@@ -221,3 +242,4 @@ def clear_project(title=config.project_title):
 
     """
     client[config.db_name]['node'].remove({'title': title})
+
