@@ -11,7 +11,8 @@ from pymongo import MongoClient
 import util
 import config
 
-class projectCreationTest(unittest.TestCase):
+
+class ProjectCreationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
