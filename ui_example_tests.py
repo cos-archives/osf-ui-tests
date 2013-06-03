@@ -38,8 +38,12 @@ class UITests(unittest.TestCase):
         cls.driver.implicitly_wait(5)
 
         # Create user account and login
-        util.create_user(cls.driver)
-        util.login(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
         # Create test project and store URL
         cls.project_url = util.create_project(cls.driver)
@@ -51,13 +55,14 @@ class UITests(unittest.TestCase):
     def tearDownClass(cls):
         
         # Need to login again to delete project
-        util.login(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
         # Delete test project
         util.delete_project(cls.driver)
-
-        # Delete test user
-        util.clear_user()
 
         # Close WebDriver
         cls.driver.close()

@@ -29,17 +29,18 @@ class ProjectWikiTests(unittest.TestCase):
         cls.driver = util.launch_driver()
         
         # Create test account
-        util.create_user(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
 
         # Login to test account
-        util.login(cls.driver)
+        util.login(
+            cls.driver, 
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
     @classmethod
     def tearDownClass(cls):
         
-        # Delete test user
-        util.clear_user()
-
         # Close Selenium
         cls.driver.close()
     

@@ -22,7 +22,10 @@ class UserCreationTest(unittest.TestCase):
         
         # Launch Selenium
         cls.driver = util.launch_driver()
-    
+        
+        # Generate user data
+        cls.user_data = util.gen_user_data()
+
     @classmethod
     def tearDownClass(cls):
         
@@ -32,16 +35,8 @@ class UserCreationTest(unittest.TestCase):
     def setUp(self):
         
         # Browse to account creation page
-        self.driver.get('http://localhost:5000/account')
+        self.driver.get('%s/account' % (config.osf_home))
         
-        # Delete users
-        util.clear_user()
-
-    def tearDown(self):
-        
-        # Delete users
-        util.clear_user(config.registration_data['username'])
-
     def _submit_and_check(self, form_data, alert_text):
         """Submit form data and check for appropriate alert box. Asserts
         that there is exactly one matching alert box.
@@ -64,7 +59,7 @@ class UserCreationTest(unittest.TestCase):
     def test_no_password(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['password'] = ''
     
         # Submit form
@@ -73,7 +68,7 @@ class UserCreationTest(unittest.TestCase):
     def test_no_email(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['username'] = ''
     
         # Submit form
@@ -82,7 +77,7 @@ class UserCreationTest(unittest.TestCase):
     def test_password_mismatch(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['password2'] = form_data['password2'] + 'junk'
 
         # Submit form
@@ -91,7 +86,7 @@ class UserCreationTest(unittest.TestCase):
     def test_email_mismatch(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['username2'] = form_data['username2'] + 'junk'
 
         # Submit form
@@ -100,16 +95,27 @@ class UserCreationTest(unittest.TestCase):
     def test_short_password(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['password'] = 'short'
 
         # Submit form
         self._submit_and_check(form_data, 'password is too short')
     
+    def test_long_password(self):
+        
+        # Alter form data
+        form_data = util.gen_user_data()
+        password = 'toolong' * 50
+        form_data['password'] = password
+        form_data['password2'] = password
+        
+        # Submit form
+        self._submit_and_check(form_data, 'password is too long')
+
     def test_invalid_email(self):
         
         # Alter form data
-        form_data = config.registration_data.copy()
+        form_data = util.gen_user_data()
         form_data['username'] = 'invalidemail'
 
         # Submit form
@@ -118,14 +124,13 @@ class UserCreationTest(unittest.TestCase):
     def test_valid_account(self):
         
         # Submit original form data
-        self._submit_and_check(config.registration_data, 'you may now login')
-        #self._submit_and_check(self.form_data, 'you may now login')
+        self._submit_and_check(self.user_data, 'you may now login')
         
         # Make sure we can log in
         util.login(
             self.driver,
-            config.registration_data['username'],
-            config.registration_data['password']
+            self.user_data['username'],
+            self.user_data['password']
         )
         self.assertTrue('dashboard' in self.driver.current_url)
 

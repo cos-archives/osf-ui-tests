@@ -19,14 +19,15 @@ class ProjectCreationTest(unittest.TestCase):
         cls.driver = util.launch_driver()
         
         # Create user account and login
-        util.create_user(cls.driver)
-        util.login(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
     @classmethod
     def tearDownClass(cls):
-        
-        # 
-        util.clear_user()
         
         # 
         cls.driver.close()

@@ -12,29 +12,27 @@ from selenium.webdriver.common.keys import Keys
 import util
 import config
 
-class create_new_node(unittest.TestCase):
+class CreateNewNodeTest(unittest.TestCase):
 
     def setUp(self):
         
         # Start WebDriver
-        self.driver = webdriver.Firefox()
-
-        # Wait for elements to appear
-        self.driver.implicitly_wait(30)
+        self.driver = util.launch_driver()
 
         # Create test user
-        util.create_user(self.driver)
+        self.user_data = util.create_user(self.driver)
         
         # Login to test account
-        util.login(self.driver)
+        util.login(
+            self.driver,
+            self.user_data['username'],
+            self.user_data['password']
+        )
 
         # Create project and store URL
         self.url = util.create_project(self.driver)
 
     def tearDown(self):
-
-        # Delete test project
-        util.delete_project(self.driver)
 
         # Close WebDriver
         self.driver.close()

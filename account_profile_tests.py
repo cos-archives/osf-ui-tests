@@ -24,17 +24,18 @@ class AccountProfileTest(unittest.TestCase):
         cls.driver = util.launch_driver()
         
         # Create test user
-        util.create_user(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
         
         # Login to test account
-        util.login(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
     
     @classmethod
     def tearDownClass(cls):
         
-        # Delete test user
-        util.clear_user()
-           
         # Close WebDriver
         cls.driver.close()
 
@@ -50,7 +51,7 @@ class AccountProfileTest(unittest.TestCase):
         """
         profile_name = self.driver.find_element_by_id('profile-fullname').text
         self.assertTrue(
-            config.registration_data['fullname'] in profile_name
+            self.user_data['fullname'] in profile_name
         )
 
     def test_change_name(self):
@@ -70,17 +71,17 @@ class AccountProfileTest(unittest.TestCase):
         edit_profile_name_field.clear()
 
         # enter the reverse name
-        edit_profile_name_field.send_keys(config.registration_data['fullname'][::-1])
+        edit_profile_name_field.send_keys(self.user_data['fullname'][::-1])
 
         # find and click submit new name
         self.driver.find_element_by_xpath(
             '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
         ).click()
-
+        
         # refresh page and assert change was made
         self.driver.refresh()
-        profile_name = self.driver.find_element_by_id('profile-dfullname').text
-        self.assertTrue(config.registration_data['fullname'][::-1] in profile_name)
+        profile_name = self.driver.find_element_by_id('profile-fullname').text
+        self.assertTrue(self.user_data['fullname'][::-1] in profile_name)
 
         # return the username back to its original -- same as above
         self.driver.find_element_by_id(
@@ -90,7 +91,7 @@ class AccountProfileTest(unittest.TestCase):
             '//div[@class="popover-content"]//input[@class="span2"]'
         )
         edit_profile_name_field.clear()
-        edit_profile_name_field.send_keys(config.registration_data['fullname'])
+        edit_profile_name_field.send_keys(self.user_data['fullname'])
         self.driver.find_element_by_xpath(
             '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
         ).click()
@@ -98,7 +99,7 @@ class AccountProfileTest(unittest.TestCase):
         # refresh page and assert username is back to the original
         self.driver.refresh()
         profile_name = self.driver.find_element_by_id('profile-fullname').text
-        self.assertTrue(config.registration_data['fullname'] in profile_name)
+        self.assertTrue(self.user_data['fullname'] in profile_name)
 
     @unittest.skip("not an implemented feature in OSF codebase")
     def test_change_location(self):
@@ -121,7 +122,7 @@ class AccountProfileTest(unittest.TestCase):
         profile_name = self.driver.find_element_by_id(
             'profile-fullname'
         ).text
-        self.assertTrue(config.registration_data['fullname'] in profile_name)
+        self.assertTrue(self.user_data['fullname'] in profile_name)
 
     @unittest.skip("not implemented")
     def test_check_public_project_updates(self):
