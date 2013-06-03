@@ -11,10 +11,6 @@ from selenium.webdriver.common.keys import Keys
 # Project imports
 import config
 
-# Set up MongoDB
-from pymongo import MongoClient
-client = MongoClient(config.mongo_uri)
-
 def launch_driver(driver_name='Firefox', wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
