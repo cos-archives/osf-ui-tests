@@ -2,6 +2,8 @@
 Miscellaneous utility functions for smokescreen tests
 """
 
+import uuid
+
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -83,10 +85,7 @@ def fill_form(form, fields):
     # Click submit button
     form.find_element_by_xpath('.//button[@type="submit"]').click()
 
-def login(
-        driver, 
-        username=config.registration_data['username'], 
-        password=config.registration_data['password']):
+def login(driver, username, password):
     """Login to OSF
 
     Args:
@@ -108,13 +107,28 @@ def login(
         'password' : password,
     })
 
-def create_user(driver, registration_data=config.registration_data):
+def gen_user_data(_length=12):
+    """ Generate data to create a user account. """
+    
+    fullname = str(uuid.uuid1())[:_length]
+    username = str(uuid.uuid1())[:_length] + '@osftest.org'
+    password = str(uuid.uuid1())[:_length]
+
+    username2 = username
+    password2 = password
+    
+    _locs = locals()
+    return {k:_locs[k] for k in _locs if not k.startswith('_')}
+
+def create_user(driver, user_data=None):
     """Create a new user account.
 
     Args:
         driver : selenium.webdriver instance
-        registration_data : dict of id -> value pairs for registration form
-                            default: config.registration_data
+        user_data : dict of id -> value pairs for registration form
+                    default: config.registration_data
+    Returns:
+        dict of user information
 
     Examples:
         > create_user(driver, {
@@ -127,6 +141,10 @@ def create_user(driver, registration_data=config.registration_data):
 
     """
     
+    # Generate random user data if not provided
+    if user_data is None:
+        user_data = gen_user_data()
+
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
     
@@ -134,7 +152,10 @@ def create_user(driver, registration_data=config.registration_data):
     registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
     
     # Fill out form
-    fill_form(registration_form, registration_data)
+    fill_form(registration_form, user_data)
+    
+    # Return user data
+    return user_data
 
 def goto_dashboard(driver):
     """Browse to dashboard page.
@@ -247,25 +268,6 @@ def create_project(driver, project_title=config.project_title, project_descripti
 
     # Return project URL
     return driver.current_url
-
-def clear_user(username=config.registration_data['username']):
-    """Clear user from database. Note: Removing users
-    from the database directly is not ideal. Once users
-    can be removed through the web interface, this 
-    method should be rewritten.
-
-    Args:
-        username : Username
-
-    """
-    
-    # Get collection
-    collection = client[config.db_name]['user']
-
-    # Remove user
-    collection.remove({
-        'username' : username,
-    })
 
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
