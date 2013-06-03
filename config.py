@@ -22,6 +22,15 @@ registration_data = {
     'password2' : 'testtest',
 }
 
+
+second_user_registration_data = {
+    'fullname' : 'test second',
+    'username' : 'test@second.test',
+    'username2' : 'test@second.test',
+    'password' : 'testsecond',
+    'password2' : 'testsecond',
+}
+
 # Test project data
 project_title = 'test project'
 project_description = 'test project description'
