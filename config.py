@@ -2,6 +2,8 @@
 Configuration for smokescreen testing
 """
 
+selenium_wait_time = 5
+
 # 
 osf_home = 'localhost:5000'
 

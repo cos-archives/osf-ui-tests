@@ -34,6 +34,14 @@ class CreateForkTests(unittest.TestCase):
         # Make the project public
         util.make_project_public(self.driver, self.url)
 
+        #add to the wiki
+        self.driver.find_element_by_link_text('Wiki').click()
+        util._edit_wiki(self.driver)
+        util._add_wiki_text(
+            self.driver, "This is wiki test")
+        util._submit_wiki_text(self.driver)
+        self.wiki_text = util._get_wiki_text(self.driver)
+
         #logout
         util.logout(self.driver)
 
@@ -51,9 +59,13 @@ class CreateForkTests(unittest.TestCase):
         link = self.driver.find_element_by_xpath(
             '//a[@class="btn"][@data-original-title="Number of times this node has been forked (copied)"]')
         link.click()
+        time.sleep(5)
         title = self.driver.find_element_by_css_selector("h1#node-title-editable").text
         self.assertEqual(title,
             "Fork of test project")
+        wiki_text = util._get_wiki_text(self.driver)
+        self.assertEqual(self.wiki_text, wiki_text)
+
 
     def tearDown(self):
 
