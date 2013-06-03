@@ -17,20 +17,21 @@ class ProjectCreationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         
-        cls.driver = webdriver.Firefox()
-        
-        # 
-        cls.driver.implicitly_wait(30)
+        cls.driver = util.launch_driver()
         
         # Create user account and login
-        util.create_user(cls.driver)
-        util.login(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
     @classmethod
     def tearDownClass(cls):
         
         # 
-        util.clear_user()
+        cls.driver.close()
     
     def test_create_project(self):
         """
@@ -56,7 +57,6 @@ class ProjectCreationTests(unittest.TestCase):
             config.project_description
         )
         self.assertEqual(redirect_title, config.project_title)
-        self.project_url = self.driver.current_url
 
         # Delete project
         util.delete_project(self.driver)
@@ -76,5 +76,6 @@ class ProjectCreationTests(unittest.TestCase):
         # Must be exactly one matching alert
         self.assertEqual(len(alerts), 1)
 
+# Run tests
 if __name__ == '__main__':
     unittest.main()

@@ -2,12 +2,47 @@
 Miscellaneous utility functions for smokescreen tests
 """
 
+import uuid
+
+# Selenium imports
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 # Project imports
 import config
 
-# Set up MongoDB
-from pymongo import MongoClient
-client = MongoClient(config.mongo_uri)
+def launch_driver(driver_name='Firefox', wait_time=config.selenium_wait_time):
+    """Create and configure a WebDriver.
+    
+    Args:
+        driver_name : Name of WebDriver to use
+        wait_time : Time to implicitly wait for element load
+
+    """
+        
+    # Start WebDriver
+    # If driver_name is a method of webdriver, use that; 
+    # else use webdriver.Firefox()
+    if hasattr(webdriver, driver_name):
+        driver = getattr(webdriver, driver_name)()
+    else:
+        driver = webdriver.Firefox()
+
+    # Wait for elements to load
+    driver.implicitly_wait(wait_time)
+    
+    # Return driver
+    return driver
+
+def clear_text(elm):
+    """Clear text via backspace. Usually we can skip
+    this and clear via elm.clear() directly, but this
+    doesn't work in all cases (e.g. Wiki editing).
+
+    """
+    
+    for _ in range(len(elm.text)):
+        elm.send_keys(Keys.BACK_SPACE)
 
 def get_alert_boxes(driver, alert_text):
     """Check page for alert boxes. Asserts that there is exactly
@@ -46,7 +81,7 @@ def fill_form(form, fields):
     # Click submit button
     form.find_element_by_xpath('.//button[@type="submit"]').click()
 
-def login(driver, username=config.registration_data['username'], password=config.registration_data['password']):
+def login(driver, username, password):
     """Login to OSF
 
     Args:
@@ -68,13 +103,28 @@ def login(driver, username=config.registration_data['username'], password=config
         'password' : password,
     })
 
-def create_user(driver, registration_data=config.registration_data):
+def gen_user_data(_length=12):
+    """ Generate data to create a user account. """
+    
+    fullname = str(uuid.uuid1())[:_length]
+    username = str(uuid.uuid1())[:_length] + '@osftest.org'
+    password = str(uuid.uuid1())[:_length]
+
+    username2 = username
+    password2 = password
+    
+    _locs = locals()
+    return {k:_locs[k] for k in _locs if not k.startswith('_')}
+
+def create_user(driver, user_data=None):
     """Create a new user account.
 
     Args:
         driver : selenium.webdriver instance
-        registration_data : dict of id -> value pairs for registration form
-                            default: config.registration_data
+        user_data : dict of id -> value pairs for registration form
+                    default: config.registration_data
+    Returns:
+        dict of user information
 
     Examples:
         > create_user(driver, {
@@ -87,6 +137,10 @@ def create_user(driver, registration_data=config.registration_data):
 
     """
     
+    # Generate random user data if not provided
+    if user_data is None:
+        user_data = gen_user_data()
+
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
     
@@ -94,44 +148,60 @@ def create_user(driver, registration_data=config.registration_data):
     registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
     
     # Fill out form
-    fill_form(registration_form, registration_data)
+    fill_form(registration_form, user_data)
+    
+    # Return user data
+    return user_data
 
 def goto_dashboard(driver):
+    """Browse to dashboard page.
     
-    # 
+    Args:
+        driver : WebDriver instance
+
+    """
     driver.get('%s/dashboard' % (config.osf_home))
 
 def goto_profile(driver):
-    """
-    goes to a logged in user's public profile
-
+    """Browse to public profile page. 
+    
     Args:
-        driver : selenium.webdriver instance
-        username : OSF username
-        password : OSF password
+        driver : WebDriver instance
+    
     """
-    # go to OSF home page
+    # Browse to dashboard
     goto_dashboard(driver)
 
-    # grab the profile button and load the page
+    # Click Public Profile link
     driver.find_element_by_link_text('My Public Profile').click()
 
-def goto_project(driver, project_title):
-    """goes to a logged in user's specific project
+def goto_project(driver, project_title=config.project_title):
+    """Browse to project page.
 
     Args:
-        driver : selenium.webdriver instance
-        project_title : name of project to be loaded (case sensitive)
+        driver : WebDriver instance
+        project_title : Title of project to be loaded
+    Returns:
+        URL of project page
 
     """
-    # go to user's profile
+    # Browse to dashboard
     goto_dashboard(driver)
 
-    # grab the project button and load the page
+    # Click on project title
     driver.find_element_by_link_text(project_title).click()
+    
+    # Return URL of project page
+    return driver.current_url
 
 def goto_settings(driver, project_name):
-    
+    """Browse to project settings page.
+
+    Args:
+        driver : WebDriver instance
+        project_name : Project name
+
+    """
     # Browse to project page
     goto_project(driver, project_name)
 
@@ -147,7 +217,6 @@ def delete_project(driver, project_title=config.project_title):
         project_title : project title
 
     """
-    
     # Browse to project settings
     goto_settings(driver, project_title)
 
@@ -155,13 +224,12 @@ def delete_project(driver, project_title=config.project_title):
     driver.find_element_by_xpath('//button[@type="submit"]').click()
 
 def logout(driver):
-    """logs current user out of OSF
+    """ Log out of OSF.
 
     Args:
         driver : selenium.webdriver instance
 
     """
-
     # browse to OSF page
     driver.get(config.osf_home)
 
@@ -179,45 +247,50 @@ def create_project(driver, project_title=config.project_title, project_descripti
         URL of created project
 
     """
+    # Browse to dashboard
+    goto_dashboard(driver)
 
-    # Browse to dashboard page
-    driver.get('%s/dashboard' % (config.osf_home))
-
-    #find the new project link and click it
+    # Click New Project button
     driver.find_element_by_link_text("New Project").click()
 
-    # enter the title and description of your project
-    # in the relevant fields and submit
-    title_field = driver.find_element_by_xpath(
-        '//form[@name="newProject"]//input[@id="title"]'
+    # Fill out form and submit
+    project_form = driver.find_element_by_xpath('//form[@name="newProject"]')
+    fill_form(
+        project_form, {
+            'title' : project_title,
+            'description' : project_description,
+        }
     )
-    description_field = driver.find_element_by_xpath(
-        '//form[@name="newProject"]//textarea[@id="description"]'
-    )
-    title_field.send_keys(project_title)
-    description_field.send_keys(project_description)
-    submit_button = driver.find_element_by_xpath(
-        '//button[@class="btn primary"][@type="submit"]')
-    submit_button.click()
 
     # Return project URL
     return driver.current_url
 
-def clear_user(username=config.registration_data['username']):
-    """Clear user from database
+def select_partial(driver, id, start, stop):
+    """Select a partial range of text from an element.
 
     Args:
-        username : Username
+        driver : WebDriver instance
+        id : ID of target element
+        start : Start position
+        stop : Stop position
 
     """
-    
-    client[config.db_name]['user'].remove({'username' : username})
-
-def clear_project(title=config.project_title):
-    """Clear project from database
-
-    Args:
-        title : Project title
-
-    """
-    client[config.db_name]['node'].remove({'title': title})
+    # Inject partial selection function
+    # Adapted from http://stackoverflow.com/questions/646611/programmatically-selecting-partial-text-in-an-input-field
+    driver.execute_script('''
+        (function(field, start, end) {
+            if( field.createTextRange ) {
+                var selRange = field.createTextRange();
+                selRange.collapse(true);
+                selRange.moveStart('character', start);
+                selRange.moveEnd('character', end-start);
+                selRange.select();
+            } else if( field.setSelectionRange ) {
+                field.setSelectionRange(start, end);
+            } else if( field.selectionStart ) {
+                field.selectionStart = start;
+                field.selectionEnd = end;
+            }
+            field.focus();
+        })(document.getElementById("%s"), %d, %d);
+    ''' % (id, start, stop))
