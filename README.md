@@ -17,6 +17,12 @@ OSF-UI-Tests
 * Testing file submission with Selenium. Currently using blueimp. See page for issue: https://github.com/blueimp/jQuery-File-Upload/issues/1228 
 Possible workrounds include: use requests to submit post request or via javascipt.
 
+### Next steps:
+* Finish file upload/deletion testing.
+* Create registration tests
+* Create add/delete contributer tests
+* Move testing to Sauce Labs
+
 ### Notes: If issues arise during tests, look at the following suites first.
 * user_creations_tests
 * project_creation_tests
