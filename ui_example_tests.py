@@ -20,14 +20,14 @@ import unittest
 
 # Selenium imports
 from selenium import webdriver
-from pymongo import MongoClient
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import util
 import config
 
-class sampleOSFUITests(unittest.TestCase):
+
+class SampleOSFUITests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -36,11 +36,15 @@ class sampleOSFUITests(unittest.TestCase):
         cls.driver = webdriver.Firefox()
         
         # 
-        cls.driver.implicitly_wait(30)
+        cls.driver.implicitly_wait(5)
 
         # Create user account and login
-        util.create_user(cls.driver)
-        util.login(cls.driver)
+        cls.user_data = util.create_user(cls.driver)
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
 
         # Create test project and store URL
         cls.project_url = util.create_project(cls.driver)
@@ -51,6 +55,16 @@ class sampleOSFUITests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         
+        # Need to login again to delete project
+        util.login(
+            cls.driver,
+            cls.user_data['username'],
+            cls.user_data['password']
+        )
+
+        # Delete test project
+        util.delete_project(cls.driver)
+
         # Close WebDriver
         cls.driver.close()
 
