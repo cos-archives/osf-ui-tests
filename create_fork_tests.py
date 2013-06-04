@@ -14,16 +14,17 @@ class CreateForkTests(unittest.TestCase):
     def setUp(self):
 
         # Start WebDriver
-        self.driver = webdriver.Firefox()
-
-        # Wait for elements to appear
-        self.driver.implicitly_wait(30)
+        self.driver = util.launch_driver()
 
         # Create test user
-        util.create_user(self.driver)
+        self.user_data = util.create_user(self.driver)
 
         # Login to test account
-        util.login(self.driver)
+        util.login(
+            self.driver,
+            self.user_data['username'],
+            self.user_data['password']
+        )
 
         # create a project
         util.create_project(self.driver)
@@ -36,47 +37,55 @@ class CreateForkTests(unittest.TestCase):
 
         #add to the wiki
         self.driver.find_element_by_link_text('Wiki').click()
-        util._edit_wiki(self.driver)
-        util._add_wiki_text(
+        util.edit_wiki(self.driver)
+        util.add_wiki_text(
             self.driver, "This is wiki test")
-        util._submit_wiki_text(self.driver)
-        self.wiki_text = util._get_wiki_text(self.driver)
+        util.submit_wiki_text(self.driver)
+        self.wiki_text = util.get_wiki_text(self.driver)
 
         #logout
         util.logout(self.driver)
 
-        util.create_user(self.driver,config.second_user_registration_data)
+        self.second_user_data = util.create_user(self.driver)
 
+        # Login to test account
         util.login(
-            self.driver, username=config.second_user_registration_data['username'],
-            password=config.second_user_registration_data['password'])
+            self.driver,
+            self.second_user_data['username'],
+            self.second_user_data['password']
+        )
 
 
     def test_create_fork(self):
 
         #go to the project that is now public
         self.driver.get(self.url)
+        time.sleep(2)
         link = self.driver.find_element_by_xpath(
             '//a[@class="btn"][@data-original-title="Number of times this node has been forked (copied)"]')
         link.click()
-        time.sleep(5)
+        time.sleep(2)
         title = self.driver.find_element_by_css_selector("h1#node-title-editable").text
         self.assertEqual(title,
             "Fork of test project")
-        wiki_text = util._get_wiki_text(self.driver)
+        wiki_text = util.get_wiki_text(self.driver)
         self.assertEqual(self.wiki_text, wiki_text)
 
 
     def tearDown(self):
 
         # Delete test project
-        util.login(self.driver)
+        util.login(self.driver,
+            self.user_data['username'],
+            self.user_data['password'],
+        )
         util.delete_project(self.driver)
         util.logout(self.driver)
 
-        util.login(
-            self.driver, username=config.second_user_registration_data['username'],
-            password=config.second_user_registration_data['password'])
+        util.login(self.driver,
+            self.second_user_data['username'],
+            self.second_user_data['password'],
+        )
         util.delete_project(self.driver, "Fork of test project")
         util.logout(self.driver)
 

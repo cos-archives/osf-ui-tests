@@ -1,24 +1,13 @@
 """
 Miscellaneous utility functions for smokescreen tests
 """
-
-<<<<<<< HEAD
-import time
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-# Project imports
-import config
-
-# Set up MongoDB
-from pymongo import MongoClient
-
-client = MongoClient(config.mongo_uri)
-=======
 import uuid
+import time
 
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
@@ -55,7 +44,6 @@ def clear_text(elm):
     
     for _ in range(len(elm.text)):
         elm.send_keys(Keys.BACK_SPACE)
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
 
 def get_alert_boxes(driver, alert_text):
     """Check page for alert boxes. Asserts that there is exactly
@@ -149,13 +137,8 @@ def create_user(driver, user_data=None):
         }
 
     """
-<<<<<<< HEAD
-=======
-    
-    # Generate random user data if not provided
     if user_data is None:
         user_data = gen_user_data()
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
 
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
@@ -170,16 +153,11 @@ def create_user(driver, user_data=None):
     return user_data
 
 def goto_dashboard(driver):
-<<<<<<< HEAD
 
-    #
-    driver.get('%s/dashboard' % (config.osf_home))
-=======
     """Browse to dashboard page.
     
     Args:
         driver : WebDriver instance
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
 
     """
     driver.get('%s/dashboard' % (config.osf_home))
@@ -198,11 +176,8 @@ def goto_profile(driver):
     driver.find_element_by_link_text('My Public Profile').click()
 
 def goto_project(driver, project_title=config.project_title):
-<<<<<<< HEAD
-    """goes to a logged in user's specific project
-=======
+
     """Browse to project page.
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
 
     Args:
         driver : WebDriver instance
@@ -216,14 +191,6 @@ def goto_project(driver, project_title=config.project_title):
 
     # Click on project title
     driver.find_element_by_link_text(project_title).click()
-<<<<<<< HEAD
-    return driver.current_url
-
-def goto_settings(driver, project_name):
-
-=======
-    
-    # Return URL of project page
     return driver.current_url
 
 def goto_settings(driver, project_name):
@@ -234,7 +201,6 @@ def goto_settings(driver, project_name):
         project_name : Project name
 
     """
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
     # Browse to project page
     goto_project(driver, project_name)
 
@@ -250,10 +216,6 @@ def delete_project(driver, project_title=config.project_title):
         project_title : project title
 
     """
-<<<<<<< HEAD
-
-=======
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
     # Browse to project settings
     goto_settings(driver, project_title)
 
@@ -302,7 +264,6 @@ def create_project(driver, project_title=config.project_title, project_descripti
     # Return project URL
     return driver.current_url
 
-<<<<<<< HEAD
 def make_project_public(driver, url):
 
     driver.get(url)
@@ -321,46 +282,28 @@ def make_project_private(driver, url):
     driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
     return driver.current_url
 
-def clear_user(username=config.registration_data['username']):
-    """Clear user from database
 
-    Args:
-        username : Username
-
-    """
-
-    client[config.db_name]['user'].remove({'username' : username})
-
-def clear_project(title=config.project_title):
-    """Clear project from database
-
-    Args:
-        title : Project title
-
-    """
-    client[config.db_name]['node'].remove({'title': title})
-
-def _edit_wiki(driver):
+def edit_wiki(driver):
 
     edit_button = driver.find_element_by_link_text('Edit')
     edit_button.click()
 
-def _get_wiki_input(driver):
+def get_wiki_input(driver):
 
     return driver.find_element_by_id('wmd-input')
 
-def _add_wiki_text(driver, text):
+def add_wiki_text(driver, text):
 
-    _get_wiki_input(driver).send_keys(text)
+    get_wiki_input(driver).send_keys(text)
 
-def _submit_wiki_text(driver):
+def submit_wiki_text(driver):
     """ Click submit button. """
 
     driver.find_element_by_xpath(
         '//div[@class="wmd-panel"]//input[@type="submit"]'
     ).click()
 
-def _get_wiki_par(driver):
+def get_wiki_par(driver):
     """ Get <p> containing wiki text. """
 
     # Set implicitly_wait to short value: text may not
@@ -383,11 +326,11 @@ def _get_wiki_par(driver):
     # Return element
     return wiki_par
 
-def _get_wiki_text(driver):
+def get_wiki_text(driver):
     """ Get text from wiki <p>. """
 
     # Get <p> containing wiki text
-    wiki_par = _get_wiki_par(driver)
+    wiki_par = get_wiki_par(driver)
 
     # Extract text
     if wiki_par is not None:
@@ -404,7 +347,6 @@ def select_partial(driver, id, start, stop):
     stop : Stop position
 
     """
-=======
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
 
@@ -415,12 +357,10 @@ def select_partial(driver, id, start, stop):
         stop : Stop position
 
     """
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
     # Inject partial selection function
     # Adapted from http://stackoverflow.com/questions/646611/programmatically-selecting-partial-text-in-an-input-field
     driver.execute_script('''
         (function(field, start, end) {
-<<<<<<< HEAD
         if( field.createTextRange ) {
         var selRange = field.createTextRange();
         selRange.collapse(true);
@@ -436,20 +376,3 @@ def select_partial(driver, id, start, stop):
         field.focus();
         })(document.getElementById("%s"), %d, %d);
         ''' % (id, start, stop))
-=======
-            if( field.createTextRange ) {
-                var selRange = field.createTextRange();
-                selRange.collapse(true);
-                selRange.moveStart('character', start);
-                selRange.moveEnd('character', end-start);
-                selRange.select();
-            } else if( field.setSelectionRange ) {
-                field.setSelectionRange(start, end);
-            } else if( field.selectionStart ) {
-                field.selectionStart = start;
-                field.selectionEnd = end;
-            }
-            field.focus();
-        })(document.getElementById("%s"), %d, %d);
-    ''' % (id, start, stop))
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
