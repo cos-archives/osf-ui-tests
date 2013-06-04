@@ -11,7 +11,6 @@ from pymongo import MongoClient
 import util
 import config
 
-
 class ProjectCreationTests(unittest.TestCase):
 
     @classmethod
@@ -60,6 +59,30 @@ class ProjectCreationTests(unittest.TestCase):
 
         # Delete project
         util.delete_project(self.driver)
+
+    def test_create_project_no_title(self):
+        self.project_title = ''
+        self.project_description = "This is a great project"
+        util.create_project(
+            self.driver, self.project_title, self.project_description)
+        alert_msg = self.driver.find_element_by_xpath(
+            '//div[@class="alert alert-block alert-warning fade in"]//p').text
+        self.assertEqual(alert_msg, "Title is required")
+        #assert that a title is needed
+
+    def test_create_project_no_description(self):
+            self.project_title = "My Great Project"
+            self.project_description = ''
+            util.create_project(
+                self.driver, self.project_title, self.project_description)
+            #assert that the title and description above the same
+            #as the webpage
+            redirect_title = self.driver.find_element_by_xpath(
+                '//h1[@id="node-title-editable"]').text
+            #theres a lot of text in this p element, so have to find
+            #where the description starts
+            self.assertEqual(redirect_title, self.project_title)
+            util.delete_project("My Great Project")
     
     def test_delete_project(self):
         """ Test creating and then deleting a project. """
