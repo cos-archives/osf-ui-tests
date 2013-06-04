@@ -1,12 +1,13 @@
 """
 Miscellaneous utility functions for smokescreen tests
 """
-
 import uuid
+import time
 
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
@@ -55,16 +56,16 @@ def get_alert_boxes(driver, alert_text):
         matching alert boxes
 
     """
-    
+
     # Find alerts
     alerts = driver.find_elements_by_xpath(
         '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' % \
             (alert_text.upper(), alert_text.lower(), alert_text.lower())
     )
-    
+
     # Return matching alert boxes
     return alerts
-    
+
 def fill_form(form, fields):
     """Fill out form fields and click submit button.
 
@@ -73,11 +74,11 @@ def fill_form(form, fields):
         fields : dict of id -> value pairs for form
 
     """
-    
+
     # Enter field values
     for field in fields:
         form.find_element_by_id(field).send_keys(fields[field])
-    
+
     # Click submit button
     form.find_element_by_xpath('.//button[@type="submit"]').click()
 
@@ -136,17 +137,15 @@ def create_user(driver, user_data=None):
         }
 
     """
-    
-    # Generate random user data if not provided
     if user_data is None:
         user_data = gen_user_data()
 
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
-    
+
     # Find form
     registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
-    
+
     # Fill out form
     fill_form(registration_form, user_data)
     
@@ -154,6 +153,7 @@ def create_user(driver, user_data=None):
     return user_data
 
 def goto_dashboard(driver):
+
     """Browse to dashboard page.
     
     Args:
@@ -176,6 +176,7 @@ def goto_profile(driver):
     driver.find_element_by_link_text('My Public Profile').click()
 
 def goto_project(driver, project_title=config.project_title):
+
     """Browse to project page.
 
     Args:
@@ -190,8 +191,6 @@ def goto_project(driver, project_title=config.project_title):
 
     # Click on project title
     driver.find_element_by_link_text(project_title).click()
-    
-    # Return URL of project page
     return driver.current_url
 
 def goto_settings(driver, project_name):
@@ -265,6 +264,89 @@ def create_project(driver, project_title=config.project_title, project_descripti
     # Return project URL
     return driver.current_url
 
+def make_project_public(driver, url):
+
+    driver.get(url)
+    link = driver.find_element_by_link_text("Make public")
+    link.click()
+    time.sleep(3) #wait until modal box finishes moving
+    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
+
+def make_project_private(driver, url):
+
+    driver.get(driver.current_url)
+    link = driver.find_element_by_link_text("Make private")
+    link.click()
+    time.sleep(3) #wait until modal box finishes moving
+    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
+
+
+def edit_wiki(driver):
+
+    edit_button = driver.find_element_by_link_text('Edit')
+    edit_button.click()
+
+def get_wiki_input(driver):
+
+    return driver.find_element_by_id('wmd-input')
+
+def add_wiki_text(driver, text):
+
+    get_wiki_input(driver).send_keys(text)
+
+def submit_wiki_text(driver):
+    """ Click submit button. """
+
+    driver.find_element_by_xpath(
+        '//div[@class="wmd-panel"]//input[@type="submit"]'
+    ).click()
+
+def get_wiki_par(driver):
+    """ Get <p> containing wiki text. """
+
+    # Set implicitly_wait to short value: text may not
+    # exist, so we don't want to wait too long to find it
+    driver.implicitly_wait(0.1)
+
+    # Extract wiki text
+    # Hack: Wiki text element isn't uniquely labeled,
+    # so find its sibling first
+    try:
+        wiki_par = driver.find_element_by_xpath(
+            '//div[@id="addContributors"]/following-sibling::div//p'
+        )
+    except NoSuchElementException:
+        wiki_par = None
+
+    # Set implicitly_wait to original value
+    driver.implicitly_wait(config.selenium_wait_time)
+
+    # Return element
+    return wiki_par
+
+def get_wiki_text(driver):
+    """ Get text from wiki <p>. """
+
+    # Get <p> containing wiki text
+    wiki_par = get_wiki_par(driver)
+
+    # Extract text
+    if wiki_par is not None:
+        return wiki_par.text
+    return ''
+
+def select_partial(driver, id, start, stop):
+    """Select a partial range of text from an element.
+
+    Args:
+    driver : WebDriver instance
+    id : ID of target element
+    start : Start position
+    stop : Stop position
+
+    """
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
 
@@ -279,18 +361,18 @@ def select_partial(driver, id, start, stop):
     # Adapted from http://stackoverflow.com/questions/646611/programmatically-selecting-partial-text-in-an-input-field
     driver.execute_script('''
         (function(field, start, end) {
-            if( field.createTextRange ) {
-                var selRange = field.createTextRange();
-                selRange.collapse(true);
-                selRange.moveStart('character', start);
-                selRange.moveEnd('character', end-start);
-                selRange.select();
-            } else if( field.setSelectionRange ) {
-                field.setSelectionRange(start, end);
-            } else if( field.selectionStart ) {
-                field.selectionStart = start;
-                field.selectionEnd = end;
-            }
-            field.focus();
+        if( field.createTextRange ) {
+        var selRange = field.createTextRange();
+        selRange.collapse(true);
+        selRange.moveStart('character', start);
+        selRange.moveEnd('character', end-start);
+        selRange.select();
+        } else if( field.setSelectionRange ) {
+        field.setSelectionRange(start, end);
+        } else if( field.selectionStart ) {
+        field.selectionStart = start;
+        field.selectionEnd = end;
+        }
+        field.focus();
         })(document.getElementById("%s"), %d, %d);
-    ''' % (id, start, stop))
+        ''' % (id, start, stop))

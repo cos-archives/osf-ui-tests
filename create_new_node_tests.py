@@ -12,7 +12,6 @@ from selenium.webdriver.common.keys import Keys
 import util
 import config
 
-
 class CreateNewNodeTests(unittest.TestCase):
 
     def setUp(self):
