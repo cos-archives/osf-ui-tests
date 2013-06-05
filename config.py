@@ -16,3 +16,17 @@ db_name = 'test'
 # Test project data
 project_title = 'test project'
 project_description = 'test project description'
+
+node_title = 'test node'
+
+open_ended_registration_data = {
+    '#ember295' : 'test registration',
+    '#ember319' : 'continue',
+}
+
+osf_standard_registration_data = {
+    '#ember299' : 'Yes',
+    '#ember454' : 'No',
+    '#ember587' : 'None',
+    '#ember610' : 'continue',
+}
