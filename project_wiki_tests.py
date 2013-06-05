@@ -14,49 +14,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import base
 import util
 import config
 
-
-class ProjectWikiTests(unittest.TestCase):
+class ProjectWikiTests(base.ProjectSmokeTest):
     
-    # Setup / teardown functions
-
-    @classmethod
-    def setUpClass(cls):
-        
-        # Launch Selenium
-        cls.driver = util.launch_driver()
-        
-        # Create test account
-        cls.user_data = util.create_user(cls.driver)
-
-        # Login to test account
-        util.login(
-            cls.driver, 
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close Selenium
-        cls.driver.close()
-    
-    def setUp(self):
-        
-        # Create test project
-        self.project_url = util.create_project(self.driver)
-    
-        # Browse to project page
-        util.goto_project(self.driver)
-    
-    def tearDown(self):
-        
-        # Delete test project
-        util.delete_project(self.driver)
-
     # Utility functions
 
     def _edit_wiki(self):

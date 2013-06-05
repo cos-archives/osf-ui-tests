@@ -12,28 +12,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import base
 import util
 import config
 
-class UserCreationTest(unittest.TestCase):
-    
-    @classmethod
-    def setUpClass(cls):
-        
-        # Launch Selenium
-        cls.driver = util.launch_driver()
-        
-        # Generate user data
-        cls.user_data = util.gen_user_data()
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close Selenium
-        cls.driver.close()
+class UserCreationTest(base.SmokeTest):
     
     def setUp(self):
         
+        # Call parent setUp
+        super(UserCreationTest, self).setUp()
+        
+        # Generate user data
+        self.user_data = util.gen_user_data()
+
         # Browse to account creation page
         self.driver.get('%s/account' % (config.osf_home))
         
@@ -47,8 +39,11 @@ class UserCreationTest(unittest.TestCase):
 
         """
         
+        # Prepend #'s to form keys
+        id_form_data = {'#%s' % (k) : form_data[k] for k in form_data}
+
         # Submit form
-        util.fill_form(self.driver, form_data)
+        util.fill_form(self.driver, id_form_data)
         
         # Get alert boxes
         alerts = util.get_alert_boxes(self.driver, alert_text)

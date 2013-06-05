@@ -8,30 +8,12 @@ from selenium import webdriver
 from pymongo import MongoClient
 
 # Project imports
+import base
 import util
 import config
 
-class ProjectCreationTest(unittest.TestCase):
+class ProjectCreationTest(base.UserSmokeTest):
 
-    @classmethod
-    def setUpClass(cls):
-        
-        cls.driver = util.launch_driver()
-        
-        # Create user account and login
-        cls.user_data = util.create_user(cls.driver)
-        util.login(
-            cls.driver,
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # 
-        cls.driver.close()
-    
     def test_create_project(self):
         """
         test to make sure that creating a project works correctly

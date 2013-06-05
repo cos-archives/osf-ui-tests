@@ -12,35 +12,17 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 # Project imports
+import base
 import util
 import config
 
-class AccountProfileTest(unittest.TestCase):
+class AccountProfileTest(base.UserSmokeTest):
     
-    @classmethod
-    def setUpClass(cls):
-        
-        # Start WebDriver
-        cls.driver = util.launch_driver()
-        
-        # Create test user
-        cls.user_data = util.create_user(cls.driver)
-        
-        # Login to test account
-        util.login(
-            cls.driver,
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-    
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close WebDriver
-        cls.driver.close()
-
     def setUp(self):
-
+        
+        # Call parent setUp
+        super(AccountProfileTest, self).setUp()
+        
         # Browse to profile
         util.goto_profile(self.driver)
 

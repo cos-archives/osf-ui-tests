@@ -16,6 +16,7 @@ to using Firefox. Terrible.
 4. Alter actual OSF pages to place 'web responses' in the page source
     custom meta-tags or something else. Seems hackish.
 """
+
 import unittest
 
 # Selenium imports
@@ -23,49 +24,31 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import base
 import util
 import config
 
-class UITests(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
+class UITests(base.ProjectSmokeTest):
+    
+    def setUp(self):
         
-        # Start WebDriver
-        cls.driver = webdriver.Firefox()
-        
-        # 
-        cls.driver.implicitly_wait(5)
-
-        # Create user account and login
-        cls.user_data = util.create_user(cls.driver)
-        util.login(
-            cls.driver,
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-
-        # Create test project and store URL
-        cls.project_url = util.create_project(cls.driver)
+        # Call parent setUp
+        super(UITests, self).setUp()
 
         # Log out
-        util.logout(cls.driver)
-    
-    @classmethod
-    def tearDownClass(cls):
+        util.logout(self.driver)
+
+    def tearDown(self):
         
         # Need to login again to delete project
         util.login(
-            cls.driver,
-            cls.user_data['username'],
-            cls.user_data['password']
+            self.driver,
+            self.user_data['username'],
+            self.user_data['password']
         )
 
-        # Delete test project
-        util.delete_project(cls.driver)
-
-        # Close WebDriver
-        cls.driver.close()
+        # Call parent tearDown
+        super(UITests, self).tearDown()
 
     def test_unauthorized_access_private_project(self):
         """
