@@ -3,16 +3,46 @@ Miscellaneous utility functions for smokescreen tests
 """
 
 import os
+import re
 import uuid
+import time
 
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
 
-def launch_driver(driver_name='Firefox', wait_time=config.selenium_wait_time):
+def wait_until_visible(elm, ntry=50, delay=0.1):
+    """
+
+    """
+    for _ in range(ntry):
+        if elm.is_displayed():
+            return True
+        time.sleep(delay)
+
+    return False
+
+def wait_until_stable(elm, ntry=50, delay=0.1):
+    """
+
+    """
+    # Set initial size 
+    size = {}
+
+    for _ in range(ntry):
+        if elm.size == size:
+            return True
+        size = elm.size
+        time.sleep(delay)
+    
+    # Fail
+    return False
+
+def launch_driver(driver_name='Chrome', wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
     Args:
@@ -72,31 +102,36 @@ def get_alert_boxes(driver, alert_text):
         matching alert boxes
 
     """
-    
+
     # Find alerts
     alerts = driver.find_elements_by_xpath(
         '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' % \
             (alert_text.upper(), alert_text.lower(), alert_text.lower())
     )
-    
+
     # Return matching alert boxes
     return alerts
     
-def fill_form(form, fields, button_xpath='.//button[@type="submit"]'):
+find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+
+def fill_form(
+        root, 
+        fields, 
+        button_finder=find_btn):
     """Fill out form fields and click submit button.
 
     Args:
-        form : webdriver element
+        form : root element
         fields : dict of id -> value pairs for form
+        button_finder : function to get button from root element
 
     """
-    
     # Enter field values
     for field in fields:
-        form.find_element_by_css_selector(field).send_keys(fields[field])
+        root.find_element_by_css_selector(field).send_keys(fields[field])
     
     # Click submit button
-    form.find_element_by_xpath(button_xpath).click()
+    button_finder(root).click()
 
 def login(driver, username, password):
     """Login to OSF
@@ -153,8 +188,6 @@ def create_user(driver, user_data=None):
         }
 
     """
-    
-    # Generate random user data if not provided
     if user_data is None:
         user_data = gen_user_data()
 
@@ -162,10 +195,10 @@ def create_user(driver, user_data=None):
 
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
-    
+
     # Find form
     registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
-    
+
     # Fill out form
     fill_form(registration_form, form_data)
     
@@ -173,6 +206,7 @@ def create_user(driver, user_data=None):
     return user_data
 
 def goto_dashboard(driver):
+
     """Browse to dashboard page.
     
     Args:
@@ -195,6 +229,7 @@ def goto_profile(driver):
     driver.find_element_by_link_text('My Public Profile').click()
 
 def goto_project(driver, project_title=config.project_title):
+
     """Browse to project page.
 
     Args:
@@ -209,8 +244,6 @@ def goto_project(driver, project_title=config.project_title):
 
     # Click on project title
     driver.find_element_by_link_text(project_title).click()
-    
-    # Return URL of project page
     return driver.current_url
 
 def goto_files(driver, project_title=config.project_title):
@@ -272,16 +305,15 @@ def create_registration(
         '//option[contains(., "%s")]' % (registration_type)
     ).click()
     
-    # Get registration form
-    form = driver.find_element_by_xpath('//form[@class="form-horizontal"]')
-    
     # Fill out registration form
     fill_form(
-        form,
+        driver,
         registration_data,
-        './/button'
+        lambda elm: elm.find_element_by_css_selector(
+            '.ember-view button.primary'
+        )
     )
-    
+
     # Hack: Wait for registration label so that we can get the
     # correct URL for the registration
     driver.find_element_by_css_selector('.label-important')
@@ -351,19 +383,31 @@ def create_node(
         project_title=config.project_title, 
         node_title=config.node_title,
         project_url=None):
-    
-    # 
+    """
+
+    """
+    # Browse to project
     if project_url is not None:
         driver.get(project_url)
     else:
         goto_project(driver, project_title)
-
+    
+    # Click New Node button
     driver.find_element_by_link_text('New Node').click()
     
+    # Get form
     form = driver.find_element_by_xpath(
         '//form[contains(@action, "newnode")]'
     )
-
+    
+    # Wait for modal to stop moving
+    wait_until_stable(
+        driver.find_element_by_css_selector(
+            'input[name="title"]'
+        )
+    )
+    
+    # Fill out form
     fill_form(
         form, 
         {
@@ -371,6 +415,30 @@ def create_node(
             '#select01' : 'Project',
         }
     )
+
+def make_project_public(driver, url):
+
+    driver.get(url)
+
+    driver.find_element_by_link_text("Make public").click()
+
+    yes_button = driver.find_element_by_xpath(
+        '//button[contains(@class, "modal-confirm")]'
+    )
+    wait_until_stable(yes_button)
+    yes_button.click()
+
+    #driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
+
+def make_project_private(driver, url):
+
+    driver.get(driver.current_url)
+    link = driver.find_element_by_link_text("Make private")
+    link.click()
+    time.sleep(3) #wait until modal box finishes moving
+    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
+    return driver.current_url
 
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
@@ -400,4 +468,88 @@ def select_partial(driver, id, start, stop):
             }
             field.focus();
         })(document.getElementById("%s"), %d, %d);
-    ''' % (id, start, stop))
+        ''' % (id, start, stop))
+
+# Wiki functions
+def edit_wiki(driver):
+ 
+    edit_button = driver.find_element_by_link_text('Edit')
+    edit_button.click()
+
+def get_wiki_input(driver):
+ 
+    return driver.find_element_by_id('wmd-input')
+
+def add_wiki_text(driver, text):
+ 
+    get_wiki_input(driver).send_keys(text)
+
+def clear_wiki_text(driver):
+ 
+    clear_text(get_wiki_input(driver))
+
+def submit_wiki_text(driver):
+    """ Click submit button. """
+
+    driver.find_element_by_xpath(
+        '//div[@class="wmd-panel"]//input[@type="submit"]'
+    ).click()
+
+def get_wiki_version(driver):
+    """ Get current wiki version. """
+ 
+    # Extract version text
+    version = driver\
+        .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
+        .text
+ 
+    # Strip (current) from version string
+    version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
+
+    # Return version number or 0
+    try:
+        return int(version)
+    except ValueError:
+        return 0
+
+def get_wiki_par(driver):
+    """ Get <p> containing wiki text. """
+
+    # Set implicitly_wait to short value: text may not
+    # exist, so we don't want to wait too long to find it
+    driver.implicitly_wait(0.1)
+
+    # Extract wiki text
+    # Hack: Wiki text element isn't uniquely labeled,
+    # so find its sibling first
+    try:
+        wiki_par = driver.find_element_by_xpath(
+            '//div[@id="addContributors"]/following-sibling::div//p'
+        )
+    except NoSuchElementException:
+        wiki_par = None
+
+    # Set implicitly_wait to original value
+    driver.implicitly_wait(config.selenium_wait_time)
+
+    # Return element
+    return wiki_par
+
+def get_wiki_text(driver):
+    """ Get text from wiki <p>. """
+
+    # Get <p> containing wiki text
+    wiki_par = get_wiki_par(driver)
+
+    # Extract text
+    if wiki_par is not None:
+        return wiki_par.text
+    return ''
+
+def get_wiki_preview(driver):
+    """
+    """
+
+    return driver\
+        .find_element_by_id('wmd-preview')\
+        .text

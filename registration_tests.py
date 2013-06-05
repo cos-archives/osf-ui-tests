@@ -12,6 +12,10 @@ import config
 
 class RegistrationTests(base.ProjectSmokeTest):
     
+    ###########
+    # Helpers #
+    ###########
+
     def _test_registration(
             self,
             registration_type,
@@ -46,6 +50,10 @@ class RegistrationTests(base.ProjectSmokeTest):
             link.get_attribute('href').strip('/'),
             self.project_url.strip('/')
         )
+    
+    #########
+    # Tests #
+    #########
 
     def test_create_open_ended_registration(self):
         """ Create an Open-Ended Registration. """

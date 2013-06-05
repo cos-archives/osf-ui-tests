@@ -16,12 +16,23 @@ import base
 import util
 import config
 
-class UserCreationTest(base.SmokeTest):
+class UserCreationTests(base.SmokeTest):
     
+    # Default form data
+    """
+    form_data = {
+        'fullname' : 'raymond occupant',
+        'username' : 'raymond@occupant.com',
+        'username2' : 'raymond@occupant.com',
+        'password' : 'secret',
+        'password2' : 'secret',
+    }
+    """
+
     def setUp(self):
         
         # Call parent setUp
-        super(UserCreationTest, self).setUp()
+        super(UserCreationTests, self).setUp()
         
         # Generate user data
         self.user_data = util.gen_user_data()

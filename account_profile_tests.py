@@ -1,7 +1,5 @@
 """
 Selenium test suite for account profile manipulation and access
-Author: Harry Rybacki
-Date: 29May13
 """
 
 import time
@@ -16,12 +14,12 @@ import base
 import util
 import config
 
-class AccountProfileTest(base.UserSmokeTest):
+class AccountProfileTests(base.UserSmokeTest):
     
     def setUp(self):
         
         # Call parent setUp
-        super(AccountProfileTest, self).setUp()
+        super(AccountProfileTests, self).setUp()
         
         # Browse to profile
         util.goto_profile(self.driver)

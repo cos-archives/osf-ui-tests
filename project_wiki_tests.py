@@ -4,8 +4,6 @@ as well as various ways to do it wrong (mismatched passwords, invalid
 email addresses, etc.).
 """
 
-import re
-import time
 import unittest
 
 # Selenium imports
@@ -22,89 +20,6 @@ class ProjectWikiTests(base.ProjectSmokeTest):
     
     # Utility functions
 
-    def _edit_wiki(self):
-        
-        edit_button = self.driver.find_element_by_link_text('Edit')
-        edit_button.click()
-    
-    def _get_wiki_input(self):
-        
-        return self.driver.find_element_by_id('wmd-input')
-
-    def _add_wiki_text(self, text):
-        
-        self._get_wiki_input().send_keys(text)
-
-    def _clear_wiki_text(self):
-        
-        util.clear_text(self._get_wiki_input())
-    
-    def _submit_wiki_text(self):
-        """ Click submit button. """
-
-        self.driver.find_element_by_xpath(
-            '//div[@class="wmd-panel"]//input[@type="submit"]'
-        ).click()
-
-    def _get_wiki_version(self):
-        """ Get current wiki version. """
-        
-        # Extract version text
-        version = self.driver\
-            .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
-            .text
-        
-        # Strip (current) from version string
-        version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
-
-        # Return version number or 0
-        try:
-            return int(version)
-        except ValueError:
-            return 0
-    
-    def _get_wiki_par(self):
-        """ Get <p> containing wiki text. """
-        
-        # Set implicitly_wait to short value: text may not
-        # exist, so we don't want to wait too long to find it
-        self.driver.implicitly_wait(0.1)
-
-        # Extract wiki text
-        # Hack: Wiki text element isn't uniquely labeled,
-        # so find its sibling first
-        try:
-            wiki_par = self.driver.find_element_by_xpath(
-                '//div[@id="addContributors"]/following-sibling::div//p'
-            )
-        except NoSuchElementException:
-            wiki_par = None
-
-        # Set implicitly_wait to original value
-        self.driver.implicitly_wait(config.selenium_wait_time)
-        
-        # Return element
-        return wiki_par
-
-    def _get_wiki_text(self):
-        """ Get text from wiki <p>. """
-        
-        # Get <p> containing wiki text
-        wiki_par = self._get_wiki_par()
-
-        # Extract text
-        if wiki_par is not None:
-            return wiki_par.text
-        return ''
-    
-    def _get_wiki_preview(self):
-        """
-        """
-        
-        return self.driver\
-            .find_element_by_id('wmd-preview')\
-            .text
-    
     def _edit_wiki_setup(self):
         """
         """
@@ -113,11 +28,11 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         self.driver.find_element_by_link_text('Wiki').click()
         
         # Get original version and text
-        orig_version = self._get_wiki_version()
-        orig_text = self._get_wiki_text() if orig_version else ''
+        orig_version = util.get_wiki_version(self.driver)
+        orig_text = util.get_wiki_text(self.driver) if orig_version else ''
         
         # Click edit button
-        self._edit_wiki()
+        util.edit_wiki(self.driver)
         
         return orig_version, orig_text
         
@@ -126,15 +41,15 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         """
         
         # Test preview text
-        preview_text = self._get_wiki_preview()
+        preview_text = util.get_wiki_preview(self.driver)
         self.assertEqual(preview_text, expected_text)
         
         # Click submit button
-        self._submit_wiki_text()
+        util.submit_wiki_text(self.driver)
 
         # Get updated version and text
-        new_version = self._get_wiki_version()
-        new_text = self._get_wiki_text() if new_version else ''
+        new_version = util.get_wiki_version(self.driver)
+        new_text = util.get_wiki_text(self.driver) if new_version else ''
         
         # Test version and text
         self.assertEqual(new_version, expected_version)
@@ -149,7 +64,7 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         orig_version, orig_text = self._edit_wiki_setup()
 
         # Clear text
-        self._clear_wiki_text()
+        util.clear_wiki_text(self.driver)
         
         # Update expected version and text
         expected_version = orig_version + 1
@@ -164,7 +79,7 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         orig_version, orig_text = self._edit_wiki_setup()
 
         # Enter text
-        self._add_wiki_text(new_text)
+        util.add_wiki_text(self.driver, new_text)
         
         # Update expected version and text
         expected_version = orig_version + 1
@@ -206,7 +121,7 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         
         # Enter text
         if new_text:
-            self._add_wiki_text(new_text)
+            util.add_wiki_text(self.driver, new_text)
         
         # Set text to boldface
         if action == 'bold':
@@ -229,7 +144,7 @@ class ProjectWikiTests(base.ProjectSmokeTest):
 
         # Assert that wiki text has been wrapped in **
         self.assertEqual(
-            self._get_wiki_input().get_attribute('value'),
+            util.get_wiki_input(self.driver).get_attribute('value'),
             expected_wrap
         )
 
@@ -244,7 +159,7 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         self._edit_wiki_teardown(expected_version, expected_text)
 
         # Assert that there are <strong> elements in the wiki text
-        wiki_par = self._get_wiki_par()
+        wiki_par = util.get_wiki_par(self.driver)
         bold_elements = wiki_par.find_elements_by_tag_name('strong')
         self.assertTrue(strong_fun(len(bold_elements)))
     

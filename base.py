@@ -9,7 +9,10 @@ import unittest
 import util
 
 class SmokeTest(unittest.TestCase):
-    
+    """Base class for smoke tests. Creates a WebDriver
+    on setUp and quits on tearDown.
+
+    """
     # Allow multiprocessing for individual tests
     _multiprocess_can_split_ = True
 
@@ -21,10 +24,16 @@ class SmokeTest(unittest.TestCase):
     def tearDown(self):
         
         # Quit Selenium
+        # Note: Use WebDriver.quit() instead of WebDriver.close();
+        # otherwise, SauceLabs tests will never finish
         self.driver.quit()
 
 class UserSmokeTest(SmokeTest):
-    
+    """Class for smoke tests that require user login.
+    Creates a user and logs in on setUp and logs out on
+    tearDown.
+
+    """
     def setUp(self):
         
         # Call parent setUpClass
@@ -47,7 +56,11 @@ class UserSmokeTest(SmokeTest):
         super(UserSmokeTest, self).tearDown()
         
 class ProjectSmokeTest(UserSmokeTest):
-    
+    """Class for smoke tests that require project
+    creation. Creates a project on setUp and deletes it
+    on tearDown.
+
+    """
     def setUp(self):
         
         # Call parent setUp
