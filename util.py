@@ -2,6 +2,7 @@
 Miscellaneous utility functions for smokescreen tests
 """
 
+import os
 import uuid
 
 # Selenium imports
@@ -19,15 +20,31 @@ def launch_driver(driver_name='Firefox', wait_time=config.selenium_wait_time):
         wait_time : Time to implicitly wait for element load
 
     """
+    
+    if driver_name == 'Remote':
+
+        # Set up desired capabilities
+        desired_capabilities = webdriver.DesiredCapabilities.FIREFOX
+        desired_capabilities['platform'] = 'MAC'
+        desired_capabilities['name'] = 'OSF | SauceLabs'
+        
+        # Set up command executor
+        command_executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' \
+            % (os.environ.get('SAUCE_USERNAME'), os.environ.get('SAUCE_ACCESS_KEY'))
+
+        args = {
+            'desired_capabilities' : desired_capabilities,
+            'command_executor' : command_executor,
+        }
+
+    else:
+            
+        args = {}
         
     # Start WebDriver
-    # If driver_name is a method of webdriver, use that; 
-    # else use webdriver.Firefox()
-    if hasattr(webdriver, driver_name):
-        driver = getattr(webdriver, driver_name)()
-    else:
-        driver = webdriver.Firefox()
-
+    driver_cls = getattr(webdriver, driver_name)
+    driver = driver_cls(**args)
+    
     # Wait for elements to load
     driver.implicitly_wait(wait_time)
     
@@ -65,7 +82,7 @@ def get_alert_boxes(driver, alert_text):
     # Return matching alert boxes
     return alerts
     
-def fill_form(form, fields):
+def fill_form(form, fields, button_xpath='.//button[@type="submit"]'):
     """Fill out form fields and click submit button.
 
     Args:
@@ -76,10 +93,10 @@ def fill_form(form, fields):
     
     # Enter field values
     for field in fields:
-        form.find_element_by_id(field).send_keys(fields[field])
+        form.find_element_by_css_selector(field).send_keys(fields[field])
     
     # Click submit button
-    form.find_element_by_xpath('.//button[@type="submit"]').click()
+    form.find_element_by_xpath(button_xpath).click()
 
 def login(driver, username, password):
     """Login to OSF
@@ -99,8 +116,8 @@ def login(driver, username, password):
     # Get login form
     login_form = driver.find_element_by_xpath('//form[@name="signin"]')
     fill_form(login_form, {
-        'username' : username,
-        'password' : password,
+        '#username' : username,
+        '#password' : password,
     })
 
 def gen_user_data(_length=12):
@@ -141,6 +158,8 @@ def create_user(driver, user_data=None):
     if user_data is None:
         user_data = gen_user_data()
 
+    form_data = {'#%s' % (k) : user_data[k] for k in user_data}
+
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
     
@@ -148,7 +167,7 @@ def create_user(driver, user_data=None):
     registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
     
     # Fill out form
-    fill_form(registration_form, user_data)
+    fill_form(registration_form, form_data)
     
     # Return user data
     return user_data
@@ -194,7 +213,20 @@ def goto_project(driver, project_title=config.project_title):
     # Return URL of project page
     return driver.current_url
 
-def goto_settings(driver, project_name):
+def goto_files(driver, project_title=config.project_title):
+    """ Browse to files page.
+
+    Args:
+        driver: WebDriver instance
+        project_title : Title of project to be loaded
+    """
+    # Browse to project page
+    goto_project(driver, project_title)
+
+    # Browse to files page
+    driver.find_element_by_link_text('Files').click()
+    
+def goto_settings(driver, project_name=config.project_title):
     """Browse to project settings page.
 
     Args:
@@ -207,6 +239,55 @@ def goto_settings(driver, project_name):
 
     # Click Settings button
     driver.find_element_by_link_text('Settings').click()
+
+def goto_registrations(driver, project_name=config.project_title):
+    
+    # Browse to project page
+    goto_project(driver, project_name)
+    
+    # Click Registrations button
+    driver.find_element_by_link_text('Registrations').click()
+
+def create_registration(
+        driver, 
+        registration_type,
+        registration_data,
+        project_name=config.project_title):
+    """Create a new registration.
+    
+    Args:
+        registration_type : Type of registration
+        registration_data : Data for registration form
+    Returns:
+        URL of registration
+    """
+    # Browse to registrations page
+    goto_registrations(driver, project_name)
+    
+    # Click New Registration button
+    driver.find_element_by_link_text('New Registration').click()
+
+    # Select registration type
+    driver.find_element_by_xpath(
+        '//option[contains(., "%s")]' % (registration_type)
+    ).click()
+    
+    # Get registration form
+    form = driver.find_element_by_xpath('//form[@class="form-horizontal"]')
+    
+    # Fill out registration form
+    fill_form(
+        form,
+        registration_data,
+        './/button'
+    )
+    
+    # Hack: Wait for registration label so that we can get the
+    # correct URL for the registration
+    driver.find_element_by_css_selector('.label-important')
+
+    # Return URL of registration
+    return driver.current_url
 
 def delete_project(driver, project_title=config.project_title):
     """Delete a project. Note: There is no confirmation for
@@ -257,13 +338,39 @@ def create_project(driver, project_title=config.project_title, project_descripti
     project_form = driver.find_element_by_xpath('//form[@name="newProject"]')
     fill_form(
         project_form, {
-            'title' : project_title,
-            'description' : project_description,
+            '#title' : project_title,
+            '#description' : project_description,
         }
     )
 
     # Return project URL
     return driver.current_url
+
+def create_node(
+        driver, 
+        project_title=config.project_title, 
+        node_title=config.node_title,
+        project_url=None):
+    
+    # 
+    if project_url is not None:
+        driver.get(project_url)
+    else:
+        goto_project(driver, project_title)
+
+    driver.find_element_by_link_text('New Node').click()
+    
+    form = driver.find_element_by_xpath(
+        '//form[contains(@action, "newnode")]'
+    )
+
+    fill_form(
+        form, 
+        {
+            'input[name="title"]' : node_title,
+            '#select01' : 'Project',
+        }
+    )
 
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
