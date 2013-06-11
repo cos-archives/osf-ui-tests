@@ -48,8 +48,8 @@ def make_remote_opts(capabilities, platform=None, version=None, name=None):
     }  
 
 nodes = [
-    {'driver_name' : 'Firefox'},
+    #{'driver_name' : 'Firefox'},
+    make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'OS X 10.6'),
     #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'Windows 8'),
-    #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'OS X 10.6'),
     #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'Linux'),
 ]
