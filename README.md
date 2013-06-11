@@ -31,6 +31,10 @@ OSF-UI-Tests
         * https://saucelabs.com/docs/connect
 * From development server
     * Point config:osf_home to dev URL
+* To run the tests
+    * Run one test file: python <testfile.py> or nosetests <testfile.py>
+    * Run all test files: nosetests
+    * Run all test files using multiple cores: nosetests --processes=2
  
 ### Notes: If issues arise during tests, look at the following suites first.
 * user_creations_tests
