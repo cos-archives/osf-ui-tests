@@ -8,7 +8,8 @@ import unittest
 # Project imports
 import util
 
-class SmokeTest(unittest.TestCase):
+#class SmokeTest(unittest.TestCase):
+class SmokeTest(object):
     """Base class for smoke tests. Creates a WebDriver
     on setUp and quits on tearDown.
 
@@ -19,7 +20,10 @@ class SmokeTest(unittest.TestCase):
     def setUp(self):
         
         # Launch Selenium
-        self.driver = util.launch_driver()
+        if hasattr(self, 'driver_opts'):
+            self.driver = util.launch_driver(**self.driver_opts)
+        else:
+            self.driver = util.launch_driver()
         
     def tearDown(self):
         
