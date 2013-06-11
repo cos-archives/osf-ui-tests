@@ -40,7 +40,7 @@ class UserCreationTests(base.SmokeTest):
         """
         
         # Prepend #'s to form keys
-        id_form_data = {'#%s' % (k) : form_data[k] for k in form_data}
+        id_form_data = {'#register-%s' % (k) : form_data[k] for k in form_data}
 
         # Submit form
         util.fill_form(self.driver, id_form_data)
@@ -130,8 +130,7 @@ class UserCreationTests(base.SmokeTest):
         self.assertTrue('dashboard' in self.driver.current_url)
 
 # Generate tests
-def test():
-    util.generate_tests(UserCreationTests)
+util.generate_tests(UserCreationTests)
 
 # Run tests
 if __name__ == '__main__':
