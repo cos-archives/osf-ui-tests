@@ -36,10 +36,13 @@ def generate_tests(klass):
     # browser / OS node
     for idx, node in enumerate(config.nodes):
         
+        # Get test name
+        test_name = 'test_%d' % (idx)
+
         # Create subclass inheriting from both the 
         # given class and unittest.TestCase
         node_klass = type(
-            'node_klass', 
+            test_name,
             (klass, unittest.TestCase), 
             {}
         )
@@ -48,7 +51,6 @@ def generate_tests(klass):
         node_klass.driver_opts = node
         
         # Add new test to calling module
-        test_name = 'test_%d' % (idx)
         setattr(mod, test_name, node_klass)
 
 def wait_until_visible(elm, ntry=50, delay=0.1):
