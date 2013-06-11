@@ -35,14 +35,18 @@ class UserLoginTests(base.SmokeTest):
     
     def test_login(self):
         
+        # Login
         util.login(
             self.driver, 
             self.user_data['username'],
             self.user_data['password']
         )
         
-        # 
+        # Assert that browser is pointing to /dashboard
         self.assertTrue('/dashboard' in self.driver.current_url)
+
+# Generate tests
+util.generate_tests(UserLoginTests)
 
 # Run tests
 if __name__ == '__main__':

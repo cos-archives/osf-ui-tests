@@ -13,7 +13,7 @@ import base
 import util
 import config
 
-class CreateNewNodeTest(base.ProjectSmokeTest):
+class CreateNewNodeTests(base.ProjectSmokeTest):
 
     def test_create_node(self):
 
@@ -25,6 +25,10 @@ class CreateNewNodeTest(base.ProjectSmokeTest):
             self.driver.find_element_by_link_text(config.node_title).text, 
             config.node_title
         )
+
+# Generate tests
+def test():
+    util.generate_tests(CreateNewNodeTests)
 
 # Run tests
 if __name__ == '__main__':

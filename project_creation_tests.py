@@ -11,7 +11,7 @@ import base
 import util
 import config
 
-class ProjectCreationTest(base.UserSmokeTest):
+class ProjectCreationTests(base.UserSmokeTest):
 
     def test_create_project(self):
         """
@@ -85,6 +85,10 @@ class ProjectCreationTest(base.UserSmokeTest):
         
         # Must be exactly one matching alert
         self.assertEqual(len(alerts), 1)
+
+# Generate tests
+def test():
+    util.generate_tests(ProjectCreationTests)
 
 # Run tests
 if __name__ == '__main__':

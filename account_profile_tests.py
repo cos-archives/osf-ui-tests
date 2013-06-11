@@ -108,6 +108,10 @@ class AccountProfileTests(base.UserSmokeTest):
     def test_check_public_project_updates(self):
         pass
 
+# Generate tests
+def test():
+    util.generate_tests(AccountProfileTests)
+
 # Run tests
 if __name__ == '__main__':
     unittest.main()

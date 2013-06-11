@@ -56,6 +56,10 @@ class AddContributorTests(base.ProjectSmokeTest):
         contribs = self.driver.find_element_by_id('contributors').text
         self.assertTrue(user_name in contribs)
 
+# Generate tests
+def test():
+    util.generate_tests(AddContributorTests)
+
 # Run tests
 if __name__ == '__main__':
     unittest.main()

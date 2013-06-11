@@ -169,6 +169,10 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         self._test_wiki_format('make this bold', 'make this bold', 'bold')
         self._test_wiki_format('', 'make this bold', 'unbold')
 
+# Generate tests
+def test():
+    util.generate_tests(ProjectWikiTests)
+
 # Run tests
 if __name__ == '__main__':
-    unittest.main() 
+    unittest.main()

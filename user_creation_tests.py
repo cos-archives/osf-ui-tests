@@ -18,17 +18,6 @@ import config
 
 class UserCreationTests(base.SmokeTest):
     
-    # Default form data
-    """
-    form_data = {
-        'fullname' : 'raymond occupant',
-        'username' : 'raymond@occupant.com',
-        'username2' : 'raymond@occupant.com',
-        'password' : 'secret',
-        'password2' : 'secret',
-    }
-    """
-
     def setUp(self):
         
         # Call parent setUp
@@ -139,6 +128,10 @@ class UserCreationTests(base.SmokeTest):
             self.user_data['password']
         )
         self.assertTrue('dashboard' in self.driver.current_url)
+
+# Generate tests
+def test():
+    util.generate_tests(UserCreationTests)
 
 # Run tests
 if __name__ == '__main__':

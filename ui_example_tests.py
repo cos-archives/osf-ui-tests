@@ -76,6 +76,10 @@ class UITests(base.ProjectSmokeTest):
         alerts = util.get_alert_boxes(self.driver, 'not a valid project')
         self.assertEqual(len(alerts), 1)
 
+# Generate tests
+def test():
+    util.generate_tests(UITests)
+
 # Run tests
 if __name__ == '__main__':
     unittest.main()
