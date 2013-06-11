@@ -12,44 +12,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import base
 import util
 import config
 
-<<<<<<< HEAD
-class UserCreationTests(unittest.TestCase):
-    
-    # Default form data
-    """
-    form_data = {
-        'fullname' : 'raymond occupant',
-        'username' : 'raymond@occupant.com',
-        'username2' : 'raymond@occupant.com',
-        'password' : 'secret',
-        'password2' : 'secret',
-    }
-    """
-=======
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-
-class UserCreationTests(unittest.TestCase):
-    
-    @classmethod
-    def setUpClass(cls):
-        
-        # Launch Selenium
-        cls.driver = util.launch_driver()
-        
-        # Generate user data
-        cls.user_data = util.gen_user_data()
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close Selenium
-        cls.driver.close()
+class UserCreationTests(base.SmokeTest):
     
     def setUp(self):
         
+        # Call parent setUp
+        super(UserCreationTests, self).setUp()
+        
+        # Generate user data
+        self.user_data = util.gen_user_data()
+
         # Browse to account creation page
         self.driver.get('%s/account' % (config.osf_home))
         
@@ -63,8 +39,11 @@ class UserCreationTests(unittest.TestCase):
 
         """
         
+        # Prepend #'s to form keys
+        id_form_data = {'#register-%s' % (k) : form_data[k] for k in form_data}
+
         # Submit form
-        util.fill_form(self.driver, form_data)
+        util.fill_form(self.driver, id_form_data)
         
         # Get alert boxes
         alerts = util.get_alert_boxes(self.driver, alert_text)
@@ -149,6 +128,9 @@ class UserCreationTests(unittest.TestCase):
             self.user_data['password']
         )
         self.assertTrue('dashboard' in self.driver.current_url)
+
+# Generate tests
+util.generate_tests(UserCreationTests)
 
 # Run tests
 if __name__ == '__main__':

@@ -4,8 +4,6 @@ as well as various ways to do it wrong (mismatched passwords, invalid
 email addresses, etc.).
 """
 
-import re
-import time
 import unittest
 
 # Selenium imports
@@ -14,248 +12,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
+import base
 import util
 import config
 
-
-class ProjectWikiTests(unittest.TestCase):
-<<<<<<< HEAD
-
-=======
+class ProjectWikiTests(base.ProjectSmokeTest):
     
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-    # Setup / teardown functions
-
-    @classmethod
-    def setUpClass(cls):
-<<<<<<< HEAD
-
-        # Launch Selenium
-        cls.driver = util.launch_driver()
-
-        # Create test account
-        util.create_user(cls.driver)
-
-        # Login to test account
-        util.login(cls.driver)
-
-    @classmethod
-    def tearDownClass(cls):
-
-        # Delete test user
-        util.clear_user()
-
-        # Close Selenium
-        cls.driver.close()
-
-    def setUp(self):
-
-        # Create test project
-        self.project_url = util.create_project(self.driver)
-
-        # Browse to project page
-        util.goto_project(self.driver)
-
-    def tearDown(self):
-
-=======
-        
-        # Launch Selenium
-        cls.driver = util.launch_driver()
-        
-        # Create test account
-        cls.user_data = util.create_user(cls.driver)
-
-        # Login to test account
-        util.login(
-            cls.driver, 
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close Selenium
-        cls.driver.close()
-    
-    def setUp(self):
-        
-        # Create test project
-        self.project_url = util.create_project(self.driver)
-    
-        # Browse to project page
-        util.goto_project(self.driver)
-    
-    def tearDown(self):
-        
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-        # Delete test project
-        util.delete_project(self.driver)
-
     # Utility functions
 
-    def _edit_wiki(self):
-<<<<<<< HEAD
-
-        edit_button = self.driver.find_element_by_link_text('Edit')
-        edit_button.click()
-
-    def _get_wiki_input(self):
-
-        return self.driver.find_element_by_id('wmd-input')
-
-    def _add_wiki_text(self, text):
-
-        self._get_wiki_input().send_keys(text)
-
-    def _clear_wiki_text(self):
-
-        util.clear_text(self._get_wiki_input())
-
-=======
-        
-        edit_button = self.driver.find_element_by_link_text('Edit')
-        edit_button.click()
-    
-    def _get_wiki_input(self):
-        
-        return self.driver.find_element_by_id('wmd-input')
-
-    def _add_wiki_text(self, text):
-        
-        self._get_wiki_input().send_keys(text)
-
-    def _clear_wiki_text(self):
-        
-        util.clear_text(self._get_wiki_input())
-    
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-    def _submit_wiki_text(self):
-        """ Click submit button. """
-
-        self.driver.find_element_by_xpath(
-            '//div[@class="wmd-panel"]//input[@type="submit"]'
-        ).click()
-
-    def _get_wiki_version(self):
-        """ Get current wiki version. """
-<<<<<<< HEAD
-
-        # Extract version text
-        version = self.driver\
-        .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
-        .text
-
-=======
-        
-        # Extract version text
-        version = self.driver\
-            .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
-            .text
-        
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-        # Strip (current) from version string
-        version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
-
-        # Return version number or 0
-        try:
-            return int(version)
-        except ValueError:
-            return 0
-<<<<<<< HEAD
-
-    def _get_wiki_par(self):
-        """ Get <p> containing wiki text. """
-
-=======
-    
-    def _get_wiki_par(self):
-        """ Get <p> containing wiki text. """
-        
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-        # Set implicitly_wait to short value: text may not
-        # exist, so we don't want to wait too long to find it
-        self.driver.implicitly_wait(0.1)
-
-        # Extract wiki text
-        # Hack: Wiki text element isn't uniquely labeled,
-        # so find its sibling first
-        try:
-            wiki_par = self.driver.find_element_by_xpath(
-                '//div[@id="addContributors"]/following-sibling::div//p'
-            )
-        except NoSuchElementException:
-            wiki_par = None
-
-        # Set implicitly_wait to original value
-        self.driver.implicitly_wait(config.selenium_wait_time)
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-        # Return element
-        return wiki_par
-
-    def _get_wiki_text(self):
-        """ Get text from wiki <p>. """
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-        # Get <p> containing wiki text
-        wiki_par = self._get_wiki_par()
-
-        # Extract text
-        if wiki_par is not None:
-            return wiki_par.text
-        return ''
-<<<<<<< HEAD
-
-    def _get_wiki_preview(self):
-        """
-"""
-
-        return self.driver\
-        .find_element_by_id('wmd-preview')\
-        .text
-
-    def _edit_wiki_setup(self):
-        """
-"""
-
-        # Browse to wiki page
-        self.driver.find_element_by_link_text('Wiki').click()
-
-        # Get original version and text
-        orig_version = self._get_wiki_version()
-        orig_text = self._get_wiki_text() if orig_version else ''
-
-        # Click edit button
-        self._edit_wiki()
-
-        return orig_version, orig_text
-
-    def _edit_wiki_teardown(self, expected_version, expected_text):
-        """
-"""
-
-        # Test preview text
-        preview_text = self._get_wiki_preview()
-        self.assertEqual(preview_text, expected_text)
-
-=======
-    
-    def _get_wiki_preview(self):
-        """
-        """
-        
-        return self.driver\
-            .find_element_by_id('wmd-preview')\
-            .text
-    
     def _edit_wiki_setup(self):
         """
         """
@@ -264,11 +28,11 @@ class ProjectWikiTests(unittest.TestCase):
         self.driver.find_element_by_link_text('Wiki').click()
         
         # Get original version and text
-        orig_version = self._get_wiki_version()
-        orig_text = self._get_wiki_text() if orig_version else ''
+        orig_version = util.get_wiki_version(self.driver)
+        orig_text = util.get_wiki_text(self.driver) if orig_version else ''
         
         # Click edit button
-        self._edit_wiki()
+        util.edit_wiki(self.driver)
         
         return orig_version, orig_text
         
@@ -277,28 +41,15 @@ class ProjectWikiTests(unittest.TestCase):
         """
         
         # Test preview text
-        preview_text = self._get_wiki_preview()
+        preview_text = util.get_wiki_preview(self.driver)
         self.assertEqual(preview_text, expected_text)
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Click submit button
-        self._submit_wiki_text()
+        util.submit_wiki_text(self.driver)
 
         # Get updated version and text
-        new_version = self._get_wiki_version()
-        new_text = self._get_wiki_text() if new_version else ''
-<<<<<<< HEAD
-
-        # Test version and text
-        self.assertEqual(new_version, expected_version)
-        self.assertEqual(new_text, expected_text)
-
-        # Check version on dashboard
-        self._check_dashboard(expected_version)
-
-    def _test_wiki_delete(self):
-
-=======
+        new_version = util.get_wiki_version(self.driver)
+        new_text = util.get_wiki_text(self.driver) if new_version else ''
         
         # Test version and text
         self.assertEqual(new_version, expected_version)
@@ -309,24 +60,11 @@ class ProjectWikiTests(unittest.TestCase):
     
     def _test_wiki_delete(self):
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Get original values and open edit box
         orig_version, orig_text = self._edit_wiki_setup()
 
         # Clear text
-        self._clear_wiki_text()
-<<<<<<< HEAD
-
-        # Update expected version and text
-        expected_version = orig_version + 1
-        expected_text = ''
-
-        # Submit changes and check results
-        self._edit_wiki_teardown(expected_version, expected_text)
-
-    def _test_wiki_edit(self, new_text):
-
-=======
+        util.clear_wiki_text(self.driver)
         
         # Update expected version and text
         expected_version = orig_version + 1
@@ -337,30 +75,11 @@ class ProjectWikiTests(unittest.TestCase):
         
     def _test_wiki_edit(self, new_text):
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Get original values and open edit box
         orig_version, orig_text = self._edit_wiki_setup()
 
         # Enter text
-        self._add_wiki_text(new_text)
-<<<<<<< HEAD
-
-        # Update expected version and text
-        expected_version = orig_version + 1
-        expected_text = orig_text + new_text
-
-        # Submit changes and check results
-        self._edit_wiki_teardown(expected_version, expected_text)
-
-    def _check_dashboard(self, expected_version):
-
-        # Browse to project page
-        util.goto_project(self.driver)
-
-        # Get latest version update
-        version = self.driver.find_element_by_tag_name('dd').text
-
-=======
+        util.add_wiki_text(self.driver, new_text)
         
         # Update expected version and text
         expected_version = orig_version + 1
@@ -377,7 +96,6 @@ class ProjectWikiTests(unittest.TestCase):
         # Get latest version update
         version = self.driver.find_element_by_tag_name('dd').text
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Assert that expected version is in version string
         self.assertTrue('version %d' % (expected_version) in version)
 
@@ -386,30 +104,11 @@ class ProjectWikiTests(unittest.TestCase):
 
     def test_wiki_batch(self):
         """ Test entering and deleting wiki text. """
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         self._test_wiki_edit('entry 1')
         self._test_wiki_edit('entry 2')
         self._test_wiki_delete()
         self._test_wiki_edit('entry 3')
-<<<<<<< HEAD
-
-    def _test_wiki_format(self, new_text, expected_text, action):
-        """Test bolding wiki text.
-
-Args:
-"""
-        # Setup and get starting values
-        orig_version, orig_text = self._edit_wiki_setup()
-
-        # Enter text
-        if new_text:
-            self._add_wiki_text(new_text)
-
-=======
     
     def _test_wiki_format(self, new_text, expected_text, action):
         """Test bolding wiki text.
@@ -422,9 +121,8 @@ Args:
         
         # Enter text
         if new_text:
-            self._add_wiki_text(new_text)
+            util.add_wiki_text(self.driver, new_text)
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Set text to boldface
         if action == 'bold':
             self.driver.execute_script(
@@ -435,11 +133,7 @@ Args:
 
         # Click bold button
         self.driver.find_element_by_id('wmd-bold-button').click()
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         # Get appropriate wrap string and bold counter function
         if action == 'bold':
             expected_wrap = '**%s**' % expected_text
@@ -450,7 +144,7 @@ Args:
 
         # Assert that wiki text has been wrapped in **
         self.assertEqual(
-            self._get_wiki_input().get_attribute('value'),
+            util.get_wiki_input(self.driver).get_attribute('value'),
             expected_wrap
         )
 
@@ -465,27 +159,19 @@ Args:
         self._edit_wiki_teardown(expected_version, expected_text)
 
         # Assert that there are <strong> elements in the wiki text
-        wiki_par = self._get_wiki_par()
+        wiki_par = util.get_wiki_par(self.driver)
         bold_elements = wiki_par.find_elements_by_tag_name('strong')
         self.assertTrue(strong_fun(len(bold_elements)))
-<<<<<<< HEAD
-
-    def test_wiki_format_batch(self):
-        """ Test bold / unbold functions. """
-
-=======
     
     def test_wiki_format_batch(self):
         """ Test bold / unbold functions. """
         
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
         self._test_wiki_format('make this bold', 'make this bold', 'bold')
         self._test_wiki_format('', 'make this bold', 'unbold')
 
+# Generate tests
+util.generate_tests(ProjectWikiTests)
+
 # Run tests
 if __name__ == '__main__':
-<<<<<<< HEAD
     unittest.main()
-=======
-    unittest.main() 
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
