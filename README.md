@@ -34,7 +34,7 @@ OSF-UI-Tests
 * To run the tests
     * Run one test file: python <testfile.py> or nosetests <testfile.py>
     * Run all test files: nosetests
-    * Run all test files using multiple cores: nosetests --processes=2
+    * Run all test files using multiple cores: nosetests --processes=2 --process-timeout=999999
  
 ### Notes: If issues arise during tests, look at the following suites first.
 * user_creations_tests
