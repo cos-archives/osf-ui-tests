@@ -18,7 +18,15 @@ from selenium.common.exceptions import NoSuchElementException
 import config
 
 def generate_tests(klass):
-    
+    """Given a class containing a set of tests, create
+    a subclass for each OS / browser / version node specified
+    in config. Then add each subclass to the global namespace
+    of the calling module. This approach means that unittest / 
+    nose will detect the generated test classes.
+
+    Args:
+        klass : Class containing tests
+    """
     # Get calling module
     # Code from http://stackoverflow.com/questions/1095543/get-name-of-calling-functions-module-in-python
     frm = inspect.stack()[1]
@@ -28,12 +36,15 @@ def generate_tests(klass):
     # browser / OS node
     for idx, node in enumerate(config.nodes):
         
-        # Create subclass
+        # Create subclass inheriting from both the 
+        # given class and unittest.TestCase
         node_klass = type(
             'node_klass', 
             (klass, unittest.TestCase), 
             {}
         )
+
+        # Store the node configuration in a class variable
         node_klass.driver_opts = node
         
         # Add new test to calling module
@@ -211,21 +222,19 @@ def create_user(driver, user_data=None):
     """
     if user_data is None:
         user_data = gen_user_data()
-    
-    # Prepend #register- to each user field to generate
-    # the CSS selector for the corresponding <input>
+
     form_data = {'#register-%s' % (k) : user_data[k] for k in user_data}
+    print form_data
 
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
 
-    # Find form
-    registration_form = driver.find_element_by_xpath(
-        '//form[@name="registration"]'
-    )
+    ## Find form
+    #registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
 
     # Fill out form
-    fill_form(registration_form, form_data)
+    fill_form(driver, form_data)
+    #fill_form(registration_form, form_data)
     
     # Return user data
     return user_data
