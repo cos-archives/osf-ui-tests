@@ -4,8 +4,10 @@ Miscellaneous utility functions for smokescreen tests
 
 import os
 import re
-import uuid
 import time
+import uuid
+import inspect
+import unittest
 
 # Selenium imports
 from selenium import webdriver
@@ -14,6 +16,29 @@ from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
+
+def generate_tests(klass):
+    
+    # Get calling module
+    # Code from http://stackoverflow.com/questions/1095543/get-name-of-calling-functions-module-in-python
+    frm = inspect.stack()[1]
+    mod = inspect.getmodule(frm[0])
+
+    # Generate a subclass of the test case for each
+    # browser / OS node
+    for idx, node in enumerate(config.nodes):
+        
+        # Create subclass
+        node_klass = type(
+            'node_klass', 
+            (klass, unittest.TestCase), 
+            {}
+        )
+        node_klass.driver_opts = node
+        
+        # Add new test to calling module
+        test_name = 'test_%d' % (idx)
+        setattr(mod, test_name, node_klass)
 
 def wait_until_visible(elm, ntry=50, delay=0.1):
     """
@@ -42,7 +67,10 @@ def wait_until_stable(elm, ntry=50, delay=0.1):
     # Fail
     return False
 
-def launch_driver(driver_name='Chrome', wait_time=config.selenium_wait_time):
+def launch_driver(
+        driver_name='Chrome', 
+        desired_capabilities={},
+        wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
     Args:
@@ -51,29 +79,22 @@ def launch_driver(driver_name='Chrome', wait_time=config.selenium_wait_time):
 
     """
     
+    driver_cls = getattr(webdriver, driver_name)
+
     if driver_name == 'Remote':
 
-        # Set up desired capabilities
-        desired_capabilities = webdriver.DesiredCapabilities.FIREFOX
-        desired_capabilities['platform'] = 'MAC'
-        desired_capabilities['name'] = 'OSF | SauceLabs'
-        
         # Set up command executor
         command_executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' \
             % (os.environ.get('SAUCE_USERNAME'), os.environ.get('SAUCE_ACCESS_KEY'))
 
-        args = {
-            'desired_capabilities' : desired_capabilities,
-            'command_executor' : command_executor,
-        }
+        driver = driver_cls(
+            desired_capabilities=desired_capabilities,
+            command_executor=command_executor
+        )
 
     else:
             
-        args = {}
-        
-    # Start WebDriver
-    driver_cls = getattr(webdriver, driver_name)
-    driver = driver_cls(**args)
+        driver = driver_cls()
     
     # Wait for elements to load
     driver.implicitly_wait(wait_time)
@@ -190,14 +211,18 @@ def create_user(driver, user_data=None):
     """
     if user_data is None:
         user_data = gen_user_data()
-
-    form_data = {'#%s' % (k) : user_data[k] for k in user_data}
+    
+    # Prepend #register- to each user field to generate
+    # the CSS selector for the corresponding <input>
+    form_data = {'#register-%s' % (k) : user_data[k] for k in user_data}
 
     # Browse to account page
     driver.get('%s/account' % (config.osf_home))
 
     # Find form
-    registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
+    registration_form = driver.find_element_by_xpath(
+        '//form[@name="registration"]'
+    )
 
     # Fill out form
     fill_form(registration_form, form_data)
