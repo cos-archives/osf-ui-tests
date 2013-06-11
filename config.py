@@ -26,3 +26,30 @@ osf_standard_registration_data = {
     '#ember587' : 'None',
     '#ember610' : 'continue',
 }
+
+#
+
+from selenium import webdriver
+
+def make_remote_opts(capabilities, platform=None, version=None, name=None):
+    
+    # Freeze local variables
+    _locals = locals()
+    
+    desired_capabilities = capabilities.copy()
+    desired_capabilities.update({
+        key : _locals[key] for key in _locals
+            if _locals[key] is not None
+    })
+
+    return {
+        'driver_name' : 'Remote',
+        'desired_capabilities' : desired_capabilities,
+    }  
+
+nodes = [
+    {'driver_name' : 'Firefox'},
+    #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'Windows 8'),
+    #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'OS X 10.6'),
+    #make_remote_opts(webdriver.DesiredCapabilities.CHROME, 'Linux'),
+]
