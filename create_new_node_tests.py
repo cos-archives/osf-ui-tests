@@ -27,8 +27,7 @@ class CreateNewNodeTests(base.ProjectSmokeTest):
         )
 
 # Generate tests
-def test():
-    util.generate_tests(CreateNewNodeTests)
+util.generate_tests(CreateNewNodeTests)
 
 # Run tests
 if __name__ == '__main__':

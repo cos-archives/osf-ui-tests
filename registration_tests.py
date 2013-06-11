@@ -100,8 +100,7 @@ class RegistrationTests(base.ProjectSmokeTest):
         )
 
 # Generate tests
-def test():
-    util.generate_tests(RegistrationTests)
+util.generate_tests(RegistrationTests)
 
 # Run tests
 if __name__ == '__main__':

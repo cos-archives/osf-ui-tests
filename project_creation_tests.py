@@ -87,8 +87,7 @@ class ProjectCreationTests(base.UserSmokeTest):
         self.assertEqual(len(alerts), 1)
 
 # Generate tests
-def test():
-    util.generate_tests(ProjectCreationTests)
+util.generate_tests(ProjectCreationTests)
 
 # Run tests
 if __name__ == '__main__':

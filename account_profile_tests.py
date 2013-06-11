@@ -109,8 +109,7 @@ class AccountProfileTests(base.UserSmokeTest):
         pass
 
 # Generate tests
-def test():
-    util.generate_tests(AccountProfileTests)
+util.generate_tests(AccountProfileTests)
 
 # Run tests
 if __name__ == '__main__':

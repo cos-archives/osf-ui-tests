@@ -323,8 +323,7 @@ class FileTests(base.ProjectSmokeTest):
             util.goto_files(self.driver)
      
 # Generate tests
-def test():
-    util.generate_tests(FileTests)
+util.generate_tests(FileTests)
 
 # Run tests
 if __name__ == '__main__':

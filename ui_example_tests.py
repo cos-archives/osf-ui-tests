@@ -77,8 +77,7 @@ class UITests(base.ProjectSmokeTest):
         self.assertEqual(len(alerts), 1)
 
 # Generate tests
-def test():
-    util.generate_tests(UITests)
+util.generate_tests(UITests)
 
 # Run tests
 if __name__ == '__main__':

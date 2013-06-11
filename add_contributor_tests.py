@@ -57,8 +57,7 @@ class AddContributorTests(base.ProjectSmokeTest):
         self.assertTrue(user_name in contribs)
 
 # Generate tests
-def test():
-    util.generate_tests(AddContributorTests)
+util.generate_tests(AddContributorTests)
 
 # Run tests
 if __name__ == '__main__':
