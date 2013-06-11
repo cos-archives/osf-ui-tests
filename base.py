@@ -1,5 +1,11 @@
 """
-
+Base classes for smoke tests. Test classes can subclass various
+classes defined here instead of repetitively defining setUp and 
+tearDown methods. Note: these classes do NOT inherit from 
+unittest.TestCase. If subclasses need to be detected by unittest / 
+nose, they must multiply inherit from TestCase. This is done to 
+permit abstract test classes that will not be detected by unittest /
+nose.
 """
 
 # Imports
@@ -8,7 +14,6 @@ import unittest
 # Project imports
 import util
 
-#class SmokeTest(unittest.TestCase):
 class SmokeTest(object):
     """Base class for smoke tests. Creates a WebDriver
     on setUp and quits on tearDown.
@@ -19,7 +24,9 @@ class SmokeTest(object):
 
     def setUp(self):
         
-        # Launch Selenium
+        # Launch Selenium using options specified as class
+        # variables, which can include driver_name and
+        # desired_capabilities
         if hasattr(self, 'driver_opts'):
             self.driver = util.launch_driver(**self.driver_opts)
         else:
