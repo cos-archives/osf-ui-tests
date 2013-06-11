@@ -1,41 +1,36 @@
+"""
+
+"""
+
 import unittest
+import time
 
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+
 # Project imports
+import base
 import util
 import config
-import time
 
-class CreateForkTests(unittest.TestCase):
+class CreateForkTests(base.ProjectSmokeTest):
 
     def setUp(self):
 
-        # Start WebDriver
-        self.driver = util.launch_driver()
+        # 
+        super(CreateForkTests, self).setUp()
 
-        # Create test user
-        self.user_data = util.create_user(self.driver)
-
-        # Login to test account
-        util.login(
-            self.driver,
-            self.user_data['username'],
-            self.user_data['password']
-        )
-
-        # create a project
-        util.create_project(self.driver)
-
-        #go to the project
+        # go to the project
         self.url = util.goto_project(self.driver)
 
         # Make the project public
         util.make_project_public(self.driver, self.url)
 
-        #add to the wiki
+        time.sleep(3)
+        
+        # add to the wiki
         self.driver.find_element_by_link_text('Wiki').click()
         util.edit_wiki(self.driver)
         util.add_wiki_text(
@@ -92,6 +87,9 @@ class CreateForkTests(unittest.TestCase):
         # Close WebDriver
         self.driver.close()
 
+# Generate tests
+util.generate_tests(CreateForkTests)
 
+# Run tests
 if __name__ == '__main__':
     unittest.main()

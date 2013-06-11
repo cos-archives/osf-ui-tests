@@ -1,7 +1,5 @@
 """
 Selenium test suite for account profile manipulation and access
-Author: Harry Rybacki
-Date: 29May13
 """
 
 import time
@@ -12,39 +10,17 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 # Project imports
+import base
 import util
 import config
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 538a68b067e58a97e183e7a6480d2bb50e6089b3
-class AccountProfileTests(unittest.TestCase):
+class AccountProfileTests(base.UserSmokeTest):
     
-    @classmethod
-    def setUpClass(cls):
-        
-        # Start WebDriver
-        cls.driver = util.launch_driver()
-        
-        # Create test user
-        cls.user_data = util.create_user(cls.driver)
-        
-        # Login to test account
-        util.login(
-            cls.driver,
-            cls.user_data['username'],
-            cls.user_data['password']
-        )
-    
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Close WebDriver
-        cls.driver.close()
-
     def setUp(self):
-
+        
+        # Call parent setUp
+        super(AccountProfileTests, self).setUp()
+        
         # Browse to profile
         util.goto_profile(self.driver)
 
@@ -131,6 +107,9 @@ class AccountProfileTests(unittest.TestCase):
     @unittest.skip("not implemented")
     def test_check_public_project_updates(self):
         pass
+
+# Generate tests
+util.generate_tests(AccountProfileTests)
 
 # Run tests
 if __name__ == '__main__':
