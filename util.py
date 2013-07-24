@@ -429,7 +429,7 @@ def create_node(
         goto_project(driver, project_title)
     
     # Click New Node button
-    driver.find_element_by_link_text('New Node').click()
+    driver.find_element_by_link_text('Add Component').click()
     
     # Get form
     form = driver.find_element_by_xpath(
@@ -448,7 +448,7 @@ def create_node(
         form, 
         {
             'input[name="title"]' : node_title,
-            '#select01' : 'Project',
+            '#category' : 'Project',
         }
     )
 
