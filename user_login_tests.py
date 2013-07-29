@@ -65,26 +65,44 @@ class UserLoginTests(base.SmokeTest):
         self.assertEqual(len(alerts), 1)
 
     def test_incorrect_password(self):
-        
+
         # Login with incorrect password
         util.login(self.driver, self.user_data['username'], 'wrongpass')
-        
+
         # Check for alert
         alerts = util.get_alert_boxes(self.driver, 'log-in failed')
         self.assertEqual(len(alerts), 1)
-    
+
+
     def test_login(self):
-        
+
         # Login
         util.login(
-            self.driver, 
+            self.driver,
             self.user_data['username'],
             self.user_data['password']
         )
-        
+
         # Assert that browser is pointing to /dashboard
         self.assertTrue('/dashboard' in self.driver.current_url)
 
+
+    def test_logout(self):
+
+        # Login
+        util.login(
+            self.driver,
+            self.user_data['username'],
+            self.user_data['password']
+        )
+
+        #logout
+        util.logout(self.driver)
+
+        # Check for alert
+        alerts = util.get_alert_boxes(self.driver, 'You have successfully logged out.')
+        self.assertEqual(len(alerts), 1)
+        #self.assertTrue('/dashboard' in self.driver.current_url)
 # Generate tests
 util.generate_tests(UserLoginTests)
 
