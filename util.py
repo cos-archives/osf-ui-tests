@@ -589,3 +589,25 @@ def get_wiki_preview(driver):
     return driver\
         .find_element_by_id('wmd-preview')\
         .text
+
+def forget_password(driver, email):
+    """forgotpassword to OSF
+
+    Args:
+        driver : selenium.webdriver instance
+        forgotpassword_data : dict of id -> value pairs for forgotpassword form
+
+    Examples:
+        > forgotpassword(driver, {'email' : 'test@test.test'})
+
+    """
+
+    # Browse to OSF forgotpassword page
+    driver.get('%s/account' % (config.osf_home))
+
+    # Get forgotpassword form
+    forgotpassword_form = driver.find_element_by_xpath('//form[@name="forgotpassword"]')
+    fill_form(forgotpassword_form, {
+        '#forgot_password-email' : email,
+
+    })
