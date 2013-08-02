@@ -10,6 +10,7 @@ import base
 import util
 import config
 
+
 class RegistrationTests(base.ProjectSmokeTest):
     
     ###########
