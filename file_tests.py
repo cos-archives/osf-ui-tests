@@ -113,6 +113,7 @@ class FileTests(base.ProjectSmokeTest):
             'ancestor::tr'
         )
 
+    @unittest.skip
     def test_add_files(self):
         """ Add several files. """
         
@@ -307,6 +308,7 @@ class FileTests(base.ProjectSmokeTest):
             # Return to files page
             util.goto_files(self.driver)
      
+    @unittest.skip
     def test_access_files(self):
         
         # Add files
