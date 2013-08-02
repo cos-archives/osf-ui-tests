@@ -38,8 +38,16 @@ class ProjectCreationTests(base.UserSmokeTest):
         )
         self.assertEqual(redirect_title, config.project_title)
 
+        #navigate to dashboard
+        util.goto_dashboard(self.driver)
+
+        #find created project in dashboard
+        title=self.driver.find_element_by_link_text(config.project_title)
+        self.assertTrue(title)
+
         # Delete project
         util.delete_project(self.driver)
+
 
     def test_create_project_no_title(self):
         #self.project_title = ''
@@ -54,9 +62,9 @@ class ProjectCreationTests(base.UserSmokeTest):
 
     def test_create_project_no_description(self):
 
-        # 
+        #
         util.create_project(
-            self.driver, 
+            self.driver,
             project_description=''
         )
 
@@ -70,19 +78,19 @@ class ProjectCreationTests(base.UserSmokeTest):
         #where the description starts
         self.assertEqual(redirect_title, config.project_title)
         util.delete_project(self.driver)
-    
+
     def test_delete_project(self):
         """ Test creating and then deleting a project. """
-            
+
         # Create a new project
         util.create_project(self.driver)
-        
+
         # Delete the project
         util.delete_project(self.driver)
-        
+
         # Get alert boxes
         alerts = util.get_alert_boxes(self.driver, 'component(s) deleted')
-        
+
         # Must be exactly one matching alert
         self.assertEqual(len(alerts), 1)
 

@@ -56,6 +56,21 @@ class AddContributorTests(base.ProjectSmokeTest):
         contribs = self.driver.find_element_by_id('contributors').text
         self.assertTrue(user_name in contribs)
 
+        #logout the first user
+        util.logout(self.driver)
+
+        #log in as the second user
+        util.login(
+            self.driver,
+            self.second_user_data['username'],
+            self.second_user_data['password']
+        )
+
+        #find created project in dashboard
+        title=self.driver.find_element_by_link_text(config.project_title)
+        self.assertTrue(title)
+
+
 # Generate tests
 util.generate_tests(AddContributorTests)
 
