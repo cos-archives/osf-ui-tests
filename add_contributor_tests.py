@@ -35,6 +35,8 @@ class AddContributorTests(base.ProjectSmokeTest):
         )
 
     def test_add_contributor(self):
+        # TODO: Convert from Ember IDs to CSS selectors.
+
 
         #go to the project
         self.url = util.goto_project(self.driver)
@@ -43,18 +45,24 @@ class AddContributorTests(base.ProjectSmokeTest):
         time.sleep(3)
 
         user_email = self.second_user_data['username']
-        username_box = self.driver.find_element_by_xpath(
-            '//input[@id="ember204"]'
+        username_box = self.driver.find_element_by_css_selector(
+            'div#addContributors input[type=text]'
         )
         username_box.send_keys(user_email)
 
-        self.driver.find_element_by_xpath('//button[@id="ember234"]').click()
-        self.driver.find_element_by_xpath('//input[@id="ember385"]').click()
-        user_name = self.driver.find_element_by_xpath('//div[@id="ember178"]').text.replace("Search\n", "")
+        search_button = self.driver.find_element_by_css_selector(
+            '#addContributors button')
+        search_button.click()
+
+
+        self.driver.find_element_by_css_selector('#addContributors input[type=radio]').click()
+
         self.driver.find_element_by_xpath('//button[@class="btn primary"]').click()
+
         time.sleep(3)
+
         contribs = self.driver.find_element_by_id('contributors').text
-        self.assertTrue(user_name in contribs)
+        self.assertTrue(self.second_user_data['fullname'] in contribs)
 
         #logout the first user
         util.logout(self.driver)
