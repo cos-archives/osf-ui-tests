@@ -383,7 +383,11 @@ def logout(driver):
     driver.get(config.osf_home)
 
     # locate and click logout button
-    driver.find_element_by_xpath('//a[@href="/logout"]').click()
+    try:
+        driver.find_element_by_xpath('//a[@href="/logout"]').click()
+    except NoSuchElementException:
+        # There is no logout link - assume the user is not logged in
+        pass
 
 def create_project(driver, project_title=config.project_title, project_description=config.project_description):
     """Create new project
