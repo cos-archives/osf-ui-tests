@@ -13,6 +13,7 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from random import randint
 
 # Project imports
 import config
@@ -189,12 +190,16 @@ def login(driver, username, password):
         '#password' : password,
     })
 
+def unicode_uuid(id_length=12):
+        return ''.join( [unichr(randint(0,10000)) for _ in xrange(id_length)] )
+
+
 def gen_user_data(_length=12):
     """ Generate data to create a user account. """
     
-    fullname = str(uuid.uuid1())[:_length]
+    fullname = unicode_uuid()
     username = str(uuid.uuid1())[:_length] + '@osftest.org'
-    password = str(uuid.uuid1())[:_length]
+    password = unicode_uuid()
 
     username2 = username
     password2 = password
@@ -611,3 +616,4 @@ def forget_password(driver, email):
         '#forgot_password-email' : email,
 
     })
+
