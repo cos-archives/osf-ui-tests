@@ -1,7 +1,6 @@
 import util
 import base
 import os
-import requests
 
 
 class FileHandlingTests(base.ProjectSmokeTest):
@@ -22,6 +21,14 @@ class FileHandlingTests(base.ProjectSmokeTest):
             'html': 'htmlfile.html',
         })
 
+        self.archive_files = _generate_full_filepaths({
+            'tar': 'text_files.tar',
+            'tar.gz': 'text_files.tar.gz',
+            'zip': 'text_files.zip',
+        })
+
+        self.archive_file_contents = ('txtfile.txt','htmlfile.html')
+
     def _add_file(self, path):
         self.goto('files')
 
@@ -30,10 +37,10 @@ class FileHandlingTests(base.ProjectSmokeTest):
         ''')
 
         # Find file input
-        input = self.driver.find_element_by_css_selector('input[type=file]')
+        field = self.driver.find_element_by_css_selector('input[type=file]')
 
         # Enter file into input
-        input.send_keys(path)
+        field.send_keys(path)
 
         # Upload files
         self.driver.find_element_by_css_selector(
@@ -84,6 +91,19 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 contents.strip(),
             )
 
+    def test_embedded_archive_preview(self):
+        for key in self.archive_files:
+            self._add_file(self.archive_files[key]['path'])
+            self.goto('file', self.archive_files[key]['filename'])
+
+            self.assertEqual(
+                set(
+                    self.get_element(
+                        '#file-container pre'
+                    ).text.strip().split('\n')[1:]
+                ),
+                set(self.archive_file_contents)
+            )
 
 util.generate_tests(FileHandlingTests)
 
@@ -100,6 +120,7 @@ def _generate_full_filepaths(file_dict):
         }
 
     return file_dict
+
 
 if __name__ == '__main__':
     import unittest
