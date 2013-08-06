@@ -27,9 +27,12 @@ class FileHandlingTests(base.ProjectSmokeTest):
             'tar.gz': 'text_files.tar.gz',
             'zip': 'text_files.zip',
         })
-
         self.archive_file_contents = ('txtfile.txt','htmlfile.html')
 
+
+        self.binary_files = _generate_full_filepaths({
+            'pdf': 'pdffile.pdf',
+        })
     def _add_file(self, path):
         """Add a file. Assumes that the test class is harnessed to a project"""
         self.goto('files')
@@ -136,6 +139,17 @@ class FileHandlingTests(base.ProjectSmokeTest):
         # delete the temp file we made
         os.close(fd)
         os.remove(temp_file_path)
+
+    def test_not_embeddable(self):
+        """Upload a non-embedable file and make sure it's not embedded"""
+        f = self.binary_files['pdf']
+
+        self._add_file(f['path'])
+        self.goto('file', f['filename'])
+
+        self.assertTrue(
+            'cannot be rendered' in self.get_element('div#file-container').text
+        )
 
 util.generate_tests(FileHandlingTests)
 
