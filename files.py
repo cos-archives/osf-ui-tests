@@ -1,6 +1,7 @@
 import util
 import base
 import os
+import tempfile
 
 
 class FileHandlingTests(base.ProjectSmokeTest):
@@ -113,6 +114,28 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 ),
                 set(self.archive_file_contents)
             )
+
+    def test_too_large_to_embed(self):
+        """Make sure very large text files are not rendered in-browser"""
+
+        # generate a 3MB temporary file
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            for _ in xrange(100000):
+                tmp_file.write('Hello, Open Science Framework!')
+
+        # add the file to the project
+        self._add_file(temp_file_path)
+        self.goto('file', os.path.split(temp_file_path)[-1])
+
+        # check that it is not rendered in the browser
+        self.assertTrue(
+            'file is too large' in self.get_element('div#file-container').text
+        )
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
 
 util.generate_tests(FileHandlingTests)
 
