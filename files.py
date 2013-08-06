@@ -1,6 +1,7 @@
 import util
 import base
 import os
+import shutil
 import tempfile
 
 
@@ -29,10 +30,15 @@ class FileHandlingTests(base.ProjectSmokeTest):
         })
         self.archive_file_contents = ('txtfile.txt','htmlfile.html')
 
-
         self.binary_files = _generate_full_filepaths({
             'pdf': 'pdffile.pdf',
         })
+
+        self.versioned_files = _generate_full_filepaths({
+            0: 'versioned-0.txt',
+            1: 'versioned-1.txt',
+        })
+
     def _add_file(self, path):
         """Add a file. Assumes that the test class is harnessed to a project"""
         self.goto('files')
@@ -51,6 +57,24 @@ class FileHandlingTests(base.ProjectSmokeTest):
         self.driver.find_element_by_css_selector(
             'div.fileupload-buttonbar button.start'
         ).click()
+
+    def _add_versioned_file(self):
+        filename = 'versioned.txt'
+        upload_dir = os.path.dirname(self.text_files['txt']['path'])
+        f = os.path.join(upload_dir, filename)
+
+        # rename and upload version 0.
+        shutil.copy(self.versioned_files[0]['path'], f)
+        self._add_file(f)
+
+        # rename and upload version 1
+        shutil.copy(self.versioned_files[1]['path'], f)
+        self._add_file(f)
+
+        # delete the temp file
+        os.remove(f)
+
+        return filename
 
     def _file_exists_in_project(self, filename):
         """Goes to a file's page, verifies by checking the title."""
@@ -150,6 +174,17 @@ class FileHandlingTests(base.ProjectSmokeTest):
         self.assertTrue(
             'cannot be rendered' in self.get_element('div#file-container').text
         )
+
+    def test_most_recent_version_displayed(self):
+        f = self._add_versioned_file()
+
+        # assert that string from version 1 is present in embed.
+        self.goto('file', f)
+        self.assertTrue(
+            'Version 1' in self.get_element('#file-container pre').text.strip()
+        )
+
+
 
 util.generate_tests(FileHandlingTests)
 
