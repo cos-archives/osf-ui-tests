@@ -184,6 +184,23 @@ class FileHandlingTests(base.ProjectSmokeTest):
             'Version 1' in self.get_element('#file-container pre').text.strip()
         )
 
+    def test_version_history(self):
+        f = self._add_versioned_file()
+
+        self.goto('file', f)
+        # topmost history entry is the current version
+        self.assertTrue(
+            'current' in self.get_element(
+                '#file-version-history tbody tr:first-child td:first-child'
+            ).text
+        )
+        # second topmost entry is revision 1.
+        self.assertTrue(
+            '1' in self.get_element(
+                '#file-version-history tbody tr:nth-of-type(2) td:first-child'
+            ).text
+        )
+
 
 
 util.generate_tests(FileHandlingTests)
