@@ -11,6 +11,10 @@ nose.
 # Imports
 import unittest
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait as wait
+
 # Project imports
 import util
 
@@ -90,3 +94,31 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # Call parent tearDown
         super(ProjectSmokeTest, self).tearDown()
+
+    def goto(self, page, *args):
+        """Go to a project's page
+
+        :param page: The name of the destination page. Acceptable include
+                     "files", "settings", and "registrations"
+        :returns: True on success, KeyError page
+        """
+        build_path = {
+            'files': lambda: '/'.join([self.project_url[:-1], 'files']),
+            'file': lambda: '/'.join([self.project_url[:-1], 'files', args[0]])
+        }
+
+        # This will throw a KeyError if the page type is not in the above dict.
+        self.driver.get(
+            url=build_path[page]()
+        )
+
+    def get_element(self, css):
+        return wait(
+            driver=self.driver,
+            timeout=10
+        ).until(
+            method=ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, css)
+            )
+        )
+
