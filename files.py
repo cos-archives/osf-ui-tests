@@ -30,6 +30,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         self.archive_file_contents = ('txtfile.txt','htmlfile.html')
 
     def _add_file(self, path):
+        """Add a file. Assumes that the test class is harnessed to a project"""
         self.goto('files')
 
         self.driver.execute_script('''
@@ -48,11 +49,13 @@ class FileHandlingTests(base.ProjectSmokeTest):
         ).click()
 
     def _file_exists_in_project(self, filename):
+        """Goes to a file's page, verifies by checking the title."""
         self.goto('file', filename)
 
         return filename in self.get_element('div.page-header h1').text
 
     def test_add_file(self):
+        """Add a file to a project, then make sure its page exists"""
         f = self.images['jpg']
 
         self._add_file(f['path'])
@@ -62,6 +65,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
     def test_embedded_image_previews(self):
+        """Test that image file pages include the image as an <img> element"""
 
         for key in self.images:
             self._add_file(self.images[key]['path'])
@@ -83,9 +87,12 @@ class FileHandlingTests(base.ProjectSmokeTest):
         for key in self.text_files:
             self._add_file(self.text_files[key]['path'])
             self.goto('file', self.text_files[key]['filename'])
+
+            # read the contents of the source file
             with open(self.text_files[key]['path']) as f:
                 contents = f.read()
 
+            # make sure they match the contents of the <pre> element.
             self.assertEqual(
                 self.get_element('#file-container pre').text.strip(),
                 contents.strip(),
@@ -96,11 +103,13 @@ class FileHandlingTests(base.ProjectSmokeTest):
             self._add_file(self.archive_files[key]['path'])
             self.goto('file', self.archive_files[key]['filename'])
 
+            # Check that the file list in the <pre> element matches the
+            # archive's content.
             self.assertEqual(
                 set(
                     self.get_element(
                         '#file-container pre'
-                    ).text.strip().split('\n')[1:]
+                    ).text.strip().split('\n')[1:]  # Exclude the first line.
                 ),
                 set(self.archive_file_contents)
             )
@@ -109,6 +118,8 @@ util.generate_tests(FileHandlingTests)
 
 
 def _generate_full_filepaths(file_dict):
+    """Given a dict of filenames, return a dict that includes the full path
+    for each."""
     # Make each filename a full path
     for f in file_dict:
         file_dict[f] = {
