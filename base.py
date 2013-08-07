@@ -16,7 +16,9 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
 
 # Project imports
+import config
 import util
+
 
 class SmokeTest(object):
     """Base class for smoke tests. Creates a WebDriver
@@ -35,6 +37,8 @@ class SmokeTest(object):
             self.driver = util.launch_driver(**self.driver_opts)
         else:
             self.driver = util.launch_driver()
+
+        self.site_root = config.osf_home.strip('/')
         
     def tearDown(self):
         
@@ -42,6 +46,7 @@ class SmokeTest(object):
         # Note: Use WebDriver.quit() instead of WebDriver.close();
         # otherwise, SauceLabs tests will never finish
         self.driver.quit()
+
 
 class UserSmokeTest(SmokeTest):
     """Class for smoke tests that require user login.
@@ -69,6 +74,7 @@ class UserSmokeTest(SmokeTest):
 
         # Call parent tearDown
         super(UserSmokeTest, self).tearDown()
+
         
 class ProjectSmokeTest(UserSmokeTest):
     """Class for smoke tests that require project
@@ -103,8 +109,10 @@ class ProjectSmokeTest(UserSmokeTest):
         :returns: True on success, KeyError page
         """
         build_path = {
+            'dashboard': lambda: self.project_url,
             'files': lambda: '/'.join([self.project_url[:-1], 'files']),
-            'file': lambda: '/'.join([self.project_url[:-1], 'files', args[0]])
+            'file': lambda: '/'.join([self.project_url[:-1], 'files', args[0]]),
+            'user-dashboard': lambda: '/'.join([self.site_root, 'dashboard'])
         }
 
         # This will throw a KeyError if the page type is not in the above dict.
@@ -122,3 +130,40 @@ class ProjectSmokeTest(UserSmokeTest):
             )
         )
 
+    # User methods
+
+    def create_user(self):
+        return util.create_user(self.driver)
+
+    def log_in(self, user=None):
+        if not user:
+            user = self.user_data
+        return util.login(
+            self.driver,
+            user['username'],
+            user['password']
+
+        )
+
+    def log_out(self):
+        return util.logout(self.driver)
+
+    # Node methods
+
+    def add_contributor(self, user):
+        # click the "add" link
+        self.get_element('#contributors a[href="#addContributors"]').click()
+
+        # enter the user's email address
+        self.get_element('div#addContributors input[type=text]').send_keys(
+            user['username']
+        )
+
+        # click the search button
+        self.get_element('#addContributors button').click()
+
+        # click the radio button for the first result
+        self.get_element('#addContributors input[type=radio]').click()
+
+        # click the "Add" button
+        self.get_element('#addContributors button.btn.primary').click()
