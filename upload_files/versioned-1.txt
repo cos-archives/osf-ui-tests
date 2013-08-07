@@ -1,0 +1,2 @@
+Version 0 of a simple text file.
+Version 1 adds another line.
