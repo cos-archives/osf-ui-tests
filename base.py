@@ -167,3 +167,17 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # click the "Add" button
         self.get_element('#addContributors button.btn.primary').click()
+
+    def remove_contributor(self, user):
+
+        self.driver.execute_script(
+            """me = $('#contributors a:contains("{fullname}")')
+                .append('<i class="icon-remove"><i>');
+            removeUser(
+                me.attr("data-userid"),
+                me.attr("data-fullname"),
+                me
+            );""".format(fullname=user['fullname'])
+        )
+
+        self.driver.switch_to_alert().accept()
