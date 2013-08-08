@@ -1,4 +1,5 @@
-import time
+import config
+import util
 
 from base import ProjectSmokeTest, not_implemented
 
@@ -67,22 +68,18 @@ class ProjectSecurityTest(ProjectSmokeTest):
         self.log_in(self.user_data)
 
     def test_public_private(self):
-        import util
-        import config
-        """ Test creating a project and then making it public. """
+        """Test that public and private states work as intended.
 
-        # Navigate to the project
-        util.goto_project(self.driver, project_title=config.project_title)
+        TODO: While this test tests security fine, it doesn't test the pop-up
+        modals at all. This is because we ran into complex issues with selenium,
+        trying to get it to fully load the GET requests after dismissing the
+        confirmation modal.
 
-        # Click the "Make public" button
-        self.get_element(
-            'div.btn-toolbar > div.btn-group:first-child > a'
-        ).click()
+        This should be fixed once we understand selenium better.
+        """
 
-        # Confirm modal popup
-        self.get_element('div#modal_0 button.modal-confirm').click()
-
-        time.sleep(3)
+        # Make the project public
+        self.driver.get('{url}makepublic'.format(url=self.project_url))
 
         self.log_out()
 
@@ -93,24 +90,12 @@ class ProjectSecurityTest(ProjectSmokeTest):
             self.get_element('#node-title-editable').text
         )
 
-        util.login(
-            driver=self.driver,
-            username=self.user_data['username'],
-            password=self.user_data['password'],
-        )
+        self.log_in()
 
-        # Make the project private
-        self.goto('dashboard')
-        self.get_element(
-            "div.btn-toolbar > div.btn-group:first-child > a"
-        ).click()
-
-        # Confirm modal popup
-        self.get_element('div#modal_0 button.modal-confirm').click()
+        self.driver.get('{url}makeprivate'.format(url=self.project_url))
 
         self.log_out()
 
-        time.sleep(3)
         self.goto('dashboard')
 
         self.assertEqual(
@@ -118,7 +103,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
             1
         )
 
-        self.log_in(self.user_data)
+        self.log_in()
 
     @not_implemented
     def test_fork_with_private_components(self):
