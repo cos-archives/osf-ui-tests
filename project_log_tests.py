@@ -172,7 +172,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self.assertEqual(message_log.log_text, second_user_data["fullname"] + " added " + self.user_data['fullname']
                                                + " as contributor on node " + config.project_title)
 
-        #check the user_url and project_url
+        #check the second user_url, first user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2]+"/", project_url)
@@ -208,14 +208,17 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self.assertEqual(message_log.log_text, second_user_data["fullname"] + " removed " + self.user_data['fullname']
                                                + " as a contributor from project " + config.project_title)
 
-        #check the user_url and project_url
+        #check the second user_url, first user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2]+"/", project_url)
 
 
     def test_file_upload_log(self):
+        """
+        test to make sure that project log works correctly on uploading files to a project
 
+        """
          # Test file names
         self.images = self._generate_full_filepaths({
             'jpg': 'test.jpg',
@@ -244,7 +247,10 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
 
     def test_file_modification_log(self):
+        """
+        test to make sure that project log works correctly on modifying files on a project
 
+        """
         # Test file names
         self.text_files = self._generate_full_filepaths({
             'txt': 'txtfile.txt',
@@ -276,7 +282,10 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
 
     def test_delete_file_log(self):
+        """
+        test to make sure that project log works correctly on deleting files from a project
 
+        """
         # Test file names
         self.images = self._generate_full_filepaths({
             'jpg': 'test.jpg',
