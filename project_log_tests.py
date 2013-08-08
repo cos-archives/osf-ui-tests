@@ -17,13 +17,13 @@ import util
 import config
 import uuid
 
+
 class ProjectLogTests(base.ProjectSmokeTest):
 
     def _assert_time(self,time_now):
         #assert the time
         time_diff = abs(datetime.utcnow()-time_now)
         self.assertTrue(time_diff < timedelta(minutes=2))
-
 
     def test_create_project_log(self):
         """
@@ -37,12 +37,20 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log text
-        self.assertEqual(message_log.log_text, self.user_data["fullname"]+ " created project")
+        self.assertEqual(
+            message_log.log_text,
+            "{} created project".format(self.user_data["fullname"])
+        )
 
         #check the user_url and project_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1]+"/", self.project_url)
-
+        self.assertEqual(
+            message_log.log_url[0],
+            self.get_user_url()
+        )
+        self.assertEqual(
+            message_log.log_url[1],
+            self.project_url.strip('/')
+        )
 
     def test_create_node_log(self):
         """
@@ -59,20 +67,31 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, self.user_data["fullname"]+ " created node " + config.node_title)
-
+        self.assertEqual(
+            message_log.log_text,
+            "{} created node {}".format(
+                self.user_data["fullname"],
+                config.node_title,
+            )
+        )
 
         #check the user_url
-        self.assertEqual(message_log.log_url[0],self.get_user_url())
+        self.assertEqual(
+            message_log.log_url[0],
+            self.get_user_url()
+        )
 
         #get the node url
         self.driver.find_element_by_css_selector("li span a").click()
-        node_url=self.driver.current_url
+        node_url = self.driver.current_url
 
-        #check the node url
-        #this part currently failed because something need to be fixed on the webpage
-        self.assertEqual(message_log.log_url[2]+"/",node_url)
-
+        # check the node url
+        # this part currently failed because something need to be fixed on the
+        # webpage
+        self.assertEqual(
+            message_log.log_url[1],
+            node_url.strip('/')
+        )
 
     def test_project_rename_log(self):
         """
@@ -80,10 +99,10 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         """
         #get user_url
-        user_url=self.get_user_url()
+        user_url = self.get_user_url()
 
         #rename the project
-        project_new_name=str(uuid.uuid1())[:6]
+        project_new_name = str(uuid.uuid1())[:6]
         util.project_rename(self.driver, project_new_name)
 
          #get log
@@ -93,28 +112,37 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " changed the title from "
-                                               + config.project_title + " to " + project_new_name)
-
+        self.assertEqual(
+            message_log.log_text,
+            "{} changed the title from {} to {}".format(
+                self.user_data["fullname"],
+                config.project_title,
+                project_new_name,
+                )
+        )
 
         #check the user_url and project_url
-        self.assertEqual(message_log.log_url[0], user_url)
-        self.assertEqual(message_log.log_url[1]+"/", self.project_url)
+        self.assertEqual(
+            message_log.log_url[0],
+            user_url,
+        )
+        self.assertEqual(
+            message_log.log_url[1],
+            self.project_url.strip('/'),
+        )
 
         #cleanup
         util.project_rename(self.driver, config.project_title)
 
-
     def test_wiki_changes_log(self):
         """
         test to make sure that wiki_changes log works correctly
-
         """
+
         # Browse to wiki page
         self.driver.find_element_by_link_text('Wiki').click()
 
-
-         # Get original version number
+        # Get original version number
         orig_version = util.get_wiki_version(self.driver)
 
         # edit the wiki
@@ -135,14 +163,23 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #assert the log
         new_version = str(orig_version + 1)
-        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " updated wiki page home to version "
-                                               + new_version)
-
+        self.assertEqual(
+            message_log.log_text,
+            '{} updated wiki page home to version {}'.format(
+                self.user_data["fullname"],
+                new_version,
+            )
+        )
 
         #check the user_url and project_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1], wiki_url)
-
+        self.assertEqual(
+            message_log.log_url[0],
+            self.get_user_url()
+        )
+        self.assertEqual(
+            message_log.log_url[1],
+            wiki_url
+        )
 
     def test_add_contributor_log(self):
         """
@@ -150,7 +187,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         """
        # Log out
-        user_url=self.get_user_url()
+        user_url = self.get_user_url()
         util.logout(self.driver)
 
         # Create second user and get his url
@@ -172,18 +209,32 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, second_user_data["fullname"] + " added " + self.user_data['fullname']
-                                               + " as contributor on node " + config.project_title)
+        self.assertEqual(
+            message_log.log_text,
+            '{} added {} as contributor on node {}'.format(
+                second_user_data['fullname'],
+                self.user_data['fullname'],
+                config.project_title,
+            )
+        )
 
         #check the user_url and project_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1], user_url)
-        self.assertEqual(message_log.log_url[2]+"/", project_url)
-
+        self.assertEqual(
+            message_log.log_url[0],
+            self.get_user_url()
+        )
+        self.assertEqual(
+            message_log.log_url[1],
+            user_url
+        )
+        self.assertEqual(
+            message_log.log_url[2],
+            project_url.strip('/')
+        )
 
     def test_delete_contributor_log(self):
         # Log out
-        user_url=self.get_user_url()
+        user_url = self.get_user_url()
         util.logout(self.driver)
 
         # Create second user and get his url
@@ -208,19 +259,16 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, second_user_data["fullname"] + " removed " + self.user_data['fullname']
-                                               + " as a contributor from project " + config.project_title)
+        self.assertEqual(
+            message_log.log_text,
+            '{} removed {} as a contributor from project {}'.format(
+                second_user_data["fullname"],
+                self.user_data['fullname'],
+                config.project_title
+            )
+        )
 
         #check the user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2]+"/", project_url)
-
-
-
-# Generate tests
-util.generate_tests(ProjectLogTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

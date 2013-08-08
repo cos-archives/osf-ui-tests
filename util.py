@@ -17,42 +17,6 @@ from selenium.common.exceptions import NoSuchElementException
 # Project imports
 import config
 
-def generate_tests(klass):
-    """Given a class containing a set of tests, create
-    a subclass for each OS / browser / version node specified
-    in config. Then add each subclass to the global namespace
-    of the calling module. This approach means that unittest / 
-    nose will detect the generated test classes.
-
-    Args:
-        klass : Class containing tests
-    """
-    # Get calling module
-    # Code from http://stackoverflow.com/questions/1095543/get-name-of-calling-functions-module-in-python
-    frm = inspect.stack()[1]
-    mod = inspect.getmodule(frm[0])
-
-    # Generate a subclass of the test case for each
-    # browser / OS node
-    for idx, node in enumerate(config.nodes):
-        
-        # Get test name
-        test_name = 'test_%d' % (idx)
-
-        # Create subclass inheriting from both the 
-        # given class and unittest.TestCase
-        node_klass = type(
-            test_name,
-            (klass, unittest.TestCase), 
-            {}
-        )
-
-        # Store the node configuration in a class variable
-        node_klass.driver_opts = node
-        
-        # Add new test to calling module
-        setattr(mod, test_name, node_klass)
-
 def wait_until_visible(elm, ntry=50, delay=0.1):
     """
 
@@ -81,7 +45,7 @@ def wait_until_stable(elm, ntry=50, delay=0.1):
     return False
 
 def launch_driver(
-        driver_name='Chrome', 
+        driver_name='Firefox',
         desired_capabilities={},
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.

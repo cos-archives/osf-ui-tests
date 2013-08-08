@@ -1,7 +1,6 @@
 import time
 
-from base import ProjectSmokeTest
-from util import generate_tests, get_alert_boxes
+from base import ProjectSmokeTest, not_implemented
 
 
 class ProjectSecurityTest(ProjectSmokeTest):
@@ -121,9 +120,6 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         self.log_in(self.user_data)
 
-
-generate_tests(ProjectSecurityTest)
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
+    @not_implemented
+    def test_fork_with_private_components(self):
+        raise NotImplementedError

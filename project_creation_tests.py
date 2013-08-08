@@ -174,11 +174,3 @@ class ProjectCreationTests(base.UserSmokeTest):
             len(util.get_alert_boxes(self.driver, 'not authorized')),
             1
         )
-
-
-# Generate tests
-util.generate_tests(ProjectCreationTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

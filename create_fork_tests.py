@@ -86,10 +86,3 @@ class CreateForkTests(base.ProjectSmokeTest):
 
         # Close WebDriver
         self.driver.close()
-
-# Generate tests
-util.generate_tests(CreateForkTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

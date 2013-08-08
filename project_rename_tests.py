@@ -12,7 +12,6 @@ import config
 
 class ProjectRenameTests(base.ProjectSmokeTest):
 
-
     def test_project_rename(self):
         """
         test to make sure that rename a project works correctly
@@ -26,10 +25,3 @@ class ProjectRenameTests(base.ProjectSmokeTest):
 
         #cleanup
         util.project_rename(self.driver, config.project_title)
-
-# Generate tests
-util.generate_tests(ProjectRenameTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

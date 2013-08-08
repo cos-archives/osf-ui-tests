@@ -1,342 +1,232 @@
-"""
-Tests for file upload, download, and deletion.
-"""
+from unittest import skip
 
-import os
-import glob
-import time
-import unittest
-
-# LXML imports
-from lxml import etree
-from lxml.html.diff import htmldiff
-
-# Selenium imports
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
-
-# Project imports
-import base
 import util
-import config
+import base
+import os
+import shutil
+import tempfile
 
-# Get files for upload tests
-file_dir = 'upload_files'
-abs_files = [
-    os.path.abspath(file)
-    for file in glob.glob('%s/*' % file_dir)
-]
 
-# 
-missing_file = 'this_file_is_missing'
+class FileHandlingTests(base.ProjectSmokeTest):
 
-def compare_html(html1, html2):
-    """Compare two HTML files using lxml's htmldiff.
+    def setUp(self):
 
-    Args:
-        html1 : HTML file
-        html2 : HTML file
-    Returns:
-        (bool) are the files different?
+        super(FileHandlingTests, self).setUp()
 
-    """
-    # Diff HTML files
-    diff = htmldiff(html1, html2)
+        # Test file names
+        self.images = _generate_full_filepaths({
+            'jpg': 'test.jpg',
+            'png': 'test.png',
+            'gif': 'test.gif',
+        })
 
-    # Wrap diff output in <diff> tags so lxml can parse
-    diff = '<diff>%s</diff>' % (diff)
+        self.text_files = _generate_full_filepaths({
+            'txt': 'txtfile.txt',
+            'html': 'htmlfile.html',
+        })
 
-    # Parse diff
-    elm = etree.fromstring(diff)
+        self.archive_files = _generate_full_filepaths({
+            'tar': 'text_files.tar',
+            'tar.gz': 'text_files.tar.gz',
+            'zip': 'text_files.zip',
+        })
+        self.archive_file_contents = ('txtfile.txt','htmlfile.html')
 
-    # Find insert / delete notes
-    ins_nodes = elm.xpath('//ins')
-    del_nodes = elm.xpath('//del')
+        self.binary_files = _generate_full_filepaths({
+            'pdf': 'pdffile.pdf',
+        })
 
-    # Check whether there are any nodes
-    return len(ins_nodes) or len(del_nodes)
+        self.versioned_files = _generate_full_filepaths({
+            0: 'versioned-0.txt',
+            1: 'versioned-1.txt',
+        })
 
-class FileTests(base.ProjectSmokeTest):
-    
-    def _add_files(self, files):
-        """
+    def _add_file(self, path):
+        """Add a file. Assumes that the test class is harnessed to a project"""
+        self.goto('files')
 
-        """
-        # Browse to files page
-        util.goto_files(self.driver)
-        
-        # Send file path to input
-        for file in files:
+        self.driver.execute_script('''
+            $('input[type="file"]').offset({left : 50});
+        ''')
 
-            # Hack: Set input offset to positive value
-            # Otherwise Selenium can't view the input
-            self.driver.execute_script('''
-                $('input[type="file"]').offset({left : 50});
-            ''')
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type=file]')
 
-            # Find file input
-            input = self.driver.find_element_by_xpath('//input[@type="file"]')
-            
-            # Enter file into input
-            input.send_keys(file)
+        # Enter file into input
+        field.send_keys(path)
 
         # Upload files
         self.driver.find_element_by_css_selector(
             'div.fileupload-buttonbar button.start'
         ).click()
-    
-    def _get_file_link(self, file):
-        """
-        
-        Args:
-            ...
-        Returns:
-            (short file name, file link element)
-        """
-        # Strip path
-        short_file = os.path.split(file)[-1]
 
-        try:
-            file_link = self.driver.find_element_by_xpath(
-                '//a[@title="%s"]' % (short_file)
+    def _add_versioned_file(self):
+        filename = 'versioned.txt'
+        upload_dir = os.path.dirname(self.text_files['txt']['path'])
+        f = os.path.join(upload_dir, filename)
+
+        # rename and upload version 0.
+        shutil.copy(self.versioned_files[0]['path'], f)
+        self._add_file(f)
+
+        # rename and upload version 1
+        shutil.copy(self.versioned_files[1]['path'], f)
+        self._add_file(f)
+
+        # delete the temp file
+        os.remove(f)
+
+        return filename
+
+    def _file_exists_in_project(self, filename):
+        """Goes to a file's page, verifies by checking the title."""
+        self.goto('file', filename)
+
+        return filename in self.get_element('div.page-header h1').text
+
+    def test_add_file(self):
+        """Add a file to a project, then make sure its page exists"""
+        f = self.images['jpg']
+
+        self._add_file(f['path'])
+
+        self.assertTrue(
+            self._file_exists_in_project(f['filename'])
+        )
+
+    @skip('Not Implemented')
+    def test_delete_file(self):
+        raise NotImplementedError
+
+    def test_embedded_image_previews(self):
+        """Test that image file pages include the image as an <img> element"""
+
+        for key in self.images:
+            self._add_file(self.images[key]['path'])
+            self.goto('file', self.images[key]['filename'])
+
+            # Get the src attribute of the image embedded
+            src_filename = self.get_element(
+                '#file-container img[src*="{filename}"]'.format(
+                    filename=self.images[key]['filename']
+                )
+            ).get_attribute('src').split('/')[-1]
+
+            self.assertEqual(
+                src_filename,
+                self.images[key]['filename']
             )
-        except NoSuchElementException:
-            file_link = None
 
-        return short_file, file_link
-    
-    def _get_tr(self, file_link):
-        """
-        """
-        return file_link.find_element_by_xpath(
-            'ancestor::tr'
+    def test_embedded_text_preview(self):
+        for key in self.text_files:
+            self._add_file(self.text_files[key]['path'])
+            self.goto('file', self.text_files[key]['filename'])
+
+            # read the contents of the source file
+            with open(self.text_files[key]['path']) as f:
+                contents = f.read()
+
+            # make sure they match the contents of the <pre> element.
+            self.assertEqual(
+                self.get_element('#file-container pre').text.strip(),
+                contents.strip(),
+            )
+
+    def test_embedded_archive_preview(self):
+        for key in self.archive_files:
+            self._add_file(self.archive_files[key]['path'])
+            self.goto('file', self.archive_files[key]['filename'])
+
+            # Check that the file list in the <pre> element matches the
+            # archive's content.
+            self.assertEqual(
+                set(
+                    self.get_element(
+                        '#file-container pre'
+                    ).text.strip().split('\n')[1:]  # Exclude the first line.
+                ),
+                set(self.archive_file_contents)
+            )
+
+    def test_too_large_to_embed(self):
+        """Make sure very large text files are not rendered in-browser"""
+
+        # generate a 3MB temporary file
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            for _ in xrange(100000):
+                tmp_file.write('Hello, Open Science Framework!')
+
+        # add the file to the project
+        self._add_file(temp_file_path)
+        self.goto('file', os.path.split(temp_file_path)[-1])
+
+        # check that it is not rendered in the browser
+        self.assertTrue(
+            'file is too large' in self.get_element('div#file-container').text
         )
 
-    @unittest.skip
-    def test_add_files(self):
-        """ Add several files. """
-        
-        # Add files
-        self._add_files(abs_files)
-            
-        # Verify that files appear in files table
-        for file in abs_files:
-            _, file_link = self._get_file_link(file)
-            self.assertTrue(file_link is not None)
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
 
-    def _delete_file(self, file):
-        #FIXME: file_link is apparently returning None.
+    def test_not_embeddable(self):
+        """Upload a non-embedable file and make sure it's not embedded"""
+        f = self.binary_files['pdf']
 
-        # Get file link
-        _, file_link = self._get_file_link(file)
+        self._add_file(f['path'])
+        self.goto('file', f['filename'])
 
-        # Click delete button
-        file_link.find_element_by_xpath(
-            'ancestor::tr//*[contains(@class, "btn-delete")]'
-        ).click()
-
-        return file_link
-
-    @unittest.skip
-    def test_delete_files(self):
-        """ Add and delete several files. """
-
-        # Add files
-        self._add_files(abs_files)
-
-        # Delete files
-        for file in abs_files:
-
-            # Delete the file
-            file_link = self._delete_file(file)
-
-            # Check whether file has been deleted. Table rows
-            # for deleted files are hidden, not deleted, so we need
-            # to check the element's is_displayed() method. It takes
-            # a few seconds for the hide animation to complete, so
-            # check repeatedly for a few seconds until the element
-            # is hidden.
-            deleted = False
-            for tryidx in range(25):
-                if not file_link.is_displayed():
-                    deleted = True
-                    break
-                time.sleep(0.1)
-            self.assertTrue(deleted)
-
-    def _goto_file(self, file):
-        """ Browse to a file within the current project. """
-        
-        # Build file URL
-        file_url = os.path.join(self.project_url, 'files', file)
-        
-        # Browse to file
-        self.driver.get(file_url)
-
-    @unittest.skip('File not found not implemented yet.')
-    def test_access_missing_file(self):
-        """Try to access a missing file. Right now, this generates
-        a 500 error from the server. Once the server generates a more
-        informative error message, this test will need to be
-        rewritten.
-
-        """
-        # Browse to file
-        self._goto_file(missing_file)
-
-        # Assert that file is not found
-        pass
-    
-    @unittest.skip('File not found not implemented yet.')
-    def test_access_deleted_file(self):
-        
-        # Add files
-        self._add_files(abs_files)
-        
-        # Delete files
-        for file in abs_files:
-
-            self._delete_file(file)
-        
-        # Check that files can't be accessed
-        for file in abs_files:
-
-            # Browse to file
-            self._goto_file(missing_file)
-
-            # Assert that file is not found
-            pass
-
-            # Return to files page
-            util.goto_files(self.driver)
-
-    def _download_file(self, file):
-        """
-        
-        """
-        short_name, file_link = self._get_file_link(file)
-
-        tr = self._get_tr(file_link)
-
-        download_link = tr.find_element_by_xpath(
-            '//a[@download="%s"]' % (short_name)
+        self.assertTrue(
+            'cannot be rendered' in self.get_element('div#file-container').text
         )
-        
-        # Browse to download URL. We do this instead of clicking
-        # on the link directly because some browsers (e.g. Chrome
-        # trigger a file download when clicking on the link.
-        self.driver.get(download_link.get_attribute('href'))
-    
-    @unittest.skip
-    def test_file_version(self):
-        #FIXME
-        raise NotImplementedError()
-        
-        file = abs_files[0]
 
-        for idx in range(5):
+    def test_most_recent_version_displayed(self):
+        f = self._add_versioned_file()
 
-            self._add_files([file])
+        # assert that string from version 1 is present in embed.
+        self.goto('file', f)
+        self.assertTrue(
+            'Version 1' in self.get_element('#file-container pre').text.strip()
+        )
 
-            # Get file link
-            short_name, file_link = self._get_file_link(file)
-            
-            # Click on file link
-            file_link.click()
+    def test_version_history(self):
+        f = self._add_versioned_file()
 
-            trs = self.driver.find_elements_by_tag_name('tr')
+        self.goto('file', f)
+        # topmost history entry is the current version
+        self.assertTrue(
+            'current' in self.get_element(
+                '#file-version-history tbody tr:first-child td:first-child'
+            ).text
+        )
+        # second topmost entry is revision 1.
+        self.assertTrue(
+            '1' in self.get_element(
+                '#file-version-history tbody tr:nth-of-type(2) td:first-child'
+            ).text
+        )
 
-            # Assert that the number of <tr> elements equals the
-            # loop index plus two (accounting for the header row
-            # and the fact that the loop index is zero-based)
-            self.assertEqual(len(trs), idx + 2)
+    @skip('Not Implemented')
+    def test_access_file_not_found(self):
+        raise NotImplementedError
 
-    @unittest.skip
+    @skip('Not Implemented')
     def test_download_count(self):
-        
-        file = abs_files[0]
+        raise NotImplementedError
 
-        self._add_files([file])
 
-        for idx in range(5):
-            
-            # Download the file
-            self._download_file(file)
+def _generate_full_filepaths(file_dict):
+    """Given a dict of filenames, return a dict that includes the full path
+    for each."""
+    # Make each filename a full path
+    for f in file_dict:
+        file_dict[f] = {
+            'path': os.path.join(  # append filename to this directory
+                os.path.dirname(os.path.abspath(__file__)),
+                'upload_files',
+                file_dict[f]),
+            'filename': file_dict[f],
+        }
 
-            # Return to files page
-            util.goto_files(self.driver)
-     
-            # Get file link
-            short_name, file_link = self._get_file_link(file)
-            
-            # Click on file link
-            file_link.click()
-
-            trs = self.driver.find_elements_by_tag_name('tr')
-            tds = trs[1].find_elements_by_tag_name('td')
-            self.assertEqual(tds[2].text.strip(), str(idx + 1))
-
-            # Return to files page
-            util.goto_files(self.driver)
-     
-    @unittest.skip
-    def test_download_files(self):
-        #FIXME
-        raise NotImplementedError()
-
-        
-        html_files = [file for file in abs_files if file.endswith('.html')]
-
-        # Add files
-        self._add_files(html_files)
-
-        for file in html_files:
-            
-            # Download the file
-            self._download_file(file)
-            
-            # Assert that the downloaded file is the same as
-            # the file contents
-            self.assertFalse(
-                compare_html(
-                    self.driver.page_source,
-                    open(file).read()
-                )
-            )
-
-            # Return to files page
-            util.goto_files(self.driver)
-     
-    @unittest.skip
-    def test_access_files(self):
-        
-        # Add files
-        self._add_files(abs_files)
-
-        for file in abs_files:
-            
-            # Get file link
-            short_name, file_link = self._get_file_link(file)
-            
-            # Click on file link
-            file_link.click()
-
-            try:
-                file_header = self.driver.find_element_by_xpath(
-                    '//h1[contains(., "%s")]' % short_name
-                )
-            except NoSuchElementException:
-                file_header = None
-
-            self.assertTrue(file_header is not None)
-            
-            # Return to files page
-            util.goto_files(self.driver)
-     
-# Generate tests
-util.generate_tests(FileTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()
+    return file_dict

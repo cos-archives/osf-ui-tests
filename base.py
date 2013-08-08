@@ -24,7 +24,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
 
 
-class SmokeTest(object):
+class SmokeTest(unittest.TestCase):
     """Base class for smoke tests. Creates a WebDriver
     on setUp and quits on tearDown.
 
@@ -193,7 +193,7 @@ class ProjectSmokeTest(UserSmokeTest):
 
     def get_log(self):
 
-        log_entry_element = self.driver.find_element_by_css_selector("div.span5 dl")
+        log_entry_element = self.get_element("div.span5 dl")
 
         class LogEntry(object):
             def __init__(self, log_element):
@@ -212,3 +212,36 @@ class ProjectSmokeTest(UserSmokeTest):
                 )
 
         return LogEntry(log_entry_element)
+
+    # Component methods
+
+    def add_component(self, component_type, name):
+        """Adds a component to the current project
+
+        :param component_type: an attribute of ``ComponentTypes``
+        :param name: the new component's name
+
+        :returns: URL of the component"""
+        raise NotImplementedError
+
+    def delete_component(self, url, project=None):
+        """Deletes the component.
+
+        Assumes that you are logged in as a user with contributor access to the
+        parent project.
+
+        :param url: URL of the project to delete
+        :param project: Optional. The URL of the project from which to delete
+            the component.
+        """
+        raise NotImplementedError
+
+from functools import wraps
+
+
+def not_implemented(f):
+    @wraps(f)
+    @unittest.skip('Not yet implemented')
+    def wrapper(*args, **kwargs):
+        return f
+    return wrapper

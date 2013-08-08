@@ -103,9 +103,3 @@ class UserLoginTests(base.SmokeTest):
         alerts = util.get_alert_boxes(self.driver, 'You have successfully logged out.')
         self.assertEqual(len(alerts), 1)
         #self.assertTrue('/dashboard' in self.driver.current_url)
-# Generate tests
-util.generate_tests(UserLoginTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

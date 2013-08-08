@@ -25,10 +25,3 @@ class CreateNewNodeTests(base.ProjectSmokeTest):
             self.driver.find_element_by_link_text(config.node_title).text, 
             config.node_title
         )
-
-# Generate tests
-util.generate_tests(CreateNewNodeTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

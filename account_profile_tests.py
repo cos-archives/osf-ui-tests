@@ -14,6 +14,7 @@ import base
 import util
 import config
 
+
 class AccountProfileTests(base.UserSmokeTest):
     
     def setUp(self):
@@ -24,6 +25,7 @@ class AccountProfileTests(base.UserSmokeTest):
         # Browse to profile
         util.goto_profile(self.driver)
 
+    @base.not_implemented
     def test_access_profile(self):
         """
         tests user ability to access page and verifies name on profile page
@@ -81,7 +83,7 @@ class AccountProfileTests(base.UserSmokeTest):
         profile_name = self.driver.find_element_by_id('profile-fullname').text
         self.assertTrue(self.user_data['fullname'] in profile_name)
 
-    @unittest.skip("not an implemented feature in OSF codebase")
+    @base.not_implemented
     def test_change_location(self):
         pass
 
@@ -104,13 +106,6 @@ class AccountProfileTests(base.UserSmokeTest):
         ).text
         self.assertTrue(self.user_data['fullname'] in profile_name)
 
-    @unittest.skip("not implemented")
+    @base.not_implemented
     def test_check_public_project_updates(self):
         pass
-
-# Generate tests
-util.generate_tests(AccountProfileTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

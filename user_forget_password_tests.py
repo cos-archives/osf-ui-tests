@@ -74,12 +74,3 @@ class UserForgetPasswordTests(base.SmokeTest):
         # check for alert
         alerts = util.get_alert_boxes(self.driver, 'Reset email sent')
         self.assertEqual(len(alerts), 1)
-
-
-
-# Generate tests
-util.generate_tests(UserForgetPasswordTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

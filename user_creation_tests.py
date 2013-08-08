@@ -128,10 +128,3 @@ class UserCreationTests(base.SmokeTest):
             self.user_data['password']
         )
         self.assertTrue('dashboard' in self.driver.current_url)
-
-# Generate tests
-util.generate_tests(UserCreationTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()

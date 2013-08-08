@@ -99,10 +99,3 @@ class RegistrationTests(base.ProjectSmokeTest):
             len(alerts),
             1
         )
-
-# Generate tests
-util.generate_tests(RegistrationTests)
-
-# Run tests
-if __name__ == '__main__':
-    unittest.main()
