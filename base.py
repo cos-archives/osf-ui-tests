@@ -47,6 +47,16 @@ class SmokeTest(object):
         # otherwise, SauceLabs tests will never finish
         self.driver.quit()
 
+    def get_element(self, css):
+        return wait(
+            driver=self.driver,
+            timeout=10
+        ).until(
+            method=ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, css)
+            )
+        )
+
 
 class UserSmokeTest(SmokeTest):
     """Class for smoke tests that require user login.
@@ -74,6 +84,22 @@ class UserSmokeTest(SmokeTest):
 
         # Call parent tearDown
         super(UserSmokeTest, self).tearDown()
+
+    def create_user(self):
+        return util.create_user(self.driver)
+
+    def log_in(self, user=None):
+        if not user:
+            user = self.user_data
+        return util.login(
+            self.driver,
+            user['username'],
+            user['password']
+
+        )
+
+    def log_out(self):
+        return util.logout(self.driver)
 
         
 class ProjectSmokeTest(UserSmokeTest):
@@ -119,34 +145,6 @@ class ProjectSmokeTest(UserSmokeTest):
         self.driver.get(
             url=build_path[page]()
         )
-
-    def get_element(self, css):
-        return wait(
-            driver=self.driver,
-            timeout=10
-        ).until(
-            method=ec.visibility_of_element_located(
-                (By.CSS_SELECTOR, css)
-            )
-        )
-
-    # User methods
-
-    def create_user(self):
-        return util.create_user(self.driver)
-
-    def log_in(self, user=None):
-        if not user:
-            user = self.user_data
-        return util.login(
-            self.driver,
-            user['username'],
-            user['password']
-
-        )
-
-    def log_out(self):
-        return util.logout(self.driver)
 
     # Node methods
 
