@@ -1,3 +1,5 @@
+import time
+
 from base import ProjectSmokeTest
 from util import generate_tests, get_alert_boxes
 
@@ -63,6 +65,60 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         # log out and back in as the first user, so teardown will work
         self.log_out()
+        self.log_in(self.user_data)
+
+    def test_public_private(self):
+        import util
+        import config
+        """ Test creating a project and then making it public. """
+
+        # Navigate to the project
+        util.goto_project(self.driver, project_title=config.project_title)
+
+        # Click the "Make public" button
+        self.get_element(
+            'div.btn-toolbar > div.btn-group:first-child > a'
+        ).click()
+
+        # Confirm modal popup
+        self.get_element('div#modal_0 button.modal-confirm').click()
+
+        time.sleep(3)
+
+        self.log_out()
+
+        # Confirm access be comparing project's title to the expected value
+        self.goto('dashboard')
+        self.assertEqual(
+            config.project_title,
+            self.get_element('#node-title-editable').text
+        )
+
+        util.login(
+            driver=self.driver,
+            username=self.user_data['username'],
+            password=self.user_data['password'],
+        )
+
+        # Make the project private
+        self.goto('dashboard')
+        self.get_element(
+            "div.btn-toolbar > div.btn-group:first-child > a"
+        ).click()
+
+        # Confirm modal popup
+        self.get_element('div#modal_0 button.modal-confirm').click()
+
+        self.log_out()
+
+        time.sleep(3)
+        self.goto('dashboard')
+
+        self.assertEqual(
+            len(util.get_alert_boxes(self.driver, 'not authorized')),
+            1
+        )
+
         self.log_in(self.user_data)
 
 
