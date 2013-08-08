@@ -35,32 +35,11 @@ class AddContributorTests(base.ProjectSmokeTest):
         )
 
     def test_add_contributor(self):
-        # TODO: Convert from Ember IDs to CSS selectors.
 
+        #add the contributor
+        self.add_contributor(self.second_user_data)
 
-        #go to the project
-        self.url = util.goto_project(self.driver)
-
-        self.driver.find_element_by_link_text("add").click()
-        time.sleep(3)
-
-        user_email = self.second_user_data['username']
-        username_box = self.driver.find_element_by_css_selector(
-            'div#addContributors input[type=text]'
-        )
-        username_box.send_keys(user_email)
-
-        search_button = self.driver.find_element_by_css_selector(
-            '#addContributors button')
-        search_button.click()
-
-
-        self.driver.find_element_by_css_selector('#addContributors input[type=radio]').click()
-
-        self.driver.find_element_by_xpath('//button[@class="btn primary"]').click()
-
-        time.sleep(3)
-
+        #check the contributor
         contribs = self.driver.find_element_by_id('contributors').text
         self.assertTrue(self.second_user_data['fullname'] in contribs)
 
