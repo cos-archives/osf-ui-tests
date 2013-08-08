@@ -456,6 +456,7 @@ def create_node(
         }
     )
 
+
 def make_project_public(driver, url):
 
     driver.get(url)
@@ -615,3 +616,29 @@ def forget_password(driver, email):
         '#forgot_password-email' : email,
 
     })
+
+def project_rename(driver, text):
+
+        driver.find_element_by_id('node-title-editable').click()
+
+        # select the name field on the new popup
+        edit_profile_name_field = driver.find_element_by_xpath(
+            '//div[@class="popover-content"]//input[@class="span2"]'
+        )
+
+        # delete the current project name
+        edit_profile_name_field.clear()
+
+        # enter the new project name
+        edit_profile_name_field.send_keys(text)
+
+        # find and click submit new project name
+        driver.find_element_by_xpath(
+            '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
+        ).click()
+        driver.refresh()
+        goto_project(driver, text)
+
+
+
+

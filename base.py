@@ -18,6 +18,10 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 # Project imports
 import config
 import util
+from datetime import datetime
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait as wait
 
 
 class SmokeTest(object):
@@ -85,6 +89,7 @@ class UserSmokeTest(SmokeTest):
         # Call parent tearDown
         super(UserSmokeTest, self).tearDown()
 
+
     def create_user(self):
         return util.create_user(self.driver)
 
@@ -100,6 +105,12 @@ class UserSmokeTest(SmokeTest):
 
     def log_out(self):
         return util.logout(self.driver)
+
+    def get_user_url(self):
+        util.goto_profile(self.driver)
+        user_url=self.driver.find_element_by_css_selector("tr>td>a:first-child").get_attribute("href")
+        util.goto_project(self.driver)
+        return user_url
 
         
 class ProjectSmokeTest(UserSmokeTest):
@@ -179,3 +190,25 @@ class ProjectSmokeTest(UserSmokeTest):
         )
 
         self.driver.switch_to_alert().accept()
+
+    def get_log(self):
+
+        log_entry_element = self.driver.find_element_by_css_selector("div.span5 dl")
+
+        class LogEntry(object):
+            def __init__(self, log_element):
+                entry_element = log_element.find_element_by_css_selector('dd:nth-of-type(1)')
+
+                self.log_text = entry_element.text
+
+                self.log_url=[]
+                css_url = entry_element.find_elements_by_css_selector('a')
+                for x in css_url:
+                    self.log_url.append(x.get_attribute('href'))
+
+                self.log_time = datetime.strptime(
+                    log_element.find_element_by_css_selector("dt:nth-of-type(1)").text,
+                    "%m/%d/%y %I:%M %p",
+                )
+
+        return LogEntry(log_entry_element)
