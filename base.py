@@ -9,6 +9,7 @@ nose.
 """
 
 # Imports
+from functools import wraps
 import unittest
 
 from selenium.webdriver.common.by import By
@@ -213,16 +214,70 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return LogEntry(log_entry_element)
 
+    def make_private(self, url=None):
+        """Make a project or component private.
+
+        :param url: Optional. The URL of the project or component - defaults to
+            ``self.project_url``
+        """
+        self.driver.get('{url}/makeprivate'.format(
+            url=url.strip('/') or self.project_url.strip('/'))
+        )
+
+    def make_public(self, url=None):
+        """Make a project or component private.
+
+        :param url: Optional. The URL of the project or component - defaults to
+            ``self.project_url``
+        """
+        self.driver.get('{url}/makepublic'.format(
+            url=url.strip('/') or self.project_url.strip('/'))
+        )
+
+
     # Component methods
 
-    def add_component(self, component_type, name):
+    def add_component(self, component_type, name, project_url=None):
         """Adds a component to the current project
 
-        :param component_type: an attribute of ``ComponentTypes``
+        :param component_type: a string representing the component type
         :param name: the new component's name
 
         :returns: URL of the component"""
-        raise NotImplementedError
+
+        # go to the project
+        self.goto(
+            'dashboard',
+            project_url or self.project_url
+        )
+
+        # click "Add Component"
+        self.get_element('a.btn[href="#newComponent"]').click()
+
+        modal = self.get_element('div.modal.fade.in')
+
+        # enter the component name
+        modal.find_element_by_css_selector(
+            'input[name="title"]'
+        ).send_keys(name)
+
+        # choose the component type
+        modal.find_element_by_css_selector(
+            'select#category'
+        ).send_keys(component_type)
+
+        # click OK
+        modal.find_element_by_css_selector(
+            '.modal-footer button[type="submit"]'
+        ).click()
+
+        # return url of the component
+        return self.get_element(
+            '#Nodes li.project:last-child h3 a'
+        ).get_attribute('href')
+
+
+
 
     def delete_component(self, url, project=None):
         """Deletes the component.
@@ -235,8 +290,6 @@ class ProjectSmokeTest(UserSmokeTest):
             the component.
         """
         raise NotImplementedError
-
-from functools import wraps
 
 
 def not_implemented(f):
