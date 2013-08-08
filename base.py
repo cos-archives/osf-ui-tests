@@ -18,7 +18,10 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 # Project imports
 import config
 import util
-from datetime import datetime
+import os
+import shutil
+import tempfile
+from datetime import datetime, timedelta
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -212,3 +215,67 @@ class ProjectSmokeTest(UserSmokeTest):
                 )
 
         return LogEntry(log_entry_element)
+
+
+    def _add_file(self, path):
+        """Add a file. Assumes that the test class is harnessed to a project"""
+        self.goto('files')
+
+        self.driver.execute_script('''
+            $('input[type="file"]').offset({left : 50});
+        ''')
+
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type=file]')
+
+        # Enter file into input
+        field.send_keys(path)
+
+        # Upload files
+        self.driver.find_element_by_css_selector(
+            'div.fileupload-buttonbar button.start'
+        ).click()
+
+    def _add_versioned_file(self,text_files, versioned_files):
+        filename = 'versioned.txt'
+        upload_dir = os.path.dirname(text_files['txt']['path'])
+        f = os.path.join(upload_dir, filename)
+
+        # rename and upload version 0.
+        shutil.copy(versioned_files[0]['path'], f)
+        self._add_file(f)
+
+        # rename and upload version 1
+        shutil.copy(versioned_files[1]['path'], f)
+        self._add_file(f)
+
+        # delete the temp file
+        os.remove(f)
+
+        return filename
+
+    def _file_exists_in_project(self, filename):
+        """Goes to a file's page, verifies by checking the title."""
+        self.goto('file', filename)
+
+        return filename in self.get_element('div.page-header h1').text
+
+    def _generate_full_filepaths(self, file_dict):
+        """Given a dict of filenames, return a dict that includes the full path
+        for each."""
+        # Make each filename a full path
+        for f in file_dict:
+            file_dict[f] = {
+                'path': os.path.join(  # append filename to this directory
+                    os.path.dirname(os.path.abspath(__file__)),
+                    'upload_files',
+                    file_dict[f]),
+                'filename': file_dict[f],
+        }
+
+        return file_dict
+
+    def _assert_time(self,time_now):
+        #assert the time
+        time_diff = abs(datetime.utcnow()-time_now)
+        self.assertTrue(time_diff < timedelta(minutes=2))

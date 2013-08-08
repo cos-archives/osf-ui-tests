@@ -12,75 +12,33 @@ class FileHandlingTests(base.ProjectSmokeTest):
         super(FileHandlingTests, self).setUp()
 
         # Test file names
-        self.images = _generate_full_filepaths({
+        self.images = self._generate_full_filepaths({
             'jpg': 'test.jpg',
             'png': 'test.png',
             'gif': 'test.gif',
         })
 
-        self.text_files = _generate_full_filepaths({
+        self.text_files = self._generate_full_filepaths({
             'txt': 'txtfile.txt',
             'html': 'htmlfile.html',
         })
 
-        self.archive_files = _generate_full_filepaths({
+        self.archive_files = self._generate_full_filepaths({
             'tar': 'text_files.tar',
             'tar.gz': 'text_files.tar.gz',
             'zip': 'text_files.zip',
         })
         self.archive_file_contents = ('txtfile.txt','htmlfile.html')
 
-        self.binary_files = _generate_full_filepaths({
+        self.binary_files = self._generate_full_filepaths({
             'pdf': 'pdffile.pdf',
         })
 
-        self.versioned_files = _generate_full_filepaths({
+        self.versioned_files = self._generate_full_filepaths({
             0: 'versioned-0.txt',
             1: 'versioned-1.txt',
         })
 
-    def _add_file(self, path):
-        """Add a file. Assumes that the test class is harnessed to a project"""
-        self.goto('files')
-
-        self.driver.execute_script('''
-            $('input[type="file"]').offset({left : 50});
-        ''')
-
-        # Find file input
-        field = self.driver.find_element_by_css_selector('input[type=file]')
-
-        # Enter file into input
-        field.send_keys(path)
-
-        # Upload files
-        self.driver.find_element_by_css_selector(
-            'div.fileupload-buttonbar button.start'
-        ).click()
-
-    def _add_versioned_file(self):
-        filename = 'versioned.txt'
-        upload_dir = os.path.dirname(self.text_files['txt']['path'])
-        f = os.path.join(upload_dir, filename)
-
-        # rename and upload version 0.
-        shutil.copy(self.versioned_files[0]['path'], f)
-        self._add_file(f)
-
-        # rename and upload version 1
-        shutil.copy(self.versioned_files[1]['path'], f)
-        self._add_file(f)
-
-        # delete the temp file
-        os.remove(f)
-
-        return filename
-
-    def _file_exists_in_project(self, filename):
-        """Goes to a file's page, verifies by checking the title."""
-        self.goto('file', filename)
-
-        return filename in self.get_element('div.page-header h1').text
 
     def test_add_file(self):
         """Add a file to a project, then make sure its page exists"""
@@ -176,7 +134,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
     def test_most_recent_version_displayed(self):
-        f = self._add_versioned_file()
+        f = self._add_versioned_file(self.text_files, self.versioned_files)
 
         # assert that string from version 1 is present in embed.
         self.goto('file', f)
@@ -185,7 +143,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
     def test_version_history(self):
-        f = self._add_versioned_file()
+        f = self._add_versioned_file(self.text_files, self.versioned_files)
 
         self.goto('file', f)
         # topmost history entry is the current version
@@ -202,24 +160,25 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
 
+    def test_delete_file(self):
+        #add a file
+        f = self.images['jpg']
+        self._add_file(f['path'])
+
+        #delete the added file
+        self.goto('files')
+        self.driver.find_element_by_css_selector('td form button').click()
+
+        #check the file not exist
+        self.goto('file', f['filename'])
+
+        self.assertEqual(self.driver.find_element_by_css_selector("h1").text, u'Not Found')
+
+
+
 
 util.generate_tests(FileHandlingTests)
 
-
-def _generate_full_filepaths(file_dict):
-    """Given a dict of filenames, return a dict that includes the full path
-    for each."""
-    # Make each filename a full path
-    for f in file_dict:
-        file_dict[f] = {
-            'path': os.path.join(  # append filename to this directory
-                os.path.dirname(os.path.abspath(__file__)),
-                'upload_files',
-                file_dict[f]),
-            'filename': file_dict[f],
-        }
-
-    return file_dict
 
 
 if __name__ == '__main__':
