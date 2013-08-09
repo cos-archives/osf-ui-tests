@@ -10,6 +10,8 @@ nose.
 
 # Imports
 from functools import wraps
+import os
+import shutil
 import unittest
 
 from selenium.webdriver.common.by import By
@@ -90,7 +92,6 @@ class UserSmokeTest(SmokeTest):
         # Call parent tearDown
         super(UserSmokeTest, self).tearDown()
 
-
     def create_user(self):
         return util.create_user(self.driver)
 
@@ -130,6 +131,34 @@ class ProjectSmokeTest(UserSmokeTest):
     
         # Browse to project page
         util.goto_project(self.driver)
+
+        # add file paths
+        self.image_files = _generate_full_filepaths({
+            'jpg': 'test.jpg',
+            'png': 'test.png',
+            'gif': 'test.gif',
+        })
+
+        self.text_files = _generate_full_filepaths({
+            'txt': 'txtfile.txt',
+            'html': 'htmlfile.html',
+        })
+
+        self.archive_files = _generate_full_filepaths({
+            'tar': 'text_files.tar',
+            'tar.gz': 'text_files.tar.gz',
+            'zip': 'text_files.zip',
+        })
+        self.archive_file_contents = ('txtfile.txt','htmlfile.html')
+
+        self.binary_files = _generate_full_filepaths({
+            'pdf': 'pdffile.pdf',
+        })
+
+        self.versioned_files = _generate_full_filepaths({
+            0: 'versioned-0.txt',
+            1: 'versioned-1.txt',
+        })
     
     def tearDown(self):
         
@@ -139,17 +168,22 @@ class ProjectSmokeTest(UserSmokeTest):
         # Call parent tearDown
         super(ProjectSmokeTest, self).tearDown()
 
-    def goto(self, page, *args):
+    def goto(self, page, *args, **kwargs):
         """Go to a project's page
 
         :param page: The name of the destination page. Acceptable include
-                     "files", "settings", and "registrations"
+            "files", "settings", and "registrations"
+        :param node_url: Optional. The URL of the project or component to use.
+
         :returns: True on success, KeyError page
         """
+        base_url = kwargs.get('node_url', self.project_url).strip('/')
+
         build_path = {
-            'dashboard': lambda: self.project_url,
-            'files': lambda: '/'.join([self.project_url[:-1], 'files']),
-            'file': lambda: '/'.join([self.project_url[:-1], 'files', args[0]]),
+            'dashboard': lambda: base_url,
+            'files': lambda: '/'.join([base_url, 'files']),
+            'file': lambda: '/'.join([base_url, 'files', args[0]]),
+            'settings': lambda: '/'.join([base_url, 'settings']),
             'user-dashboard': lambda: '/'.join([self.site_root, 'dashboard'])
         }
 
@@ -220,9 +254,13 @@ class ProjectSmokeTest(UserSmokeTest):
         :param url: Optional. The URL of the project or component - defaults to
             ``self.project_url``
         """
-        self.driver.get('{url}/makeprivate'.format(
-            url=url.strip('/') or self.project_url.strip('/'))
-        )
+
+        url = url or self.project_url
+
+        if self.is_public(url):
+            self.driver.get('{url}/makeprivate'.format(
+                url=url.strip('/') or self.project_url.strip('/'))
+            )
 
     def make_public(self, url=None):
         """Make a project or component private.
@@ -230,10 +268,70 @@ class ProjectSmokeTest(UserSmokeTest):
         :param url: Optional. The URL of the project or component - defaults to
             ``self.project_url``
         """
-        self.driver.get('{url}/makepublic'.format(
-            url=url.strip('/') or self.project_url.strip('/'))
-        )
 
+        url = url or self.project_url
+
+        if not self.is_public(url):
+            self.driver.get('{url}/makepublic'.format(
+                url=url.strip('/') or self.project_url.strip('/'))
+            )
+
+    def is_public(self, url=None):
+        """Test whether a project or component is public.
+
+        :param url: Optional. The URL of the project of component to test.
+            Defaults to ``self.project_url``
+
+        :return: ``True`` if public; ``False`` if private
+        """
+        url = url or self.project_url
+
+        self.driver.get(url)
+
+        state = self.get_element(
+            '.btn-toolbar .btn-group:first-child button.disabled'
+        ).text.lower()
+
+        return state == 'public'
+
+    def add_versioned_file(self):
+        filename = 'versioned.txt'
+        upload_dir = os.path.dirname(self.text_files['txt']['path'])
+        f = os.path.join(upload_dir, filename)
+
+        # rename and upload version 0.
+        shutil.copy(self.versioned_files[0]['path'], f)
+        self.add_file(f)
+
+        # rename and upload version 1
+        shutil.copy(self.versioned_files[1]['path'], f)
+        self.add_file(f)
+
+        # delete the temp file
+        os.remove(f)
+
+        return filename
+
+    def add_file(self, path, node_url=None):
+        """Add a file. Assumes that the test class is harnessed to a project"""
+        node_url = node_url or self.project_url
+
+        self.goto('files')
+
+        self.driver.execute_script('''
+            $('input[type="file"]').offset({left : 50});
+        ''')
+
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type=file]')
+
+        # Enter file into input
+        field.send_keys(path)
+
+        # Upload files
+        self.driver.find_element_by_css_selector(
+            'div.fileupload-buttonbar button.start'
+        ).click()
 
     # Component methods
 
@@ -276,9 +374,6 @@ class ProjectSmokeTest(UserSmokeTest):
             '#Nodes li.project:last-child h3 a'
         ).get_attribute('href')
 
-
-
-
     def delete_component(self, url, project=None):
         """Deletes the component.
 
@@ -291,6 +386,59 @@ class ProjectSmokeTest(UserSmokeTest):
         """
         raise NotImplementedError
 
+    def assert_not_authorized(self, url=None):
+        """Navigate to the page, and see if the item is accessible.
+        """
+
+        # if a url was provided, go there
+        if url:
+            self.driver.get(url)
+
+        # should have been redirected to the homepage
+        self.assertEqual(
+            self.driver.current_url.strip('/'),
+            self.site_root.strip('/'),
+        )
+
+        # an alert should be present with the error message
+        self.assertIn(
+            'not authorized',
+            self.get_element('div#alert-container').text,
+        )
+
+    def create_fork(self, url=None):
+        """Create a fork, and return its URL
+
+        :param url: Optional. The URL of the component or project to fork
+        """
+
+        if url:
+            self.driver.get(url)
+
+        # click the fork button
+        self.get_element(
+            'div.btn-toolbar div.btn-group:last-child a:last-child'
+        ).click()
+
+        # if the page isn't loaded yet, this code might help.
+        from selenium.common.exceptions import StaleElementReferenceException
+        wait(
+            driver=self.driver,
+            timeout=10,
+            ignored_exceptions=(StaleElementReferenceException,)
+        ).until(
+            method=lambda d: 'Forked from' in
+                             d.find_element_by_css_selector(
+                                 'p#contributors'
+                             ).text
+        )
+
+        return self.driver.current_url
+
+        #return self.driver.find_elements_by_css_selector(
+        #    'li.project a'
+        #)[0].get_attribute('href')
+
 
 def not_implemented(f):
     @wraps(f)
@@ -298,3 +446,19 @@ def not_implemented(f):
     def wrapper(*args, **kwargs):
         return f
     return wrapper
+
+
+def _generate_full_filepaths(file_dict):
+    """Given a dict of filenames, return a dict that includes the full path
+    for each."""
+    # Make each filename a full path
+    for f in file_dict:
+        file_dict[f] = {
+            'path': os.path.join(  # append filename to this directory
+                os.path.dirname(os.path.abspath(__file__)),
+                'upload_files',
+                file_dict[f]),
+            'filename': file_dict[f],
+        }
+
+    return file_dict

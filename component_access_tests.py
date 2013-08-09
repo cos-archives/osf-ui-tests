@@ -38,3 +38,146 @@ class ComponentAccessCase(ProjectSmokeTest):
 
         # log back in so the teardown works.
         self.log_in()
+
+    def test_private_component_of_public_project(self):
+        """Test that a private component of a public project is not accessible
+        """
+
+        # make the project public
+        self.make_public()
+
+        # create a component
+        title = "Private Hypothesis"
+        component_url = self.add_component('hypothesis', title)
+
+        # verify that the component is private
+        if self.is_public(component_url):
+            self.make_private(component_url)
+
+        # test that the component is not accessible to an anonymous user
+
+        self.log_out()
+
+        self.assert_not_authorized(component_url)
+
+        # test that the component is not accessible to a non-contributor
+
+        self.second_user = self.create_user()
+        self.log_in(self.second_user)
+
+        self.assert_not_authorized(component_url)
+
+        # log back in so teardown doesn't fail.
+        self.log_out()
+        self.log_in()
+
+    def test_private_component_of_public_project_not_forked(self):
+        """Test that a private components of public projects are not forked
+        when the project is forked
+        """
+
+        # make the project public
+        self.make_public()
+
+        # create a private component
+        private_component_title = "Private-Component"
+        private_component_url = self.add_component(
+            'hypothesis',
+            private_component_title,
+        )
+
+        # verify that the component is private
+        if self.is_public(private_component_url):
+            self.make_private(private_component_url)
+
+        # create a public component
+        public_component_title = "Public-Component"
+        public_component_url = self.add_component(
+            'hypothesis',
+            public_component_title
+        )
+
+        # verify that the component is public
+        if not self.is_public(public_component_url):
+            self.make_public(public_component_url)
+
+        # Log out and make a new user
+        self.log_out()
+        self.second_user = self.create_user()
+        self.log_in(self.second_user)
+
+        # go to the project
+        self.goto('dashboard')
+
+        fork_url = self.create_fork()
+
+        self.driver.get(fork_url)
+
+        # Public component should be there
+        self.assertIn(
+            public_component_title,
+            self.get_element('#Nodes').text
+        )
+
+
+        # Private component should not be there
+        self.assertNotIn(
+            private_component_title,
+            self.get_element('#Nodes').text
+        )
+
+        # delete the forked project.
+        self.goto('settings', node_url=fork_url)
+        self.get_element('button[type="submit"]').click()
+
+        # log back in as the first user so teardown will work.
+        self.log_out()
+        self.log_in()
+
+
+    def test_files_of_private_component_of_public_project(self):
+        """Test that a private component of a public project is not accessible
+        """
+
+        # make the project public
+        self.make_public()
+
+        # create a component
+        title = "Private Hypothesis"
+        component_url = self.add_component('hypothesis', title)
+
+        # verify that the component is private
+        if self.is_public(component_url):
+            self.make_private(component_url)
+
+        # upload a file to the component
+        self.add_file(self.image_files['jpg']['path'])
+
+        # test that the component is not accessible to an anonymous user
+
+        self.log_out()
+
+        self.goto(
+            'file',
+            self.image_files['jpg']['filename'],
+            node_url=component_url,
+        )
+
+        self.assert_not_authorized()
+
+        # test that the component is not accessible to a non-contributor
+
+        self.second_user = self.create_user()
+        self.log_in(self.second_user)
+
+        self.goto(
+            'file',
+            self.image_files['jpg']['filename'],
+            node_url=component_url,
+        )
+
+        self.assert_not_authorized()
+
+        # log back in so teardown doesn't fail.
+        self.log_out()
+        self.log_in()

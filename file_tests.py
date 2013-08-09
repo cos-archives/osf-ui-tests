@@ -13,71 +13,6 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
         super(FileHandlingTests, self).setUp()
 
-        # Test file names
-        self.images = _generate_full_filepaths({
-            'jpg': 'test.jpg',
-            'png': 'test.png',
-            'gif': 'test.gif',
-        })
-
-        self.text_files = _generate_full_filepaths({
-            'txt': 'txtfile.txt',
-            'html': 'htmlfile.html',
-        })
-
-        self.archive_files = _generate_full_filepaths({
-            'tar': 'text_files.tar',
-            'tar.gz': 'text_files.tar.gz',
-            'zip': 'text_files.zip',
-        })
-        self.archive_file_contents = ('txtfile.txt','htmlfile.html')
-
-        self.binary_files = _generate_full_filepaths({
-            'pdf': 'pdffile.pdf',
-        })
-
-        self.versioned_files = _generate_full_filepaths({
-            0: 'versioned-0.txt',
-            1: 'versioned-1.txt',
-        })
-
-    def _add_file(self, path):
-        """Add a file. Assumes that the test class is harnessed to a project"""
-        self.goto('files')
-
-        self.driver.execute_script('''
-            $('input[type="file"]').offset({left : 50});
-        ''')
-
-        # Find file input
-        field = self.driver.find_element_by_css_selector('input[type=file]')
-
-        # Enter file into input
-        field.send_keys(path)
-
-        # Upload files
-        self.driver.find_element_by_css_selector(
-            'div.fileupload-buttonbar button.start'
-        ).click()
-
-    def _add_versioned_file(self):
-        filename = 'versioned.txt'
-        upload_dir = os.path.dirname(self.text_files['txt']['path'])
-        f = os.path.join(upload_dir, filename)
-
-        # rename and upload version 0.
-        shutil.copy(self.versioned_files[0]['path'], f)
-        self._add_file(f)
-
-        # rename and upload version 1
-        shutil.copy(self.versioned_files[1]['path'], f)
-        self._add_file(f)
-
-        # delete the temp file
-        os.remove(f)
-
-        return filename
-
     def _file_exists_in_project(self, filename):
         """Goes to a file's page, verifies by checking the title."""
         self.goto('file', filename)
@@ -86,9 +21,9 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
     def test_add_file(self):
         """Add a file to a project, then make sure its page exists"""
-        f = self.images['jpg']
+        f = self.image_files['jpg']
 
-        self._add_file(f['path'])
+        self.add_file(f['path'])
 
         self.assertTrue(
             self._file_exists_in_project(f['filename'])
@@ -101,25 +36,25 @@ class FileHandlingTests(base.ProjectSmokeTest):
     def test_embedded_image_previews(self):
         """Test that image file pages include the image as an <img> element"""
 
-        for key in self.images:
-            self._add_file(self.images[key]['path'])
-            self.goto('file', self.images[key]['filename'])
+        for key in self.image_files:
+            self.add_file(self.image_files[key]['path'])
+            self.goto('file', self.image_files[key]['filename'])
 
             # Get the src attribute of the image embedded
             src_filename = self.get_element(
                 '#file-container img[src*="{filename}"]'.format(
-                    filename=self.images[key]['filename']
+                    filename=self.image_files[key]['filename']
                 )
             ).get_attribute('src').split('/')[-1]
 
             self.assertEqual(
                 src_filename,
-                self.images[key]['filename']
+                self.image_files[key]['filename']
             )
 
     def test_embedded_text_preview(self):
         for key in self.text_files:
-            self._add_file(self.text_files[key]['path'])
+            self.add_file(self.text_files[key]['path'])
             self.goto('file', self.text_files[key]['filename'])
 
             # read the contents of the source file
@@ -134,7 +69,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
     def test_embedded_archive_preview(self):
         for key in self.archive_files:
-            self._add_file(self.archive_files[key]['path'])
+            self.add_file(self.archive_files[key]['path'])
             self.goto('file', self.archive_files[key]['filename'])
 
             # Check that the file list in the <pre> element matches the
@@ -158,7 +93,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 tmp_file.write('Hello, Open Science Framework!')
 
         # add the file to the project
-        self._add_file(temp_file_path)
+        self.add_file(temp_file_path)
         self.goto('file', os.path.split(temp_file_path)[-1])
 
         # check that it is not rendered in the browser
@@ -174,7 +109,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         """Upload a non-embedable file and make sure it's not embedded"""
         f = self.binary_files['pdf']
 
-        self._add_file(f['path'])
+        self.add_file(f['path'])
         self.goto('file', f['filename'])
 
         self.assertTrue(
@@ -182,7 +117,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
     def test_most_recent_version_displayed(self):
-        f = self._add_versioned_file()
+        f = self.add_versioned_file()
 
         # assert that string from version 1 is present in embed.
         self.goto('file', f)
@@ -191,7 +126,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
         )
 
     def test_version_history(self):
-        f = self._add_versioned_file()
+        f = self.add_versioned_file()
 
         self.goto('file', f)
         # topmost history entry is the current version
@@ -214,19 +149,3 @@ class FileHandlingTests(base.ProjectSmokeTest):
     @skip('Not Implemented')
     def test_download_count(self):
         raise NotImplementedError
-
-
-def _generate_full_filepaths(file_dict):
-    """Given a dict of filenames, return a dict that includes the full path
-    for each."""
-    # Make each filename a full path
-    for f in file_dict:
-        file_dict[f] = {
-            'path': os.path.join(  # append filename to this directory
-                os.path.dirname(os.path.abspath(__file__)),
-                'upload_files',
-                file_dict[f]),
-            'filename': file_dict[f],
-        }
-
-    return file_dict
