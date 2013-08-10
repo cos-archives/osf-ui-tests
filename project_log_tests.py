@@ -115,10 +115,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         orig_version = util.get_wiki_version(self.driver)
 
         # edit the wiki
-        util.edit_wiki(self.driver)
-        util.clear_wiki_text(self.driver)
-        util.add_wiki_text(self.driver, str(uuid.uuid1())[:20])
-        util.submit_wiki_text(self.driver)
+        self._add_wiki(str(uuid.uuid1())[:20])
 
         #get wiki_url
         wiki_url = self.driver.current_url

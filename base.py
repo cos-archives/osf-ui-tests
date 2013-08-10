@@ -279,3 +279,10 @@ class ProjectSmokeTest(UserSmokeTest):
         #assert the time
         time_diff = abs(datetime.utcnow()-time_now)
         self.assertTrue(time_diff < timedelta(minutes=2))
+
+    def _add_wiki(self,text):
+        #help function to add the wiki "text"
+        util.edit_wiki(self.driver)
+        util.clear_wiki_text(self.driver)
+        util.add_wiki_text(self.driver, text)
+        util.submit_wiki_text(self.driver)
