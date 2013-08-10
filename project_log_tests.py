@@ -175,6 +175,30 @@ class ProjectLogTests(base.ProjectSmokeTest):
             wiki_url
         )
 
+    def test_create_fork_log(self):
+        """
+        test to make sure that fork a project log works correctly
+
+        """
+        #fork the project
+        self.get_element(
+            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
+
+        #get log
+        message_log = self.get_log()
+
+        #assert the time
+        self._assert_time(message_log.log_time)
+
+        #assert the log text
+        self.assertEqual(message_log.log_text
+            , self.user_data["fullname"] + " created fork from project" + config.project_title)
+
+        #check the user_url and project_url
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+"/", self.project_url)
+
+
     def test_add_contributor_log(self):
         """
         test to make sure that add contributor log works correctly
