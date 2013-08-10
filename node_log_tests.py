@@ -20,6 +20,7 @@ import os
 import shutil
 
 class NodeLogTests(base.ProjectSmokeTest):
+
     def setUp(self):
 
         super(NodeLogTests, self).setUp()
@@ -94,6 +95,31 @@ class NodeLogTests(base.ProjectSmokeTest):
         #check the user_url and node_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], wiki_url)
+
+
+    def test_node_create_fork_log(self):
+        """
+        test to make sure that a project log works correctly on forking a correct node
+
+        """
+        #fork the project
+        self.get_element(
+            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
+
+        #get log
+        util.goto_project(self.driver)
+        message_log = self.get_log()
+
+        #assert the time
+        self._assert_time(message_log.log_time)
+
+        #assert the log text
+        self.assertEqual(message_log.log_text
+            , self.user_data["fullname"] + " created fork from node" + config.node_title)
+
+        #check the user_url and project_url
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+"/", self.node_url)
 
 
     def test_node_add_contributor_log(self):
