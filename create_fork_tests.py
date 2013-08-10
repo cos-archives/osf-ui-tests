@@ -28,14 +28,10 @@ class CreateForkTests(base.ProjectSmokeTest):
         # Make the project public
         util.make_project_public(self.driver, self.url)
 
-        time.sleep(3)
         
         # add to the wiki
-        self.driver.find_element_by_link_text('Wiki').click()
-        util.edit_wiki(self.driver)
-        util.add_wiki_text(
-            self.driver, "This is wiki test")
-        util.submit_wiki_text(self.driver)
+        self.goto('wiki')
+        self._add_wiki("This is wiki test")
         self.wiki_text = util.get_wiki_text(self.driver)
 
         #logout
@@ -56,15 +52,16 @@ class CreateForkTests(base.ProjectSmokeTest):
         #go to the project that is now public
         self.driver.get(self.url)
         time.sleep(2)
-        link = self.driver.find_element_by_xpath(
-            '//a[@class="btn"][@data-original-title="Number of times this node has been forked (copied)"]')
-        link.click()
-        time.sleep(2)
-        title = self.driver.find_element_by_css_selector("h1#node-title-editable").text
+        self.get_element(
+            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
+        title = self.get_element("h1#node-title-editable").text
         self.assertEqual(title,
             "Fork of test project")
         wiki_text = util.get_wiki_text(self.driver)
         self.assertEqual(self.wiki_text, wiki_text)
+
+
+
 
 
     def tearDown(self):

@@ -16,14 +16,11 @@ import base
 import util
 import config
 import uuid
+import os
+import shutil
 
 
 class ProjectLogTests(base.ProjectSmokeTest):
-
-    def _assert_time(self,time_now):
-        #assert the time
-        time_diff = abs(datetime.utcnow()-time_now)
-        self.assertTrue(time_diff < timedelta(minutes=2))
 
     def test_create_project_log(self):
         """
@@ -146,10 +143,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         orig_version = util.get_wiki_version(self.driver)
 
         # edit the wiki
-        util.edit_wiki(self.driver)
-        util.clear_wiki_text(self.driver)
-        util.add_wiki_text(self.driver, str(uuid.uuid1())[:20])
-        util.submit_wiki_text(self.driver)
+        self._add_wiki(str(uuid.uuid1())[:20])
 
         #get wiki_url
         wiki_url = self.driver.current_url
@@ -249,8 +243,12 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #add contributor
         self.add_contributor(self.user_data)
 
+        time.sleep(3)
+
         #remove contributor
         self.remove_contributor(self.user_data)
+
+        time.sleep(3)
 
          #get log
         message_log = self.get_log()
@@ -268,7 +266,110 @@ class ProjectLogTests(base.ProjectSmokeTest):
             )
         )
 
-        #check the user_url and project_url
+        #check the second user_url, first user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2]+"/", project_url)
+
+
+    def test_file_upload_log(self):
+        """
+        test to make sure that project log works correctly on uploading files to a project
+
+        """
+         # Test file names
+        self.images = self._generate_full_filepaths({
+            'jpg': 'test.jpg',
+            'png': 'test.png',
+            'gif': 'test.gif',
+        })
+
+        #Add a file to a project
+        f = self.images['jpg']
+        self.add_file(f['path'])
+
+        #get the log
+        util.goto_project(self.driver)
+        message_log = self.get_log()
+
+        #assert the time
+        self._assert_time(message_log.log_time)
+
+        #assert the log
+        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " added file " + f['filename']
+                                               + " to project " + config.project_title)
+
+        #check the user_url and project_url
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+'/', self.project_url)
+
+
+    def test_file_modification_log(self):
+        """
+        test to make sure that project log works correctly on modifying files on a project
+
+        """
+        # Test file names
+        self.text_files = self._generate_full_filepaths({
+            'txt': 'txtfile.txt',
+            'html': 'htmlfile.html',
+        })
+
+        self.versioned_files = self._generate_full_filepaths({
+            0: 'versioned-0.txt',
+            1: 'versioned-1.txt',
+        })
+
+        #Add a file to a project
+        f = self._add_versioned_file(self.text_files, self.versioned_files)
+
+        #get the log
+        util.goto_project(self.driver)
+        message_log = self.get_log()
+
+        #assert the time
+        self._assert_time(message_log.log_time)
+
+        #assert the log
+        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " updated file " + f
+                                               + " in project " + config.project_title)
+
+        #check the user_url and project_url
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+'/', self.project_url)
+
+
+    def test_delete_file_log(self):
+        """
+        test to make sure that project log works correctly on deleting files from a project
+
+        """
+        # Test file names
+        self.images = self._generate_full_filepaths({
+            'jpg': 'test.jpg',
+            'png': 'test.png',
+            'gif': 'test.gif',
+        })
+
+        #add a file
+        f = self.images['jpg']
+        self.add_file(f['path'])
+
+        #delete the added file
+        self.goto('files')
+        self.driver.find_element_by_css_selector('td form button').click()
+
+        #get the log
+        util.goto_project(self.driver)
+        message_log = self.get_log()
+
+        #assert the time
+        self._assert_time(message_log.log_time)
+
+        #assert the log
+        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " removed file " + f['filename']
+                                               + " from project " + config.project_title)
+
+        #check the user_url and project_url
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+'/', self.project_url)
