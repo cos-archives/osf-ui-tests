@@ -78,8 +78,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
         This should be fixed once we understand selenium better.
         """
 
-        # Make the project public
-        self.driver.get('{url}makepublic'.format(url=self.project_url))
+        self.make_public()
 
         self.log_out()
 
@@ -92,7 +91,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         self.log_in()
 
-        self.driver.get('{url}makeprivate'.format(url=self.project_url))
+        self.make_private()
 
         self.log_out()
 
