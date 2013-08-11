@@ -492,6 +492,25 @@ class ProjectSmokeTest(UserSmokeTest):
         util.add_wiki_text(self.driver, text)
         util.submit_wiki_text(self.driver)
 
+    def get_wiki_text(self):
+        """Provided you are on a wiki page, get the raw contents of the page"""
+        return self.driver.execute_script('''
+            return $('textarea#wmd-input').val()
+        ''')
+
+    def set_wiki_text(self, text, append=True):
+        textarea = self.get_element('textarea#wmd-input')
+
+        if not append:
+            # clear the input
+            self.driver.execute_script('''
+                $('textarea#wmd-input').val('')
+            ''')
+
+        textarea.send_keys(text)
+
+
+
 
 
 def not_implemented(f):
