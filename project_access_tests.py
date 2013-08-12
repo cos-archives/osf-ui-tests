@@ -148,6 +148,11 @@ class ProjectSecurityTest(ProjectSmokeTest):
         with self.assertRaises(TimeoutException):
             self.edit_title('foo')
 
+        # try to add a contributor
+        self.goto('dashboard')
+        with self.assertRaises(TimeoutException):
+            self.add_contributor(second_user)
+
         # log back in so teardown works.
         self.log_out()
         self.log_in()
