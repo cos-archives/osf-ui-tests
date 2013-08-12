@@ -153,6 +153,16 @@ class ProjectSecurityTest(ProjectSmokeTest):
         with self.assertRaises(TimeoutException):
             self.add_contributor(second_user)
 
+        # try to remove a contributor
+        self.goto('dashboard')
+        # with self.assertRaises(TimeoutException):
+        self.remove_contributor(self.user_data)
+        self.goto('dashboard')
+        self.assertIn(
+            self.user_data['fullname'],
+            self.get_element('#contributors').text,
+        )
+
         # log back in so teardown works.
         self.log_out()
         self.log_in()
