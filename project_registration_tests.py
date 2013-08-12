@@ -5,6 +5,8 @@ Tests for creating project registrations.
 # Project imports
 import base
 
+from selenium.common.exceptions import TimeoutException
+
 
 class RegistrationTests(base.ProjectSmokeTest):
 
@@ -85,3 +87,44 @@ class RegistrationTests(base.ProjectSmokeTest):
         # dismiss the alert
         alert.dismiss()
 
+    def test_registration_add_contributor(self):
+        second_user = self.create_user()
+        registration_url = self.create_registration()
+
+        # add a contributor
+        self.driver.get(registration_url)
+        # with self.assertRaises(TimeoutException):
+        self.add_contributor(second_user)
+
+        # refresh the page
+        self.driver.get(registration_url)
+
+        # make sure the added user isn't there.
+        self.assertNotIn(
+            second_user['fullname'],
+            self.get_element('#contributors').text,
+        )
+
+    def test_registration_remove_contributor(self):
+        """ Attempts to remove a contributor from a registration """
+
+        # create a user
+        second_user = self.create_user()
+
+        # add them to the project
+        self.goto('dashboard')
+        self.add_contributor(second_user)
+
+        # register it.
+        registration_url = self.create_registration()
+
+        # remove them from the registration
+        self.driver.get(registration_url)
+        self.remove_contributor(second_user)
+
+        # make sure they're still there
+        self.driver.get(registration_url)
+        self.assertIn(
+            second_user['fullname'],
+            self.get_element('#contributors').text
+        )
