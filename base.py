@@ -473,23 +473,24 @@ class ProjectSmokeTest(UserSmokeTest):
             self.driver.get(
                 node_url.strip('/') + '/register/Open-Ended_Registration'
             )
+        elif registration_type == 'OSF-Standard Pre-Data Collection Registration':
+            self.driver.get('/'.join([
+                node_url.strip('/'),
+                'register',
+                'OSF-Standard_Pre-Data_Collection_Registration',
+            ]))
         else:
             raise ValueError('Invalid registration type')
-
-        # Click New Registration button
-        # self.get_element('div.page-header a.btn[type="button"]').click()
-
-        # Select registration type
-        # self.get_element(
-        #     'form.form-horizontal select.ember-view'
-        # ).send_keys(registration_type)
-
-        #
 
         # Fill out the form
         self.get_element(
             'textarea.ember-view'
-        ).send_keys('Test content for a texarea.')
+        ).send_keys('Test content for a textarea.')
+
+        for elem in self.driver.find_elements_by_css_selector(
+                'div#registration_template select'):
+            elem.send_keys('Yes')
+
 
         self.get_element(
             'form.form-horizontal div.control-group input.ember-view'
