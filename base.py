@@ -458,7 +458,11 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return self.driver.current_url
 
-    def create_registration(self, registration_type, node_url=None):
+    def create_registration(
+            self,
+            registration_type='Open-Ended Registration',
+            node_url=None,
+    ):
         """Create a new registration.
 
         Args:

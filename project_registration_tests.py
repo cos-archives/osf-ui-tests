@@ -28,3 +28,13 @@ class RegistrationTests(base.ProjectSmokeTest):
             'This node is a registration of',
             self.get_element('span.label.label-important').text
         )
+
+    def test_registration_link_to_parent_project(self):
+        registration_url = self.create_registration()
+
+        self.assertEqual(
+            self.get_element(
+                'span.label.label-important a'
+            ).get_attribute('href').strip('/'),
+            self.project_url.strip('/'),
+        )
