@@ -60,7 +60,7 @@ class SmokeTest(unittest.TestCase):
     def get_element(self, css):
         return wait(
             driver=self.driver,
-            timeout=10
+            timeout=5
         ).until(
             method=ec.visibility_of_element_located(
                 (By.CSS_SELECTOR, css)
@@ -186,6 +186,7 @@ class ProjectSmokeTest(UserSmokeTest):
             'dashboard': lambda: base_url,
             'files': lambda: '/'.join([base_url, 'files']),
             'file': lambda: '/'.join([base_url, 'files', args[0]]),
+            'registrations': lambda: '/'.join([base_url, 'registrations']),
             'settings': lambda: '/'.join([base_url, 'settings']),
             'user-dashboard': lambda: '/'.join([self.site_root, 'dashboard']),
             'wiki': lambda: '/'.join([base_url, 'wiki']),
@@ -252,6 +253,26 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return LogEntry(log_entry_element)
 
+    def edit_title(self, text):
+
+        self.get_element('#node-title-editable').click()
+
+        # select the name field on the new popup
+        edit_profile_name_field = self.get_element(
+            'div.popover-content input.span2'
+        )
+
+        # delete the current project name
+        edit_profile_name_field.clear()
+
+        # enter the new project name
+        edit_profile_name_field.send_keys(text)
+
+        # find and click submit new project name
+        self.get_element(
+            'div.popover-content button.btn.btn-primary'
+        ).click()
+
     def make_private(self, url=None):
         """Make a project or component private.
 
@@ -316,9 +337,10 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return filename
 
-    def add_file(self, path):
+    def add_file(self, path, node_url=None):
         """Add a file. Assumes that the test class is harnessed to a project"""
-        self.goto('files')
+        node_url = node_url or self.project_url
+        self.goto('files', node_url=node_url)
 
         self.driver.execute_script('''
             $('input[type="file"]').offset({left : 50});
@@ -437,27 +459,56 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return self.driver.current_url
 
-        #return self.driver.find_elements_by_css_selector(
-        #    'li.project a'
-        #)[0].get_attribute('href')
+    def create_registration(
+            self,
+            registration_type='Open-Ended Registration',
+            node_url=None,
+    ):
+        """Create a new registration.
 
-    def _add_versioned_file(self,text_files, versioned_files):
-        filename = 'versioned.txt'
-        upload_dir = os.path.dirname(text_files['txt']['path'])
-        f = os.path.join(upload_dir, filename)
+        Args:
+            registration_type : Type of registration
+            registration_data : Data for registration form
+        Returns:
+            URL of registration
+        """
+        # Browse to registrations page
+        node_url = node_url or self.project_url
+        if registration_type == 'Open-Ended Registration':
+            self.driver.get(
+                node_url.strip('/') + '/register/Open-Ended_Registration'
+            )
+        elif registration_type == 'OSF-Standard Pre-Data Collection Registration':
+            self.driver.get('/'.join([
+                node_url.strip('/'),
+                'register',
+                'OSF-Standard_Pre-Data_Collection_Registration',
+            ]))
+        else:
+            raise ValueError('Invalid registration type')
 
-        # rename and upload version 0.
-        shutil.copy(versioned_files[0]['path'], f)
-        self.add_file(f)
+        # Fill out the form
+        self.get_element(
+            'textarea.ember-view'
+        ).send_keys('Test content for a textarea.')
 
-        # rename and upload version 1
-        shutil.copy(versioned_files[1]['path'], f)
-        self.add_file(f)
+        for elem in self.driver.find_elements_by_css_selector(
+                'div#registration_template select'):
+            elem.send_keys('Yes')
 
-        # delete the temp file
-        os.remove(f)
 
-        return filename
+        self.get_element(
+            'form.form-horizontal div.control-group input.ember-view'
+        ).send_keys('continue')
+
+        self.get_element('div.ember-view button.btn.primary').click()
+
+        # Hack: Wait for registration label so that we can get the
+        # correct URL for the registration
+        self.get_element('.label-important')
+
+        # Return URL of registration
+        return self.driver.current_url
 
     def _file_exists_in_project(self, filename):
         """Goes to a file's page, verifies by checking the title."""
@@ -491,6 +542,25 @@ class ProjectSmokeTest(UserSmokeTest):
         util.clear_wiki_text(self.driver)
         util.add_wiki_text(self.driver, text)
         util.submit_wiki_text(self.driver)
+
+    def get_wiki_text(self):
+        """Provided you are on a wiki page, get the raw contents of the page"""
+        return self.driver.execute_script('''
+            return $('textarea#wmd-input').val()
+        ''')
+
+    def set_wiki_text(self, text, append=True):
+        textarea = self.get_element('textarea#wmd-input')
+
+        if not append:
+            # clear the input
+            self.driver.execute_script('''
+                $('textarea#wmd-input').val('')
+            ''')
+
+        textarea.send_keys(text)
+
+
 
 
 

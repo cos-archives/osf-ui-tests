@@ -281,46 +281,6 @@ def goto_registrations(driver, project_name=config.project_title):
     # Click Registrations button
     driver.find_element_by_link_text('Registrations').click()
 
-def create_registration(
-        driver, 
-        registration_type,
-        registration_data,
-        project_name=config.project_title):
-    """Create a new registration.
-    
-    Args:
-        registration_type : Type of registration
-        registration_data : Data for registration form
-    Returns:
-        URL of registration
-    """
-    # Browse to registrations page
-    goto_registrations(driver, project_name)
-    
-    # Click New Registration button
-    driver.find_element_by_link_text('New Registration').click()
-
-    # Select registration type
-    driver.find_element_by_xpath(
-        '//option[contains(., "%s")]' % (registration_type)
-    ).click()
-    
-    # Fill out registration form
-    fill_form(
-        driver,
-        registration_data,
-        lambda elm: elm.find_element_by_css_selector(
-            '.ember-view button.primary'
-        )
-    )
-
-    # Hack: Wait for registration label so that we can get the
-    # correct URL for the registration
-    driver.find_element_by_css_selector('.label-important')
-
-    # Return URL of registration
-    return driver.current_url
-
 def delete_project(driver, project_title=config.project_title):
     """Delete a project. Note: There is no confirmation for
     project deletion as of this writing, but should be soon.
