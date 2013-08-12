@@ -3,6 +3,7 @@ from unittest import skip
 import util
 import base
 import os
+import requests
 import shutil
 import tempfile
 
@@ -141,6 +142,33 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 '#file-version-history tbody tr:nth-of-type(2) td:first-child'
             ).text
         )
+
+        # make the project public so requests can access it w/o being logged in.
+        self.goto('dashboard')
+        self.make_public()
+
+        self.goto('file', f)
+
+        # see that the added text is in the current version
+        self.assertIn(
+            'Version 1',
+            requests.get(
+                self.get_element(
+                    '#file-version-history tbody tr:first-child a'
+                ).get_attribute('href')
+            ).content,
+        )
+
+        # ... but isn't in the first version.
+        self.assertNotIn(
+            'Version 1',
+            requests.get(
+                self.get_element(
+                    '#file-version-history tbody tr:last-child a'
+                ).get_attribute('href')
+            ).content,
+        )
+
 
     @skip('Not Implemented')
     def test_access_file_not_found(self):
