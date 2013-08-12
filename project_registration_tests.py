@@ -4,6 +4,7 @@ Tests for creating project registrations.
 
 # Project imports
 import base
+from config import osf_home
 
 from selenium.common.exceptions import TimeoutException
 
@@ -127,4 +128,26 @@ class RegistrationTests(base.ProjectSmokeTest):
         self.assertIn(
             second_user['fullname'],
             self.get_element('#contributors').text
+        )
+
+    def test_registration_modify_wiki(self):
+        registration_url = self.create_registration()
+
+        # go to the registration's wiki
+        self.goto('wiki', node_url=registration_url)
+
+        # click "Edit"
+        self.get_element(
+            '.subnav ul.nav > li:first-child > a[href$="edit"]'
+        ).click()
+
+        # should have been redirected to the homepage
+        self.assertEqual(
+            self.driver.current_url.strip('/'),
+            registration_url.strip('/'),
+        )
+
+        self.assertIn(
+            'Registrations are read-only',
+            self.get_element('#alert-container').text,
         )
