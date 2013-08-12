@@ -186,6 +186,7 @@ class ProjectSmokeTest(UserSmokeTest):
             'dashboard': lambda: base_url,
             'files': lambda: '/'.join([base_url, 'files']),
             'file': lambda: '/'.join([base_url, 'files', args[0]]),
+            'registrations': lambda: '/'.join([base_url, 'registrations']),
             'settings': lambda: '/'.join([base_url, 'settings']),
             'user-dashboard': lambda: '/'.join([self.site_root, 'dashboard']),
             'wiki': lambda: '/'.join([base_url, 'wiki']),
@@ -457,9 +458,51 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return self.driver.current_url
 
-        #return self.driver.find_elements_by_css_selector(
-        #    'li.project a'
-        #)[0].get_attribute('href')
+    def create_registration(self, registration_type, node_url=None):
+        """Create a new registration.
+
+        Args:
+            registration_type : Type of registration
+            registration_data : Data for registration form
+        Returns:
+            URL of registration
+        """
+        # Browse to registrations page
+        node_url = node_url or self.project_url
+        if registration_type == 'Open-Ended Registration':
+            self.driver.get(
+                node_url.strip('/') + '/register/Open-Ended_Registration'
+            )
+        else:
+            raise ValueError('Invalid registration type')
+
+        # Click New Registration button
+        # self.get_element('div.page-header a.btn[type="button"]').click()
+
+        # Select registration type
+        # self.get_element(
+        #     'form.form-horizontal select.ember-view'
+        # ).send_keys(registration_type)
+
+        #
+
+        # Fill out the form
+        self.get_element(
+            'textarea.ember-view'
+        ).send_keys('Test content for a texarea.')
+
+        self.get_element(
+            'form.form-horizontal div.control-group input.ember-view'
+        ).send_keys('continue')
+
+        self.get_element('div.ember-view button.btn.primary').click()
+
+        # Hack: Wait for registration label so that we can get the
+        # correct URL for the registration
+        self.get_element('.label-important')
+
+        # Return URL of registration
+        return self.driver.current_url
 
     def _file_exists_in_project(self, filename):
         """Goes to a file's page, verifies by checking the title."""
