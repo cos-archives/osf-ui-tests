@@ -337,9 +337,10 @@ class ProjectSmokeTest(UserSmokeTest):
 
         return filename
 
-    def add_file(self, path):
+    def add_file(self, path, node_url=None):
         """Add a file. Assumes that the test class is harnessed to a project"""
-        self.goto('files')
+        node_url = node_url or self.project_url
+        self.goto('files', node_url=node_url)
 
         self.driver.execute_script('''
             $('input[type="file"]').offset({left : 50});
