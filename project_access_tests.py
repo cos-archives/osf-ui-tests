@@ -143,6 +143,11 @@ class ProjectSecurityTest(ProjectSmokeTest):
             self.driver.current_url
         )
 
+        # try to rename the project
+        self.goto('dashboard')
+        with self.assertRaises(TimeoutException):
+            self.edit_title('foo')
+
         # log back in so teardown works.
         self.log_out()
         self.log_in()

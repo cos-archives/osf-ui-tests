@@ -60,7 +60,7 @@ class SmokeTest(unittest.TestCase):
     def get_element(self, css):
         return wait(
             driver=self.driver,
-            timeout=10
+            timeout=5
         ).until(
             method=ec.visibility_of_element_located(
                 (By.CSS_SELECTOR, css)
@@ -251,6 +251,26 @@ class ProjectSmokeTest(UserSmokeTest):
                 )
 
         return LogEntry(log_entry_element)
+
+    def edit_title(self, text):
+
+        self.get_element('#node-title-editable').click()
+
+        # select the name field on the new popup
+        edit_profile_name_field = self.get_element(
+            'div.popover-content input.span2'
+        )
+
+        # delete the current project name
+        edit_profile_name_field.clear()
+
+        # enter the new project name
+        edit_profile_name_field.send_keys(text)
+
+        # find and click submit new project name
+        self.get_element(
+            'div.popover-content button.btn.btn-primary'
+        ).click()
 
     def make_private(self, url=None):
         """Make a project or component private.
