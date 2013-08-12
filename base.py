@@ -441,24 +441,6 @@ class ProjectSmokeTest(UserSmokeTest):
         #    'li.project a'
         #)[0].get_attribute('href')
 
-    def _add_versioned_file(self,text_files, versioned_files):
-        filename = 'versioned.txt'
-        upload_dir = os.path.dirname(text_files['txt']['path'])
-        f = os.path.join(upload_dir, filename)
-
-        # rename and upload version 0.
-        shutil.copy(versioned_files[0]['path'], f)
-        self.add_file(f)
-
-        # rename and upload version 1
-        shutil.copy(versioned_files[1]['path'], f)
-        self.add_file(f)
-
-        # delete the temp file
-        os.remove(f)
-
-        return filename
-
     def _file_exists_in_project(self, filename):
         """Goes to a file's page, verifies by checking the title."""
         self.goto('file', filename)

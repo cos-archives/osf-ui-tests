@@ -119,7 +119,6 @@ class ComponentAccessCase(ProjectSmokeTest):
             self.get_element('#Nodes').text
         )
 
-
         # Private component should not be there
         self.assertNotIn(
             private_component_title,
@@ -133,7 +132,6 @@ class ComponentAccessCase(ProjectSmokeTest):
         # log back in as the first user so teardown will work.
         self.log_out()
         self.log_in()
-
 
     def test_files_of_private_component_of_public_project(self):
         """Test that a private component of a public project is not accessible

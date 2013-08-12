@@ -2,13 +2,7 @@
 Tests for project logs.
 """
 
-import unittest
 import time
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait as wait
-from datetime import datetime, timedelta
 
 
 # Project imports
@@ -16,8 +10,6 @@ import base
 import util
 import config
 import uuid
-import os
-import shutil
 
 
 class ProjectLogTests(base.ProjectSmokeTest):
@@ -295,7 +287,6 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2]+"/", project_url)
 
-
     def test_file_upload_log(self):
         """
         test to make sure that project log works correctly on uploading files to a project
@@ -327,7 +318,6 @@ class ProjectLogTests(base.ProjectSmokeTest):
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1]+'/', self.project_url)
 
-
     def test_file_modification_log(self):
         """
         test to make sure that project log works correctly on modifying files on a project
@@ -345,7 +335,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         })
 
         #Add a file to a project
-        f = self._add_versioned_file(self.text_files, self.versioned_files)
+        f = self.add_versioned_file()
 
         #get the log
         util.goto_project(self.driver)
@@ -361,7 +351,6 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #check the user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1]+'/', self.project_url)
-
 
     def test_delete_file_log(self):
         """
