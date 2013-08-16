@@ -220,7 +220,7 @@ class ProjectSmokeTest(UserSmokeTest):
     def remove_contributor(self, user):
 
         self.driver.execute_script(
-            """me = $('#contributors a:contains("{fullname}")')
+            u"""me = $('#contributors a:contains("{fullname}")')
                 .append('<i class="icon-remove"><i>');
             removeUser(
                 me.attr("data-userid"),

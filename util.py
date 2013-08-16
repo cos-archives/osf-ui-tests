@@ -155,16 +155,20 @@ def login(driver, username, password):
 
 def gen_user_data(_length=12):
     """ Generate data to create a user account. """
-    
-    fullname = str(uuid.uuid1())[:_length]
-    username = str(uuid.uuid1())[:_length] + '@osftest.org'
-    password = str(uuid.uuid1())[:_length]
 
-    username2 = username
-    password2 = password
-    
-    _locs = locals()
-    return {k:_locs[k] for k in _locs if not k.startswith('_')}
+    uid = unicode(uuid.uuid1())[:_length - 1]
+    unique = uid + u'\xe4'
+
+
+    username = u'{}@osftest.org'.format(uid)
+
+    return {
+        'username': username,
+        'username2': username,
+        'password': unique,
+        'password2': unique,
+        'fullname': unique
+    }
 
 def create_user(driver, user_data=None):
     """Create a new user account.

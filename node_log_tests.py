@@ -202,7 +202,7 @@ class NodeLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            '{} removed {} as a contributor from node {}'.format(
+            u'{} removed {} as a contributor from node {}'.format(
                 self.user_data['fullname'],
                 second_user['fullname'],
                 title,
