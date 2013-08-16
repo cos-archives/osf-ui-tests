@@ -32,9 +32,8 @@ class ForkTests(base.ProjectSmokeTest):
         # Make the project public
         util.make_project_public(self.driver, self.project_url)
 
-
         # add to the wiki
-        self.get_element('div.subnav li a')
+        time.sleep(2)
         self.driver.find_element_by_link_text('Wiki').click()
         self._add_wiki("This is wiki test")
         self.wiki_text = util.get_wiki_text(self.driver)

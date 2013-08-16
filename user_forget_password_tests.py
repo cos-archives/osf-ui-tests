@@ -14,6 +14,7 @@ import base
 import util
 import config
 
+
 class UserForgetPasswordTests(base.SmokeTest):
 
     def setUp(self):

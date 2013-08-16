@@ -167,7 +167,6 @@ class ProjectSecurityTest(ProjectSmokeTest):
         self.log_out()
         self.log_in()
 
-
     @not_implemented
     def test_fork_with_private_components(self):
         raise NotImplementedError

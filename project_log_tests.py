@@ -28,7 +28,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log text
         self.assertEqual(
             message_log.log_text,
-            "{} created project".format(self.user_data["fullname"])
+            u"{} created project".format(self.user_data["fullname"])
         )
 
         #check the user_url and project_url
@@ -58,7 +58,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            "{} created node {}".format(
+            u"{} created node {}".format(
                 self.user_data["fullname"],
                 config.node_title,
             )
@@ -103,7 +103,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            "{} changed the title from {} to {}".format(
+            u"{} changed the title from {} to {}".format(
                 self.user_data["fullname"],
                 config.project_title,
                 project_new_name,
@@ -151,7 +151,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         new_version = str(orig_version + 1)
         self.assertEqual(
             message_log.log_text,
-            '{} updated wiki page home to version {}'.format(
+            u'{} updated wiki page home to version {}'.format(
                 self.user_data["fullname"],
                 new_version,
             )
@@ -221,7 +221,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            '{} added {} as contributor on node {}'.format(
+            u'{} added {} as contributor on node {}'.format(
                 second_user_data['fullname'],
                 self.user_data['fullname'],
                 config.project_title,
@@ -275,7 +275,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            '{} removed {} as a contributor from project {}'.format(
+            u'{} removed {} as a contributor from project {}'.format(
                 second_user_data["fullname"],
                 self.user_data['fullname'],
                 config.project_title
