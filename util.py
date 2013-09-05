@@ -59,6 +59,7 @@ def launch_driver(
     
     driver_cls = getattr(webdriver, driver_name)
 
+
     if driver_name == 'Remote':
 
         # Set up command executor
@@ -171,7 +172,7 @@ def gen_user_data(_length=12):
         'fullname': unique
     }
 
-def create_user(driver, user_data=None):
+def create_user(driver=None, user_data=None):
     """Create a new user account.
 
     Args:
