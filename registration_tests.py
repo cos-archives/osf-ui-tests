@@ -1,6 +1,6 @@
 import unittest
 
-from pages import helpers
+from pages import helpers, ProjectPage, LoginPage
 
 
 class RegistrationTests(unittest.TestCase):
@@ -46,9 +46,11 @@ class RegistrationTests(unittest.TestCase):
             parent_value,
         )
 
+        page.close()
+
     def test_project_registration_title(self):
         self._test_registration_matches(
-            page=self._subproject(),
+            page=self._project(),
             attribute='title'
         )
 
@@ -62,4 +64,48 @@ class RegistrationTests(unittest.TestCase):
         self._test_registration_matches(
             page=self._subproject(),
             attribute='parent_title'
+        )
+
+    def test_project_registration_components_empty(self):
+        self._test_registration_matches(
+            page=self._project(),
+            attribute='component_names'
+        )
+
+    def test_project_registration_components(self):
+        page = self._project()
+
+        # add component
+        page = page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+
+        page = page.parent_project()
+
+        self._test_registration_matches(
+            page=page,
+            attribute='component_names'
+        )
+
+    def test_subproject_registration_components(self):
+        page = self._project()
+
+
+        page = page.add_component(
+            title='Subproject',
+            component_type='Project',
+        )
+
+        # add component
+        page = page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+
+        page = page.parent_project()
+
+        self._test_registration_matches(
+            page=page,
+            attribute='component_names'
         )

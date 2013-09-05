@@ -1,4 +1,6 @@
+from collections import namedtuple
 import datetime as dt
+import urlparse
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,8 +13,14 @@ from generic import OsfPage
 class NodePage(OsfPage):
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('project_id') is None and kwargs.get('driver') is None:
+        if kwargs.get('id') is None and kwargs.get('driver') is None:
             raise TypeError("A `project_id` or `driver` must be provided.")
+
+        if 'id' in kwargs:
+            kwargs['url'] = 'http://localhost:5000/project/{}/'.format(
+                kwargs['id']
+            )
+            del kwargs['id']
 
         super(NodePage, self).__init__(*args, **kwargs)
 
@@ -25,6 +33,13 @@ class NodePage(OsfPage):
             '#contributors span.date:nth-of-type(1)').text
 
         return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
+
+    @property
+    def id(self):
+        return urlparse.urlparse(
+            self.driver.current_url
+        ).path.strip('/').split('/')[-1]
+
 
     @property
     def title(self):
@@ -49,6 +64,31 @@ class NodePage(OsfPage):
     @property
     def _title(self):
         return self.driver.find_element_by_id('node-title-editable')
+
+    @property
+    def components(self):
+        C = namedtuple('Component', ['title', 'url'])
+        components = []
+        for elem in self.driver.find_elements_by_css_selector('#Nodes h3 a'):
+            components.append(
+                C(
+                    title=elem.text,
+                    url=elem.get_attribute('href')
+                )
+            )
+
+        return components
+
+    @property
+    def component_names(self):
+        return tuple([x.title for x in self.components])
+
+    def parent_project(self):
+        if self.parent_link:
+            self.driver.get(self.parent_link)
+            return ProjectPage(driver=self.driver)
+        else:
+            raise AttributeError("No parent project found.")
 
 
 class ProjectPage(NodePage):
