@@ -9,6 +9,7 @@ from selenium.common import exceptions as exc
 
 import logs
 from generic import OsfPage
+from helpers import WaitForPageReload
 
 
 class NodePage(OsfPage):
@@ -387,17 +388,11 @@ class ProjectPage(NodePage):
             '.container form input'
         )[-1].send_keys('continue')
 
-        # Get the body element, so we know then the page has unloaded
-        body = self.driver.find_element_by_css_selector('body')
-
-        # click "Register"
-        self.driver.find_element_by_css_selector(
-            '.container form button'
-        ).click()
-
-        # Wait at least until the page has unloaded to continue.
-        # TODO: I think this is where the 2-3 second delay is. Fix that.
-        WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
+        with WaitForPageReload(self.driver):
+            # click "Register"
+            self.driver.find_element_by_css_selector(
+                '.container form button'
+            ).click()
 
         return ProjectRegistrationPage(driver=self.driver)
 

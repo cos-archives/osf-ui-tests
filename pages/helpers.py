@@ -1,7 +1,7 @@
+import time
 from collections import namedtuple
 
 import util
-from pages import LoginPage
 
 
 def create_user():
@@ -17,11 +17,13 @@ def create_user():
     )
 
 
-def get_new_project(title=None, description=None):
+def get_new_project(title='New Project', description=None):
     """ Create a new project; return its page.
     """
 
     # Log in
+    from pages import LoginPage
+
     user = create_user()
     page = LoginPage()
     page = page.log_in(
@@ -31,3 +33,18 @@ def get_new_project(title=None, description=None):
 
     # create the project
     return page.new_project(title=title, description=description)
+
+
+class WaitForPageReload(object):
+    def __enter__(self):
+        self.body = self.driver.find_element_by_css_selector('body')
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def __exit__(self, *args, **kwargs):
+        while(True):
+            if self.body == self.driver.find_element_by_css_selector('body'):
+                time.sleep(.1)
+            else:
+                break
