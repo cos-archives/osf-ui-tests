@@ -267,6 +267,18 @@ class RegistrationTests(unittest.TestCase):
             attribute='wiki_home_content'
         )
 
+    def test_project_registration_log_matches(self):
+        self._test_registration_matches(
+            page=self._project(),
+            attribute='logs',
+        )
+
+    def test_subproject_registration_log_matches(self):
+        self._test_registration_matches(
+            page=self._subproject(),
+            attribute='logs',
+        )
+
     def _test_registration_logged(self, page):
         user = page.contributors[0].full_name
 
