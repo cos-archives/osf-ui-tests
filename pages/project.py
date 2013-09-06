@@ -1,12 +1,13 @@
-from collections import namedtuple
 import datetime as dt
 import urlparse
+from collections import namedtuple
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 
+import logs
 from generic import OsfPage
 
 
@@ -196,6 +197,12 @@ class NodePage(OsfPage):
             )
 
         return registrations
+
+    @property
+    def logs(self):
+        return logs.parse_log(
+            container=self.driver.find_element_by_id('main-log')
+        )
 
 
 class ProjectPage(NodePage):

@@ -266,3 +266,35 @@ class RegistrationTests(unittest.TestCase):
             page=page,
             attribute='wiki_home_content'
         )
+
+    def _test_registration_logged(self, page):
+        user = page.contributors[0].full_name
+
+        _url = page.driver.current_url
+
+        page = page.add_registration(
+            registration_type='Open-Ended Registration',
+            meta=('test narrative', )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            u'{user} registered project {title}'.format(
+                user=user,
+                title=page.title
+            )
+        )
+
+        page.close()
+
+    def test_project_registration_logged(self):
+        """ When a project is registered, the action should be in its log."""
+        self._test_registration_logged(self._project())
+
+    def test_subproject_registration_logged(self):
+        """ When a subproject is registered, the action should be in its log."""
+        # TODO: This fails right now because a subproject is referred to as a
+        # "node" in the log.
+        self._test_registration_logged(self._subproject())
