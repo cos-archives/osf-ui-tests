@@ -83,6 +83,14 @@ class RegistrationTests(unittest.TestCase):
 
         page = page.parent_project()
 
+        # add a subproject
+        page = page.add_component(
+            title='Test Subproject',
+            component_type='Project',
+        )
+
+        page = page.parent_project()
+
         self._test_registration_matches(
             page=page,
             attribute='component_names'
