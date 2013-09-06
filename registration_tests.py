@@ -117,3 +117,35 @@ class RegistrationTests(unittest.TestCase):
             page=page,
             attribute='component_names'
         )
+
+    def test_project_registration_created_date(self):
+        self._test_registration_matches(
+            page=self._project(),
+            attribute='date_created'
+        )
+
+    def test_subproject_registration_created_date(self):
+        self._test_registration_matches(
+            page=self._subproject(),
+            attribute='date_created'
+        )
+
+    def test_project_registration_wiki_home(self):
+        page = self._project()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def test_subproject_registration_wiki_home(self):
+        page = self._subproject()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            page=page,
+            attribute='wiki_home_content'
+        )

@@ -90,6 +90,56 @@ class NodePage(OsfPage):
         else:
             raise AttributeError("No parent project found.")
 
+    def set_wiki_content(self, content, page='home'):
+        _url = self.driver.current_url
+
+        self.driver.get(
+            '{}/wiki/{}/edit'.format(
+                _url.strip('/'),
+                page
+            )
+        )
+
+        # clear existing input
+        self.driver.execute_script("$('#wmd-input').val('');")
+
+        # set the new content
+        self.driver.find_element_by_id('wmd-input').send_keys(content)
+
+        # submit it
+        self.driver.find_element_by_css_selector(
+            '.wmd-panel input[type="submit"]'
+        ).click()
+
+        # Go back to the project page.
+        self.driver.get(_url)
+
+    def get_wiki_content(self, page='home'):
+        _url = self.driver.current_url
+
+        self.driver.get(
+            '{}/wiki/{}'.format(
+                _url.strip('/'),
+                page
+            )
+        )
+
+        # set the new content
+        content = self.driver.execute_script(
+            'var e = $("#addContributors + div");'
+            'e.find("> div:first-child").remove();'
+            'return e.text()'
+        ).strip()
+
+        # Go back to the project page.
+        self.driver.get(_url)
+
+        return content
+
+    @property
+    def wiki_home_content(self):
+        return self.get_wiki_content()
+
 
 class ProjectPage(NodePage):
     def add_component(self, title, component_type=None):
@@ -197,8 +247,6 @@ class ProjectPage(NodePage):
         return ProjectRegistrationPage(driver=self.driver)
 
 
-
-
 class ComponentPage(NodePage):
     pass
 
@@ -229,3 +277,4 @@ class ProjectRegistrationPage(ProjectPage):
         self.driver.get(_url)
 
         return tuple(meta)
+
