@@ -197,6 +197,7 @@ class NodePage(OsfPage):
 
         return registrations
 
+
 class ProjectPage(NodePage):
     def add_component(self, title, component_type=None):
         """Add a component to the project.
@@ -334,3 +335,8 @@ class ProjectRegistrationPage(ProjectPage):
 
         return tuple(meta)
 
+    @property
+    def registration_template(self):
+        return self.driver.find_element_by_css_selector(
+            '#overview a[href*="register"]'
+        ).text

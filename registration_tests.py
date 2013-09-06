@@ -13,6 +13,29 @@ class RegistrationTests(unittest.TestCase):
             component_type='Project',
         )
 
+    def _test_registration_template(self, page):
+
+        meta = ('sample narrative', )
+        template = 'Open-Ended Registration'
+
+        page = page.add_registration(
+            registration_type=template,
+            meta=meta,
+        )
+
+        self.assertEqual(
+            page.registration_template,
+            template,
+        )
+
+        page.close()
+
+    def test_project_registration_template(self):
+        self._test_registration_template(self._project())
+
+    def test_project_registration_template(self):
+        self._test_registration_template(self._subproject())
+
     def _test_registration_meta(self, page):
         meta = ('sample narrative', )
 
