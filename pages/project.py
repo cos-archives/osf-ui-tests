@@ -35,6 +35,13 @@ class NodePage(OsfPage):
         return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
 
     @property
+    def last_updated(self):
+        date_string = self.driver.find_element_by_css_selector(
+            '#contributors span.date:nth-of-type(2)').text
+
+        return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
+
+    @property
     def id(self):
         return urlparse.urlparse(
             self.driver.current_url

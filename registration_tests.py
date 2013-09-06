@@ -201,6 +201,18 @@ class RegistrationTests(unittest.TestCase):
             attribute='date_created'
         )
 
+    def test_project_registration_last_updated_date(self):
+        self._test_registration_matches(
+            page=self._project(),
+            attribute='last_updated'
+        )
+
+    def test_subproject_registration_last_updated_date(self):
+        self._test_registration_matches(
+            page=self._subproject(),
+            attribute='last_updated'
+        )
+
     def test_project_registration_wiki_home(self):
         page = self._project()
 
