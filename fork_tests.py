@@ -108,6 +108,164 @@ class ForkTests2(unittest.TestCase):
         """Subproject variant of ``self.test_project_fork_list_title``"""
         self._test_fork_title(self._subproject())
 
+    def _test_fork_matches(self, page, attribute):
+        """Given a project, fork it and verify that the attribute provided
+         matches between the project and its fork.
+
+         Note that the value of the project's attribute is stored before the
+         project is forked, as the act of forking may otherwise change the
+         state - for example, project's fork should include its log *before*
+         the project was forked.
+        """
+        parent_value = getattr(page, attribute)
+
+        page = page.fork()
+
+        self.assertEqual(
+            getattr(page, attribute),
+            parent_value,
+        )
+
+        page.close()
+
+    def test_project_fork_components_empty(self):
+        """ Verify that a fork's (empty) component list matches the
+        original project"""
+        self._test_fork_matches(
+            page=self._project(),
+            attribute='component_names'
+        )
+
+    def test_subproject_fork_components_empty(self):
+        """Subproject variant of ``self.test_project_fork_components_empty``"""
+        self._test_fork_matches(
+            page=self._subproject(),
+            attribute='component_names'
+        )
+
+    def test_project_fork_components(self):
+        """Verify that a fork's (non-empty) component list matches the original
+        project"""
+        page = self._project()
+
+        # add component
+        page = page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+
+        page = page.parent_project()
+
+        # add a subproject
+        page = page.add_component(
+            title='Test Subproject',
+            component_type='Project',
+        )
+
+        page = page.parent_project()
+
+        self._test_fork_matches(
+            page=page,
+            attribute='component_names'
+        )
+
+    def test_subproject_fork_components(self):
+        """Subproject variant of ``self.test_project_fork_components``"""
+        page = self._subproject()
+
+        # add component
+        page = page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+
+        page = page.parent_project()
+
+        self._test_fork_matches(
+            page=page,
+            attribute='component_names'
+        )
+
+    @unittest.skip('test not implemented')
+    def test_project_fork_contributors(self):
+        """Verify that a fork's contributor list matches the original project"""
+        pass
+
+
+    @unittest.skip('test not implemented')
+    def test_subproject_fork_contributors(self):
+        """Subproject variant of ``self._test_project_fork_contributors``"""
+        pass
+
+    def test_project_fork_created_date(self):
+        """Verify that a fork's creation date matches the original project"""
+        self._test_fork_matches(
+            page=self._project(),
+            attribute='date_created'
+        )
+
+    def test_subproject_fork_created_date(self):
+        """Subproject variant of ``self._test_project_fork_created_date``"""
+        self._test_fork_matches(
+            page=self._subproject(),
+            attribute='date_created'
+        )
+
+    def test_project_fork_wiki_home(self):
+        """ Verify that a fork's wiki homepage content matches the original
+        project """
+        page = self._project()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_fork_matches(
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def test_subproject_fork_wiki_home(self):
+        """Subproject variant of ``self.test_project_fork_wiki_home``"""
+        page = self._subproject()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_fork_matches(
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def _test_fork_logged(self, page):
+        """ Given a project, register it and verify that the action appears in
+        the original project's logs.
+        """
+        user = page.contributors[0].full_name
+
+        _url = page.driver.current_url
+        title = page.title
+
+        page = page.fork()
+
+        self.assertEqual(
+            page.logs[0].text,
+            u'{user} created fork from project {title}'.format(
+                user=user,
+                title=title
+            )
+        )
+
+        page.close()
+
+    def test_project_fork_logged(self):
+        """ Project variant of ``self._test_fork_logged`` """
+        self._test_fork_logged(self._project())
+
+    def test_subproject_fork_logged(self):
+        """ Subproject variant of ``self._test_fork_logged`` """
+        # TODO: This fails right now because a subproject is referred to as a
+        # "node" in the log.
+        self._test_fork_logged(self._subproject())
+
+
 
 class ForkTests(base.ProjectSmokeTest):
 
