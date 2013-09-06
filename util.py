@@ -8,6 +8,7 @@ import time
 import uuid
 import inspect
 import unittest
+import requests
 
 # Selenium imports
 from selenium import webdriver
@@ -57,6 +58,7 @@ def launch_driver(
     """
     
     driver_cls = getattr(webdriver, driver_name)
+
 
     if driver_name == 'Remote':
 
@@ -170,7 +172,7 @@ def gen_user_data(_length=12):
         'fullname': unique
     }
 
-def create_user(driver, user_data=None):
+def create_user(driver=None, user_data=None):
     """Create a new user account.
 
     Args:
@@ -190,22 +192,19 @@ def create_user(driver, user_data=None):
         }
 
     """
-    if user_data is None:
-        user_data = gen_user_data()
+    user_data = user_data or gen_user_data()
 
-    form_data = {'#register-%s' % (k) : user_data[k] for k in user_data}
-    # print form_data
+    requests.post(
+        url='/'.join((config.osf_home.strip('/'), 'register')),
+        data={
+            'register-fullname': user_data['fullname'],
+            'register-username': user_data['username'],
+            'register-username2': user_data['username'],
+            'register-password': user_data['password'],
+            'register-password2': user_data['password'],
+        }
+    )
 
-    # Browse to account page
-    driver.get('%s/account' % (config.osf_home))
-
-    ## Find form
-    #registration_form = driver.find_element_by_xpath('//form[@name="registration"]')
-
-    # Fill out form
-    fill_form(driver, form_data)
-    #fill_form(registration_form, form_data)
-    
     # Return user data
     return user_data
 
