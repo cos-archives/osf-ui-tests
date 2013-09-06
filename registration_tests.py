@@ -149,8 +149,6 @@ class RegistrationTests(unittest.TestCase):
             delta=dt.timedelta(minutes=2)
         )
 
-        page.close()
-
     def test_project_registration_list_date(self):
         """ Project variant of ``self._test_registration_list_date`` """
         self._test_registration_list_date(self._project())
