@@ -11,9 +11,103 @@ from selenium.webdriver.common.keys import Keys
 
 
 # Project imports
+from pages import helpers
 import base
 import util
 import config
+
+
+class ForkTests2(unittest.TestCase):
+    """This test case is for testing the act of creating a fork, and consistency
+    between a fork and its original node.
+    """
+
+    _project = lambda self: helpers.get_new_project()
+
+    def _subproject(self):
+        """ Create and return a (sub)project which is the child of a project.
+
+        The ``current_url`` of the driver is the subproject's overview.
+        """
+        return self._project().add_component(
+            title='New Subproject',
+            component_type='Project',
+        )
+
+    def _test_fork_list(self, page):
+        """ Given a project, register it and verify that the new registration is
+         in the project's registration list
+        """
+        _url = page.driver.current_url
+
+        page = page.fork()
+
+        page.driver.get(_url)
+
+        try:
+            return page.forks
+        finally:
+            page.close()
+
+    def test_project_fork_listed(self):
+        """After forking a project, the fork should be listed in the original
+        project's Forks pane."""
+        forks = self._test_fork_list(page=self._project())
+        self.assertEqual(len(forks), 1)
+
+    def test_subproject_fork_listed(self):
+        """After forking a project, the fork should be listed in the original
+        project's Forks pane."""
+        forks = self._test_fork_list(page=self._subproject())
+        self.assertEqual(len(forks), 1)
+
+    def test_project_fork_list_title(self):
+        """After forking a project, the fork should show the correct title in
+        the project's Forks pane.
+        """
+        page = self._project()
+        title = page.title
+
+        self.assertEqual(
+            self._test_fork_list(
+                page=page
+            )[0].title,
+            'Fork of {}'.format(title),
+        )
+
+    def test_subproject_fork_list_title(self):
+        """Subproject variant of ``self.test_project_fork_list_title``"""
+        page = self._subproject()
+        title = page.title
+
+        self.assertEqual(
+            self._test_fork_list(
+                page=page
+            )[0].title,
+            'Fork of {}'.format(title),
+        )
+
+    def _test_fork_title(self, page):
+        """Verify that a fork's title matches that of the original project -
+        with a "Fork of " prefix.
+        """
+        original_title = page.title
+        page = page.fork()
+        self.assertEqual(
+            page.title,
+            'Fork of ' + original_title,
+        )
+
+        page.close()
+
+    def test_project_fork_title(self):
+        """Project variant of ``self.test_project_fork_list_title``"""
+        self._test_fork_title(self._project())
+
+    def test_subproject_fork_title(self):
+        """Subproject variant of ``self.test_project_fork_list_title``"""
+        self._test_fork_title(self._subproject())
+
 
 class ForkTests(base.ProjectSmokeTest):
 
@@ -163,9 +257,6 @@ class ForkTests(base.ProjectSmokeTest):
 
         # Close WebDriver
         self.driver.close()
-
-# Generate tests
-util.generate_tests(ForkTests)
 
 # Run tests
 if __name__ == '__main__':

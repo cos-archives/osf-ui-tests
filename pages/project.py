@@ -272,6 +272,40 @@ class NodePage(OsfPage):
         return registrations
 
     @property
+    def forks(self):
+        """The noe's list of forks, parsed from the forks pane.
+
+         :returns: [``Fork``, ... ]
+        """
+
+        # Click "Forks"
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Forks'
+        ).click()
+
+        F = namedtuple('Fork', ('title', 'url'))
+
+        forks = []
+
+        # for each list entry
+        for f in self.driver.find_elements_by_css_selector(
+            'ul.list-group li.project h3'
+        ):
+            forks.append(
+                # build the Registration instance
+                F(
+                    title=f.find_element_by_css_selector('a').text,
+                    url=f.find_element_by_css_selector('a').get_attribute(
+                        'href'
+                    ),
+                )
+            )
+
+        return forks
+
+    @property
     def logs(self):
         """ The node's list of log entries.
 
@@ -280,6 +314,49 @@ class NodePage(OsfPage):
         return logs.parse_log(
             container=self.driver.find_element_by_id('main-log')
         )
+
+    def fork(self, split_driver=False):
+        """Create a fork of the node.
+
+         If split_driver is True, then reset self.driver to the original URL
+         and return a new object. Otherwise, return a ``ProjectPage`` or
+         ``ComponentPage`` as appropriate.
+        """
+        if split_driver:
+            page = self._clone()
+        else:
+            page = self
+
+        # Get the body element, so we know then the page has unloaded
+        #body = self.driver.find_element_by_css_selector('body')
+
+        with WaitForPageReload(self.driver):
+            # click the fork icon
+            page.driver.find_element_by_css_selector(
+                '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
+            ).click()
+
+
+
+        # Wait at least until the page has unloaded to continue.
+        # TODO: I think this is where the 2-3 second delay is. Fix that.
+        #WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
+
+        return page
+
+    def _clone(self):
+        new_driver = self.driver.__class__()
+        new_driver.get('http://localhost:5000/')
+
+        # copy cookies
+        for c in self.driver.get_cookies():
+            new_driver.add_cookie(c)
+
+        # load the current page.
+        new_driver.get(self.driver.current_url)
+
+        # return a copy of this class, with the new driver.
+        return self.__class__(driver=new_driver)
 
 
 class ProjectPage(NodePage):
