@@ -28,6 +28,25 @@ class NodePage(OsfPage):
         return len(self.driver.find_elements_by_id('node-title-editable')) == 1
 
     @property
+    def contributors(self):
+        """ A list of contributors for the node, parsed from the
+        header.
+        """
+        # TODO: This doesn't take into account non-registered users.
+        C = namedtuple('Contributor', ('full_name', 'profile_url', 'id'))
+
+        return [
+            C(
+                full_name=x.text,
+                profile_url=x.get_attribute('href'),
+                id=x.get_attribute('href').split('/')[-1],
+            )
+            for x in self.driver.find_elements_by_css_selector(
+                '#contributors a[href^="/profile"]'
+            )
+        ]
+
+    @property
     def date_created(self):
         date_string = self.driver.find_element_by_css_selector(
             '#contributors span.date:nth-of-type(1)').text

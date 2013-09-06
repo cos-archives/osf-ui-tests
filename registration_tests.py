@@ -170,7 +170,6 @@ class RegistrationTests(unittest.TestCase):
     def test_subproject_registration_components(self):
         page = self._project()
 
-
         page = page.add_component(
             title='Subproject',
             component_type='Project',
@@ -187,6 +186,18 @@ class RegistrationTests(unittest.TestCase):
         self._test_registration_matches(
             page=page,
             attribute='component_names'
+        )
+
+    def test_project_registration_contributors(self):
+        self._test_registration_matches(
+            page=self._project(),
+            attribute='contributors'
+        )
+
+    def test_subproject_registration_contributors(self):
+        self._test_registration_matches(
+            page=self._subproject(),
+            attribute='contributors'
         )
 
     def test_project_registration_created_date(self):
