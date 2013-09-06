@@ -306,6 +306,15 @@ class NodePage(OsfPage):
         return forks
 
     @property
+    def num_forks(self):
+        """The number of forks, as displayed in the icon's counter on the node's
+        dashboard
+        """
+        return int(self.driver.find_element_by_css_selector(
+                '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
+            ).text)
+
+    @property
     def logs(self):
         """ The node's list of log entries.
 
@@ -343,6 +352,19 @@ class NodePage(OsfPage):
         #WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
 
         return page
+
+    def delete(self):
+        # Click "Settings"
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Settings'
+        ).click()
+
+        # Click the delete button.
+        self.driver.find_element_by_css_selector(
+            '.container form:last-of-type button[type="submit"]'
+        ).click()
 
     def _clone(self):
         new_driver = self.driver.__class__()
