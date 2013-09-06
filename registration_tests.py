@@ -1,3 +1,4 @@
+import datetime as dt
 import unittest
 
 from pages import helpers, ProjectPage, LoginPage
@@ -32,6 +33,76 @@ class RegistrationTests(unittest.TestCase):
 
     def test_subproject_registration_meta(self):
         self._test_registration_meta(self._subproject())
+
+    def _test_registration_list(self, page):
+        _url = page.driver.current_url
+
+        page = page.add_registration(
+            registration_type='Open-Ended Registration',
+            meta=('sample narrative', )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(len(page.registrations), 1)
+
+        r = page.registrations
+
+        page.close()
+
+        return r
+
+    def test_project_registration_listed(self):
+        registrations = self._test_registration_list(page=self._project())
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_subproject_registration_listed(self):
+        registrations = self._test_registration_list(page=self._subproject())
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_project_registration_list_title(self):
+        page = self._project()
+        title = page.title
+        registrations = self._test_registration_list(page)
+
+        self.assertEqual(
+            registrations[0].title,
+            title
+        )
+
+    def test_subproject_registration_list_title(self):
+        page = self._subproject()
+        title = page.title
+        registrations = self._test_registration_list(page)
+
+        self.assertEqual(
+            registrations[0].title,
+            title
+        )
+
+    def test_project_registration_list_date(self):
+        page = self._project()
+        date_created = page.date_created
+        registrations = self._test_registration_list(page)
+
+        self.assertAlmostEqual(
+            registrations[0].date,
+            date_created,
+            delta=dt.timedelta(minutes=2)
+        )
+
+    def test_subproject_registration_list_date(self):
+        page = self._subproject()
+        date_created = page.date_created
+        registrations = self._test_registration_list(page)
+
+        self.assertAlmostEqual(
+            registrations[0].date,
+            date_created,
+            delta=dt.timedelta(minutes=2)
+        )
 
     def _test_registration_matches(self, page, attribute):
         parent_value = getattr(page, attribute)

@@ -140,6 +140,36 @@ class NodePage(OsfPage):
     def wiki_home_content(self):
         return self.get_wiki_content()
 
+    @property
+    def registrations(self):
+        # Click "Registrations"
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Registrations'
+        ).click()
+
+        R = namedtuple('Registration', ('title', 'url', 'date'))
+
+        registrations = []
+
+        for r in  self.driver.find_elements_by_css_selector(
+            'ul.list-group li.project h3'
+        ):
+            registrations.append(
+                R(
+                    title=r.find_element_by_css_selector('a').text,
+                    url=r.find_element_by_css_selector('a').get_attribute(
+                        'href'
+                    ),
+                    date=dt.datetime.strptime(
+                        r.text.split('registered: ')[-1],
+                        '%Y/%m/%d %I:%M %p'
+                    ),
+                )
+            )
+
+        return registrations
 
 class ProjectPage(NodePage):
     def add_component(self, title, component_type=None):
