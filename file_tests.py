@@ -1,3 +1,4 @@
+import unittest
 from unittest import skip
 
 import util
@@ -6,6 +7,79 @@ import os
 import requests
 import shutil
 import tempfile
+
+from pages.helpers import get_new_project
+from pages import FILES
+
+
+class FileTests(unittest.TestCase):
+
+    def _subproject(self):
+        """ Create and return a (sub)project which is the child of a project.
+
+        The ``current_url`` of the driver is the subproject's overview.
+        """
+        return get_new_project().add_component(
+            title='New Subproject',
+            component_type='Project',
+        )
+
+    def _component(self):
+        """ Create and return a (sub)project which is the child of a project.
+
+        The ``current_url`` of the driver is the subproject's overview.
+        """
+        return get_new_project().add_component(
+            title='New Component',
+            component_type='Other',
+        )
+
+    def _test_add_file(self, page):
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        self.assertEqual(
+            len(page.files),
+            1
+        )
+
+        page.close()
+
+    def test_project_add_file(self):
+        self._test_add_file(get_new_project())
+
+    def test_subproject_add_file(self):
+        self._test_add_file(self._subproject())
+
+    def test_component_add_file(self):
+        self._test_add_file(self._component())
+
+    def _test_delete_file(self, page):
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        # make sure it's there - this triggers the necessary wait.
+        self.assertIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.delete_file('test.jpg')
+
+        self.assertNotIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.close()
+
+    def test_project_delete_file(self):
+        self._test_delete_file(get_new_project())
+
+    def test_subproject_delete_file(self):
+        self._test_delete_file(self._subproject())
+
+    def test_component_delete_file(self):
+        self._test_delete_file(self._component())
 
 
 class FileHandlingTests(base.ProjectSmokeTest):
@@ -19,16 +93,6 @@ class FileHandlingTests(base.ProjectSmokeTest):
         self.goto('file', filename)
 
         return filename in self.get_element('div.page-header h1').text
-
-    def test_add_file(self):
-        """Add a file to a project, then make sure its page exists"""
-        f = self.image_files['jpg']
-
-        self.add_file(f['path'])
-
-        self.assertTrue(
-            self._file_exists_in_project(f['filename'])
-        )
 
     @skip('Not Implemented')
     def test_delete_file(self):

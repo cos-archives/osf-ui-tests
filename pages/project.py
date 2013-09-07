@@ -1,4 +1,5 @@
 import datetime as dt
+import os
 import urlparse
 from collections import namedtuple
 
@@ -352,6 +353,104 @@ class NodePage(OsfPage):
         #WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
 
         return page
+
+    def add_file(self, f):
+        """Add a file to the node."""
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        self.driver.execute_script('''
+            $('input[type="file"]').offset({left : 50});
+        ''')
+
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type=file]')
+
+        # Enter file into input
+        field.send_keys(f.path)
+
+        # Upload files
+        self.driver.find_element_by_css_selector(
+            'div.fileupload-buttonbar button.start'
+        ).click()
+
+        # refresh the page. Normally this wouldn't be necessary, but BlueImp
+        # doesn't work well with Selenium.
+        self.driver.get(self.driver.current_url)
+
+    def delete_file(self, f):
+        """Delete a file from the node"""
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(self.driver, 1).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#filesTable')
+            )
+        )
+
+        row = [
+            x for x in
+            self.driver.find_elements_by_css_selector(
+                '#filesTable tbody.files tr'
+            )
+            if x.find_element_by_css_selector('td.name a').text == f
+        ]
+
+        row[0].find_element_by_css_selector('button.btn-delete').click()
+
+    @property
+    def files(self):
+        F = namedtuple(
+            'File',
+            ('name', 'date_modified', 'file_size', 'downloads', 'url')
+        )
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(self.driver, 1).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#filesTable')
+            )
+        )
+
+        return [F(
+            name=r.find_element_by_css_selector(
+                'td.name a'
+            ).text,
+            date_modified=dt.datetime.strptime(
+                r.find_element_by_css_selector(
+                    'td:nth-of-type(2)'
+                ).text,
+                '%Y/%m/%d %I:%M %p'
+            ),
+            file_size=r.find_element_by_css_selector(
+                'td.size'
+            ).text,
+            url=r.find_element_by_css_selector(
+                'td.name a'
+            ).get_attribute('href'),
+            downloads=r.find_element_by_css_selector(
+                'td:nth-of-type(4)'
+            ).text,
+        ) for r in self.driver.find_elements_by_css_selector(
+            '#filesTable tbody.files tr'
+        )]
 
     def delete(self):
         # Click "Settings"
