@@ -2,6 +2,7 @@
 Tests for creating projects.
 """
 
+import datetime as dt
 import unittest
 
 from selenium.webdriver.common.by import By
@@ -12,6 +13,24 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 import base
 import util
 import config
+
+from pages import LoginPage
+from pages.helpers import get_new_project
+
+
+class ProjectCreationTests2(unittest.TestCase):
+
+    def test_date_created(self):
+
+        page = get_new_project('Test Project')
+
+        self.assertAlmostEqual(
+            page.date_created,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
+        )
+
+        page.close()
 
 
 class ProjectCreationTests(base.UserSmokeTest):
