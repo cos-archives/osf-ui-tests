@@ -213,7 +213,7 @@ class FileTests(unittest.TestCase):
                     '#fileupload div.fileupload-buttonbar .disabled'
                 )
             ),
-            3
+            2
         )
 
         # the delete button for the file should also be disabled
@@ -236,6 +236,7 @@ class FileTests(unittest.TestCase):
 
     def test_component_file_controls_not_present(self):
         self._test_file_controls_not_present(self._component())
+
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
