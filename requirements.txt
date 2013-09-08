@@ -1,5 +1,6 @@
 lxml==3.2.1
 multiprocessing==2.6.2.1
 nose==1.1.0
-selenium==2.33.0
+requests==1.2.3
+selenium==2.35.0
 wsgiref==0.1.2
