@@ -195,6 +195,48 @@ class FileTests(unittest.TestCase):
     def test_component_file_download_count(self):
         self._test_file_download_count(self._component())
 
+    def _test_file_controls_not_present(self, page):
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+        files_url = page.driver.current_url
+
+        page.public = True
+
+        page.log_out()
+
+        page.driver.get(files_url)
+
+        # all three buttons in the upload header should be disabled
+        self.assertEqual(
+            len(
+                page.driver.find_elements_by_css_selector(
+                    '#fileupload div.fileupload-buttonbar .disabled'
+                )
+            ),
+            3
+        )
+
+        # the delete button for the file should also be disabled
+        self.assertEqual(
+            len(
+                page.driver.find_elements_by_css_selector(
+                    'form.fileDeleteForm button.btn-delete.disabled'
+                )
+            ),
+            1
+        )
+
+        page.close()
+
+    def test_project_file_controls_not_present(self):
+        self._test_file_controls_not_present(get_new_project())
+
+    def test_subproject_file_controls_not_present(self):
+        self._test_file_controls_not_present(self._subproject())
+
+    def test_component_file_controls_not_present(self):
+        self._test_file_controls_not_present(self._component())
+
 class FileHandlingTests(base.ProjectSmokeTest):
 
     def setUp(self):
