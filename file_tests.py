@@ -133,6 +133,67 @@ class FileTests(unittest.TestCase):
     def test_component_file_extensions(self):
         self._test_file_extensions(self._component())
 
+    def _test_file_download_count(self, page):
+
+        page_url = page.driver.current_url
+
+        page.public = True
+
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('first')
+
+        # add the file to the project
+        page.add_file(temp_file_path)
+
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('second')
+
+        page.add_file(temp_file_path)
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
+
+        file_url = '{}files/{}'.format(
+            page_url,
+            os.path.basename(temp_file_path),
+        )
+
+        from pages.project import FilePage
+
+        page = FilePage(driver=page.driver)
+        page.driver.get(file_url)
+
+        self.assertEqual(
+            [x.downloads for x in page.versions],
+            [0, 0]
+        )
+
+        file_url = '{}files/download/{}/version/1'.format(
+            page_url,
+            os.path.basename(temp_file_path),
+        )
+
+        f = requests.get(file_url)
+
+        page.driver.get(page.driver.current_url)
+
+        self.assertEqual(
+            [x.downloads for x in page.versions],
+            [0, 1]
+        )
+
+        page.close()
+
+    def test_project_file_download_count(self):
+        self._test_file_download_count(get_new_project())
+
+    def test_subproject_file_download_count(self):
+        self._test_file_download_count(self._subproject())
+
+    def test_component_file_download_count(self):
+        self._test_file_download_count(self._component())
 
 class FileHandlingTests(base.ProjectSmokeTest):
 

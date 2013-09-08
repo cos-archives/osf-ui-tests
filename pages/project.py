@@ -672,3 +672,26 @@ class ProjectRegistrationPage(ProjectPage):
         return self.driver.find_element_by_css_selector(
             '#overview a[href*="register"]'
         ).text
+
+
+class FilePage(NodePage):
+
+    @property
+    def versions(self):
+        log = self.driver.find_element_by_css_selector(
+            '#file-version-history tbody'
+        )
+
+        L = namedtuple('Log', ('version', 'date_uploaded', 'downloads', 'url'))
+
+        return [L(
+            x.find_element_by_css_selector('td:nth-child(1)').text,
+            dt.datetime.strptime(
+                x.find_element_by_css_selector('td:nth-child(2)').text,
+                '%Y/%m/%d %I:%M %p',
+            ),
+            int(x.find_element_by_css_selector('td:nth-child(3)').text),
+            x.find_element_by_css_selector(
+                'td:nth-child(4) a'
+            ).get_attribute('href'),
+        ) for x in log.find_elements_by_css_selector('tr')]
