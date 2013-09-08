@@ -1,6 +1,11 @@
 from selenium import webdriver
 
+from pages.exceptions import PageException
+
+
 class OsfPage(object):
+
+    default_url = None
 
     def __init__(self, *args, **kwargs):
         # If no driver was passed, make a new default driver

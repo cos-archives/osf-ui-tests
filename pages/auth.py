@@ -1,10 +1,11 @@
+import config
 from generic import OsfPage
 from static import HomePage
 from project import ProjectPage
 
 
 class LoginPage(OsfPage):
-    default_url = 'http://localhost:5000/account'
+    default_url = '{}/account'.format(config.osf_home)
     page_name = 'account management'
 
     def __init__(self, *args, **kwargs):
@@ -53,6 +54,8 @@ class LoginPage(OsfPage):
 class UserDashboardPage(OsfPage):
 
     def __init__(self, *args, **kwargs):
+        super(UserDashboardPage, self).__init__(*args, **kwargs)
+
         self.driver = kwargs.get('driver')
 
     def _verify_page(self):

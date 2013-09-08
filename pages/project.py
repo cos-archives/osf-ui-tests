@@ -1,5 +1,4 @@
 import datetime as dt
-import os
 import urlparse
 from collections import namedtuple
 
@@ -8,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 
+import config
 import logs
 from generic import OsfPage
 from helpers import WaitForPageReload
@@ -29,8 +29,9 @@ class NodePage(OsfPage):
         # If an ID is provided, build the URL for the project
         # TODO: Shouldn't this be in ProjectPage?
         if 'id' in kwargs:
-            kwargs['url'] = 'http://localhost:5000/project/{}/'.format(
-                kwargs['id']
+            kwargs['url'] = '{}/project/{}/'.format(
+                config.osf_home,
+                kwargs['id'],
             )
             del kwargs['id']
 
@@ -498,7 +499,7 @@ class NodePage(OsfPage):
 
     def _clone(self):
         new_driver = self.driver.__class__()
-        new_driver.get('http://localhost:5000/')
+        new_driver.get(config.osf_home)
 
         # copy cookies
         for c in self.driver.get_cookies():
