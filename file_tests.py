@@ -1,11 +1,10 @@
+import datetime as dt
 import unittest
 from unittest import skip
 
-import util
 import base
 import os
 import requests
-import shutil
 import tempfile
 
 from pages.helpers import get_new_project
@@ -80,6 +79,59 @@ class FileTests(unittest.TestCase):
 
     def test_component_delete_file(self):
         self._test_delete_file(self._component())
+
+    def _test_file_extensions(self, page):
+
+        page_url = page.driver.current_url
+
+        page.public = True
+
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('first')
+
+        # add the file to the project
+        page.add_file(temp_file_path)
+
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('second')
+
+        page.add_file(temp_file_path)
+
+        page.close()
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
+
+        file_url = '{}files/download/{}/version/1'.format(
+            page_url,
+            os.path.basename(temp_file_path),
+        )
+
+        f = requests.get(file_url)
+
+        filename = f.headers['content-disposition'].split('=')[-1]
+
+        filename_date = dt.datetime.strptime(
+            filename[:-4].split('_')[-1],
+            '%Y%m%d%H%M%S'
+        )
+
+        self.assertAlmostEqual(
+            filename_date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
+        )
+
+    def test_project_file_extensions(self):
+        self._test_file_extensions(get_new_project())
+
+    def test_subproject_file_extensions(self):
+        self._test_file_extensions(self._subproject())
+
+    def test_component_file_extensions(self):
+        self._test_file_extensions(self._component())
 
 
 class FileHandlingTests(base.ProjectSmokeTest):

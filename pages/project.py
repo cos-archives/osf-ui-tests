@@ -161,6 +161,37 @@ class NodePage(OsfPage):
         """
         return tuple([x.title for x in self.components])
 
+    @property
+    def public(self):
+        return (
+            'disabled' in
+            self.driver.find_element_by_css_selector(
+                '#overview div.btn-group:nth-of-type(1) > :nth-child(2)'
+            ).get_attribute('class')
+        )
+
+    @public.setter
+    def public(self, value):
+        if self.public == value:
+            return
+
+        # If public, the "Make private" element will be the only <a>.
+        # If private, the opposite is true.
+        self.driver.find_element_by_css_selector(
+            '#overview div.btn-group:nth-of-type(1) > a'
+        ).click()
+
+        WebDriverWait(self.driver, 1).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.modal.fade.in button.btn-primary')
+            )
+        )
+
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.modal.fade.in button.btn-primary'
+            ).click()
+
     def parent_project(self):
         """Navigate to the nodes's parent project.
 
@@ -372,7 +403,7 @@ class NodePage(OsfPage):
         field = self.driver.find_element_by_css_selector('input[type=file]')
 
         # Enter file into input
-        field.send_keys(f.path)
+        field.send_keys(f if isinstance(f, basestring) else f.path)
 
         # Upload files
         self.driver.find_element_by_css_selector(
