@@ -109,7 +109,7 @@ class FileTests(unittest.TestCase):
             os.path.basename(temp_file_path),
         )
 
-        f = requests.get(file_url)
+        f = requests.get(file_url, verify=False)
 
         filename = f.headers['content-disposition'].split('=')[-1]
 
@@ -175,7 +175,7 @@ class FileTests(unittest.TestCase):
             os.path.basename(temp_file_path),
         )
 
-        f = requests.get(file_url)
+        f = requests.get(file_url, verify=False)
 
         page.driver.get(page.driver.current_url)
 
@@ -375,7 +375,8 @@ class FileHandlingTests(base.ProjectSmokeTest):
             requests.get(
                 self.get_element(
                     '#file-version-history tbody tr:first-child a'
-                ).get_attribute('href')
+                ).get_attribute('href'),
+                verify=False
             ).content,
         )
 
@@ -385,7 +386,8 @@ class FileHandlingTests(base.ProjectSmokeTest):
             requests.get(
                 self.get_element(
                     '#file-version-history tbody tr:last-child a'
-                ).get_attribute('href')
+                ).get_attribute('href'),
+                verify=False
             ).content,
         )
 
