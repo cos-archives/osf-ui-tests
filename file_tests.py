@@ -710,10 +710,6 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
         return filename in self.get_element('div.page-header h1').text
 
-    @skip('Not Implemented')
-    def test_delete_file(self):
-        raise NotImplementedError
-
     def test_embedded_image_previews(self):
         """Test that image file pages include the image as an <img> element"""
 

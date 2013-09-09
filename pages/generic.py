@@ -24,8 +24,10 @@ class OsfPage(object):
 
         # Verify the page is what you expect it to be.
         if not self._verify_page():
+            url = self.driver.current_url
+            self.driver.close()
             raise PageException('Unexpected page structure: `{}`'.format(
-                self.driver.current_url
+                url
             ))
 
     @property

@@ -1,5 +1,6 @@
 import config
 from generic import OsfPage
+from helpers import WaitForPageReload
 from static import HomePage
 from project import ProjectPage
 
@@ -26,10 +27,12 @@ class LoginPage(OsfPage):
         return [x.text for x in alerts]
 
     def log_in(self, user):
-        form = self.driver.find_element_by_name('signin')
-        form.find_element_by_id('username').send_keys(user.email)
-        form.find_element_by_id('password').send_keys(user.password)
-        form.find_element_by_css_selector('button[type=submit]').click()
+        with WaitForPageReload(self.driver):
+            form = self.driver.find_element_by_name('signin')
+            form.find_element_by_id('username').send_keys(user.email)
+            form.find_element_by_id('password').send_keys(user.password)
+            form.find_element_by_css_selector('button[type=submit]').click()
+
         return UserDashboardPage(driver=self.driver)
 
     def register(self, full_name, email, password, email2=None, password2=None):

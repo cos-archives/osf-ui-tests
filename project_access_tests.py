@@ -6,6 +6,7 @@ from base import ProjectSmokeTest, not_implemented
 from pages import helpers
 from pages.auth import LoginPage
 from pages.project import ProjectPage
+from pages.exceptions import PageException
 
 from selenium.common.exceptions import TimeoutException
 
@@ -73,6 +74,76 @@ class ProjectSecurityTests2(unittest.TestCase):
 
     def test_nested_component_add_contributors_access(self):
         self._test_add_contributor_access(helpers.get_new_nested_component())
+
+    def _test_can_access(self, page, user=None, can_access=True):
+        _url = page.driver.current_url
+        _id = page.id
+
+        page.close()
+
+        if user:
+            page = LoginPage().log_in(user)
+            page.driver.get(_url)
+
+            assertion = self.assertTrue if can_access else self.assertFalse
+
+            # verify that we weren't redirected
+            assertion(
+                page.driver.current_url == _url
+            )
+
+            page.close()
+        else:
+            if can_access:
+                page = ProjectPage(id=_id)
+                page.close()
+            else:
+                with self.assertRaises(PageException):
+                    page = ProjectPage(id=_id)
+
+    def test_private_project_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_project_non_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_project_anonymous_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_project_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_project_non_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_project_anonymous_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page)
+
 
 
 class ProjectSecurityTest(ProjectSmokeTest):
