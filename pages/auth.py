@@ -25,10 +25,10 @@ class LoginPage(OsfPage):
         )
         return [x.text for x in alerts]
 
-    def log_in(self, username, password):
+    def log_in(self, user):
         form = self.driver.find_element_by_name('signin')
-        form.find_element_by_id('username').send_keys(username)
-        form.find_element_by_id('password').send_keys(password)
+        form.find_element_by_id('username').send_keys(user.email)
+        form.find_element_by_id('password').send_keys(user.password)
         form.find_element_by_css_selector('button[type=submit]').click()
         return UserDashboardPage(driver=self.driver)
 

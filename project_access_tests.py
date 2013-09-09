@@ -1,9 +1,78 @@
 import config
+import unittest
 import util
 
 from base import ProjectSmokeTest, not_implemented
+from pages import helpers
+from pages.auth import LoginPage
+from pages.project import ProjectPage
 
 from selenium.common.exceptions import TimeoutException
+
+
+class ProjectSecurityTests2(unittest.TestCase):
+    def _test_add_contributor_listed(self, page):
+        second_user = helpers.create_user()
+
+        page.add_contributor(second_user)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors]
+        )
+
+        page.close()
+
+    def test_project_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_project())
+
+    def test_subproject_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_subproject())
+
+    def test_component_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_component())
+
+    def test_nested_component_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_nested_component())
+
+    def _test_add_contributor_access(self, page):
+        _url = page.driver.current_url
+        second_user = helpers.create_user()
+
+        page.add_contributor(second_user)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors]
+        )
+
+        page.close()
+
+        page = LoginPage()
+        page.log_in(second_user)
+
+        page.driver.get(_url)
+
+        page = ProjectPage(driver=page.driver)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors],
+        )
+
+        page.close()
+
+    def test_project_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_project())
+
+    def test_subproject_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_subproject())
+
+    def test_component_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_component())
+
+    def test_nested_component_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_nested_component())
 
 
 class ProjectSecurityTest(ProjectSmokeTest):
@@ -12,34 +81,6 @@ class ProjectSecurityTest(ProjectSmokeTest):
         super(ProjectSecurityTest, self).setUp()
 
         self.second_user = self.create_user()
-
-    def test_add_contributor(self):
-
-        # Add a contributor
-        self.goto('dashboard')
-        self.add_contributor(self.second_user)
-
-        # Make sure they're in the contributors list
-        self.assertTrue(
-            self.second_user['fullname'] in
-            self.get_element('#contributors').text
-        )
-
-        # get the project's title
-        project_title = self.get_element('h1#node-title-editable').text
-
-        # log in as the second user
-        self.log_out()
-        self.log_in(self.second_user)
-
-        # go the project dashboard.
-        self.goto('dashboard')
-
-        # check to make sure we're on the project page, not redirected home.
-        self.assertEqual(
-            self.get_element('h1#node-title-editable').text,
-            project_title,
-        )
 
     def test_remove_contributor(self):
 

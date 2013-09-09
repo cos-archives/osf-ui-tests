@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 from pages.exceptions import PageException
 

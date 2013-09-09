@@ -7,8 +7,9 @@ import os
 import requests
 import tempfile
 
-from pages.helpers import get_new_project
 from pages import FILES
+from pages.helpers import get_new_project
+from pages.project import FilePage
 
 
 class FileTests(unittest.TestCase):
@@ -33,6 +34,19 @@ class FileTests(unittest.TestCase):
             component_type='Other',
         )
 
+    def _subproject_component(self):
+        """ Create and return a (sub)project which is the child of a project.
+
+        The ``current_url`` of the driver is the subproject's overview.
+        """
+        return self._subproject().add_component(
+            title='New Component',
+            component_type='Other',
+        )
+
+    # Adding
+    ########
+
     def _test_add_file(self, page):
         page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
 
@@ -51,6 +65,147 @@ class FileTests(unittest.TestCase):
 
     def test_component_add_file(self):
         self._test_add_file(self._component())
+
+    @unittest.skip('known failure')
+    def test_project_add_file_logged(self):
+        # log says "component"; expected "project"
+
+        page = get_new_project()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} added file {filename} to {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    def test_subproject_add_file_logged(self):
+
+        page = self._subproject()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} added file {filename} to {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('known failure')
+    def test_component_add_file_logged(self):
+        # log says "project"; expected "component"
+
+        page = self._component()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} added file {filename} to {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('known failure')
+    def test_nested_component_add_file_logged(self):
+        # log says "project"; expected "component"
+        page = self._subproject_component()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} added file {filename} to {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log  # actual: 'component"
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        # Note: tests don't bubble up to this point
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    # Deleting
+    ##########
 
     def _test_delete_file(self, page):
 
@@ -79,6 +234,307 @@ class FileTests(unittest.TestCase):
 
     def test_component_delete_file(self):
         self._test_delete_file(self._component())
+
+    @unittest.skip('known failure')
+    def test_project_delete_file_logged(self):
+        # log says "component"; expected "project"
+        page = get_new_project()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        # make sure it's there - this triggers the necessary wait.
+        self.assertIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.delete_file('test.jpg')
+
+        expected_log = (
+            u'{user} removed file {filename} '
+            u'from {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log  # actual: 'component"
+        )
+
+        page.close()
+
+    def test_subproject_delete_file_logged(self):
+        page = self._subproject()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        # make sure it's there - this triggers the necessary wait.
+        self.assertIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.delete_file('test.jpg')
+
+        expected_log = (
+            u'{user} removed file {filename} '
+            u'from {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('known failure')
+    def test_component_delete_file_logged(self):
+        # log says "project"; expected "component"
+        page = self._component()
+        _url = page.driver.current_url
+        user = page.contributors[0]
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        # make sure it's there - this triggers the necessary wait.
+        self.assertIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.delete_file('test.jpg')
+
+        expected_log = (
+            u'{user} removed file {filename} '
+            u'from {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('known failure')
+    def test_nested_component_delete_file_logged(self):
+        # log says "project"; expected "component"
+        page = self._subproject_component()
+
+        _url = page.driver.current_url
+        user = page.contributors[0]
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        # make sure it's there - this triggers the necessary wait.
+        self.assertIn(
+            'test.jpg',
+            [x.name for x in page.files]
+        )
+
+        page.delete_file('test.jpg')
+
+        expected_log = (
+            u'{user} removed file {filename} '
+            u'from {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename='test.jpg',
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        page.driver.get(_url)
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    # Updating
+    ##########
+
+    def _test_file_update_logged(self, page):
+
+        page_url = page.driver.current_url
+
+        page.public = True
+
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('first')
+
+        # add the file to the project
+        page.add_file(temp_file_path)
+
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('second')
+
+        page.add_file(temp_file_path)
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
+
+        page.driver.get(page_url)
+
+        return page, os.path.basename(temp_file_path)
+
+    @unittest.skip('expected failure')
+    def test_project_file_update_logged(self):
+        # log says "component", expected "project"
+        page, filename = self._test_file_update_logged(get_new_project())
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} updated file {filename} in {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename=filename,
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    def test_subproject_file_update_logged(self):
+        page, filename = self._test_file_update_logged(self._subproject())
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} updated file {filename} in {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename=filename,
+                node_type='project',
+                node_name=page.title,
+            )
+        )
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('expected failure')
+    def test_nested_component_file_update_logged(self):
+        # log says "project"; expected "component"
+        page, filename = self._test_file_update_logged(
+            self._subproject_component()
+        )
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} updated file {filename} in {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename=filename,
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    @unittest.skip('expected failure')
+    def test_component_file_update_logged(self):
+        # expected "component"; got "project"
+        page, filename = self._test_file_update_logged(self._component())
+        user = page.contributors[0]
+
+        expected_log = (
+            u'{user} updated file {filename} in {node_type} {node_name}'.format(
+                user=user.full_name,
+                filename=filename,
+                node_type='component',
+                node_name=page.title,
+            )
+        )
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page = page.parent_project()
+
+        self.assertEqual(
+            page.logs[0].text,
+            expected_log
+        )
+
+        page.close()
+
+    # Timestamped Filenames
+    #######################
 
     def _test_file_extensions(self, page):
 
@@ -133,6 +589,9 @@ class FileTests(unittest.TestCase):
     def test_component_file_extensions(self):
         self._test_file_extensions(self._component())
 
+    # Download Counter
+    ##################
+
     def _test_file_download_count(self, page):
 
         page_url = page.driver.current_url
@@ -159,8 +618,6 @@ class FileTests(unittest.TestCase):
             page_url,
             os.path.basename(temp_file_path),
         )
-
-        from pages.project import FilePage
 
         page = FilePage(driver=page.driver)
         page.driver.get(file_url)
@@ -195,7 +652,10 @@ class FileTests(unittest.TestCase):
     def test_component_file_download_count(self):
         self._test_file_download_count(self._component())
 
-    def _test_file_controls_not_present(self, page):
+    # File modification controls
+    ############################
+
+    def _test_file_controls_not_present(self, page, second_user=False):
 
         page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
         files_url = page.driver.current_url
@@ -228,13 +688,13 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    def test_project_file_controls_not_present(self):
+    def test_project_file_controls_not_present_anonymous(self):
         self._test_file_controls_not_present(get_new_project())
 
-    def test_subproject_file_controls_not_present(self):
+    def test_subproject_file_controls_not_present_anonymous(self):
         self._test_file_controls_not_present(self._subproject())
 
-    def test_component_file_controls_not_present(self):
+    def test_component_file_controls_not_present_anonymous(self):
         self._test_file_controls_not_present(self._component())
 
 

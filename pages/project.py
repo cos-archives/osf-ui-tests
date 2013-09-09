@@ -63,6 +63,33 @@ class NodePage(OsfPage):
             )
         ]
 
+    def add_contributor(self, user):
+        with WaitForPageReload(self.driver):
+            # click the "add" link
+            self.driver.find_element_by_css_selector(
+                '#contributors a[href="#addContributors"]'
+            ).click()
+
+            # enter the user's email address
+            self.driver.find_element_by_css_selector(
+                'div#addContributors input[type=text]'
+            ).send_keys(user.email)
+
+            # click the search button
+            self.driver.find_element_by_css_selector(
+                '#addContributors button'
+            ).click()
+
+            # click the radio button for the first result
+            self.driver.find_element_by_css_selector(
+                '#addContributors input[type=radio]'
+            ).click()
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors button.btn.primary'
+            ).click()
+
     @property
     def date_created(self):
         """ The date the node was created, parsed from the header.
@@ -455,7 +482,7 @@ class NodePage(OsfPage):
             'Files'
         ).click()
 
-        WebDriverWait(self.driver, 1).until(
+        WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#filesTable')
             )
