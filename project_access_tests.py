@@ -5,7 +5,7 @@ import util
 from base import ProjectSmokeTest, not_implemented
 from pages import helpers
 from pages.auth import LoginPage
-from pages.project import ProjectPage
+from pages.project import NodePage, ProjectPage
 from pages.exceptions import PageException
 
 from selenium.common.exceptions import TimeoutException
@@ -95,11 +95,11 @@ class ProjectSecurityTests2(unittest.TestCase):
             page.close()
         else:
             if can_access:
-                page = ProjectPage(id=_id)
+                page = NodePage(url=_url)
                 page.close()
             else:
                 with self.assertRaises(PageException):
-                    page = ProjectPage(id=_id)
+                    ProjectPage(id=_id)
 
     def test_private_project_contributor_access(self):
         page = helpers.get_new_project()
@@ -117,7 +117,6 @@ class ProjectSecurityTests2(unittest.TestCase):
 
     def test_private_project_anonymous_access(self):
         page = helpers.get_new_project()
-        user = helpers.create_user()
 
         self._test_can_access(page, can_access=False)
 
@@ -139,11 +138,132 @@ class ProjectSecurityTests2(unittest.TestCase):
 
     def test_public_project_anonymous_access(self):
         page = helpers.get_new_project()
-        user = helpers.create_user()
         page.public = True
 
         self._test_can_access(page)
 
+    def test_private_subproject_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_subproject_non_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_subproject_anonymous_access(self):
+        page = helpers.get_new_subproject()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_subproject_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_subproject_non_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_subproject_anonymous_access(self):
+        page = helpers.get_new_subproject()
+        page.public = True
+
+        self._test_can_access(page)
+
+    def test_private_component_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_component_non_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_component_anonymous_access(self):
+        page = helpers.get_new_component()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_component_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_component_non_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_component_anonymous_access(self):
+        page = helpers.get_new_component()
+        page.public = True
+
+        self._test_can_access(page)
+
+    def test_private_nested_component_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_nested_component_non_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_nested_component_anonymous_access(self):
+        page = helpers.get_new_nested_component()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_nested_component_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_nested_component_non_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_nested_component_anonymous_access(self):
+        page = helpers.get_new_nested_component()
+        page.public = True
+
+        self._test_can_access(page)
 
 
 class ProjectSecurityTest(ProjectSmokeTest):

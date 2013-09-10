@@ -20,23 +20,6 @@ class NodePage(OsfPage):
     It should not be instantiated directly.
     """
 
-    def __init__(self, *args, **kwargs):
-
-        # Require that an "id" or "driver" kwarg be passed
-        if kwargs.get('id') is None and kwargs.get('driver') is None:
-            raise TypeError("A `id` or `driver` must be provided.")
-
-        # If an ID is provided, build the URL for the project
-        # TODO: Shouldn't this be in ProjectPage?
-        if 'id' in kwargs:
-            kwargs['url'] = '{}/project/{}/'.format(
-                config.osf_home,
-                kwargs['id'],
-            )
-            del kwargs['id']
-
-        super(NodePage, self).__init__(*args, **kwargs)
-
     def _verify_page(self):
         """ Return True if the current page is the one expected for a
         ``NodePage``."""
@@ -541,6 +524,27 @@ class NodePage(OsfPage):
 
 class ProjectPage(NodePage):
     """A project page, including subprojects."""
+
+    def __init__(self, *args, **kwargs):
+
+        # Require that an "id" or "driver" kwarg be passed
+        if not (
+            kwargs.get('id') or
+            kwargs.get('driver') or
+            kwargs.get('url')
+        ):
+            raise TypeError("A `url, `id`, or `driver` must be provided.")
+
+        # If an ID is provided, build the URL for the project
+        # TODO: Shouldn't this be in ProjectPage?
+        if 'id' in kwargs:
+            kwargs['url'] = '{}/project/{}/'.format(
+                config.osf_home,
+                kwargs['id'],
+            )
+            del kwargs['id']
+
+        super(NodePage, self).__init__(*args, **kwargs)
 
     def add_component(self, title, component_type=None):
         """Add a component to the project.
