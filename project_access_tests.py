@@ -301,43 +301,6 @@ class ProjectSecurityTest(ProjectSmokeTest):
         self.log_out()
         self.log_in(self.user_data)
 
-    def test_public_private(self):
-        """Test that public and private states work as intended.
-
-        TODO: While this test tests security fine, it doesn't test the pop-up
-        modals at all. This is because we ran into complex issues with selenium,
-        trying to get it to fully load the GET requests after dismissing the
-        confirmation modal.
-
-        This should be fixed once we understand selenium better.
-        """
-
-        self.make_public()
-
-        self.log_out()
-
-        # Confirm access be comparing project's title to the expected value
-        self.goto('dashboard')
-        self.assertEqual(
-            config.project_title,
-            self.get_element('#node-title-editable').text
-        )
-
-        self.log_in()
-
-        self.make_private()
-
-        self.log_out()
-
-        self.goto('dashboard')
-
-        self.assertEqual(
-            len(util.get_alert_boxes(self.driver, 'not authorized')),
-            1
-        )
-
-        self.log_in()
-
     def test_public_non_contributor_modify(self):
         """ Users who are not contributors should not have access to the wiki
         edit page of a public project.
