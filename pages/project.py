@@ -105,7 +105,6 @@ class NodePage(OsfPage):
             self.driver.current_url
         ).path.strip('/').split('/')[-1]
 
-
     @property
     def title(self):
         """The node's title, parsed from the header
@@ -113,6 +112,21 @@ class NodePage(OsfPage):
         :returns: ``str``
         """
         return self._title.text
+
+    @title.setter
+    def title(self, value):
+        self.driver.find_element_by_id('node-title-editable').click()
+
+        textbox = self.driver.find_element_by_css_selector(
+            'div.editable-popover input[type="text"]'
+        )
+        textbox.clear()
+        textbox.send_keys(value)
+
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.editable-popover button[type="submit"]'
+            ).click()
 
     @property
     def parent_title(self):

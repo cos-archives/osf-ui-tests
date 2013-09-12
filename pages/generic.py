@@ -57,5 +57,8 @@ class OsfPage(object):
         raise NotImplementedError('Page classes must define a `._verify_page()`'
                                   ' method')
 
+    def reload(self):
+        self.driver.get(self.driver.current_url)
+
     def close(self):
         self.driver.quit()
