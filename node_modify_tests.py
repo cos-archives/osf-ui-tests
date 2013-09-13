@@ -184,6 +184,8 @@ class NodeModifyTests(unittest.TestCase):
         page.reload()
         self.assertTrue(page.public)
 
+        page.close()
+
     def test_public_project_privacy_contributor(self):
         page = helpers.get_new_project()
 
@@ -191,6 +193,8 @@ class NodeModifyTests(unittest.TestCase):
         page.public = False
 
         self.assertFalse(page.public)
+
+        page.close()
 
     def test_public_project_privacy_non_contributor(self):
         page = helpers.get_new_project()
@@ -208,6 +212,7 @@ class NodeModifyTests(unittest.TestCase):
         with self.assertRaises(NoSuchElementException):
             page.public = False
 
+        page.close()
 
     def test_public_project_privacy_anonymous(self):
         page = helpers.get_new_project()
@@ -222,3 +227,5 @@ class NodeModifyTests(unittest.TestCase):
 
         with self.assertRaises(NoSuchElementException):
             page.public = False
+
+        page.close()
