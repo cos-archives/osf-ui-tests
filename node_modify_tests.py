@@ -229,3 +229,219 @@ class NodeModifyTests(unittest.TestCase):
             page.public = False
 
         page.close()
+
+    def test_private_project_title_change_contributor(self):
+        page = helpers.get_new_project()
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_project_title_change_contributor(self):
+        page = helpers.get_new_project()
+        page.public = True
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_project_title_change_non_contributor(self):
+        page = helpers.get_new_project()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+        page.close()
+
+        page = LoginPage()
+        page.log_in(helpers.create_user())
+
+        page.driver.get(_url)
+        page = ProjectPage(driver=page.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_public_project_title_change_anonymous(self):
+        page = helpers.get_new_project()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+
+        page.driver.get(_url)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+        
+    def test_private_subproject_title_change_contributor(self):
+        page = helpers.get_new_subproject()
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_subproject_title_change_contributor(self):
+        page = helpers.get_new_subproject()
+        page.public = True
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_subproject_title_change_non_contributor(self):
+        page = helpers.get_new_subproject()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+        page.close()
+
+        page = LoginPage()
+        page.log_in(helpers.create_user())
+
+        page.driver.get(_url)
+        page = ProjectPage(driver=page.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_public_subproject_title_change_anonymous(self):
+        page = helpers.get_new_subproject()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+
+        page.driver.get(_url)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_private_component_title_change_contributor(self):
+        page = helpers.get_new_component()
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_component_title_change_contributor(self):
+        page = helpers.get_new_component()
+        page.public = True
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_component_title_change_non_contributor(self):
+        page = helpers.get_new_component()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+        page.close()
+
+        page = LoginPage()
+        page.log_in(helpers.create_user())
+
+        page.driver.get(_url)
+        page = ProjectPage(driver=page.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_public_component_title_change_anonymous(self):
+        page = helpers.get_new_component()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+
+        page.driver.get(_url)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_private_nested_component_title_change_contributor(self):
+        page = helpers.get_new_nested_component()
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_nested_component_title_change_contributor(self):
+        page = helpers.get_new_nested_component()
+        page.public = True
+
+        page.title = 'changed'
+
+        page.reload()
+
+        self.assertEqual(page.title, 'changed')
+
+        page.close()
+
+    def test_public_nested_component_title_change_non_contributor(self):
+        page = helpers.get_new_nested_component()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+        page.close()
+
+        page = LoginPage()
+        page.log_in(helpers.create_user())
+
+        page.driver.get(_url)
+        page = ProjectPage(driver=page.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
+
+    def test_public_nested_component_title_change_anonymous(self):
+        page = helpers.get_new_nested_component()
+        page.public = True
+        _url = page.driver.current_url
+        page.log_out()
+
+        page.driver.get(_url)
+
+        with self.assertRaises(NoSuchElementException):
+            page.title = 'changed'
+
+        page.close()
