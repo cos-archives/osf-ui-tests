@@ -1,0 +1,2 @@
+class PageException(Exception):
+    pass

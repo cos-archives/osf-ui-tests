@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 
+import config
 import logs
 from generic import OsfPage
 from helpers import WaitForPageReload
@@ -18,22 +19,6 @@ class NodePage(OsfPage):
 
     It should not be instantiated directly.
     """
-
-    def __init__(self, *args, **kwargs):
-
-        # Require that an "id" or "driver" kwarg be passed
-        if kwargs.get('id') is None and kwargs.get('driver') is None:
-            raise TypeError("A `id` or `driver` must be provided.")
-
-        # If an ID is provided, build the URL for the project
-        # TODO: Shouldn't this be in ProjectPage?
-        if 'id' in kwargs:
-            kwargs['url'] = 'http://localhost:5000/project/{}/'.format(
-                kwargs['id']
-            )
-            del kwargs['id']
-
-        super(NodePage, self).__init__(*args, **kwargs)
 
     def _verify_page(self):
         """ Return True if the current page is the one expected for a
@@ -60,6 +45,33 @@ class NodePage(OsfPage):
                 '#contributors a[href^="/profile"]'
             )
         ]
+
+    def add_contributor(self, user):
+        with WaitForPageReload(self.driver):
+            # click the "add" link
+            self.driver.find_element_by_css_selector(
+                '#contributors a[href="#addContributors"]'
+            ).click()
+
+            # enter the user's email address
+            self.driver.find_element_by_css_selector(
+                'div#addContributors input[type=text]'
+            ).send_keys(user.email)
+
+            # click the search button
+            self.driver.find_element_by_css_selector(
+                '#addContributors button'
+            ).click()
+
+            # click the radio button for the first result
+            self.driver.find_element_by_css_selector(
+                '#addContributors input[type=radio]'
+            ).click()
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors button.btn.primary'
+            ).click()
 
     @property
     def date_created(self):
@@ -93,7 +105,6 @@ class NodePage(OsfPage):
             self.driver.current_url
         ).path.strip('/').split('/')[-1]
 
-
     @property
     def title(self):
         """The node's title, parsed from the header
@@ -101,6 +112,21 @@ class NodePage(OsfPage):
         :returns: ``str``
         """
         return self._title.text
+
+    @title.setter
+    def title(self, value):
+        self.driver.find_element_by_id('node-title-editable').click()
+
+        textbox = self.driver.find_element_by_css_selector(
+            'div.editable-popover input[type="text"]'
+        )
+        textbox.clear()
+        textbox.send_keys(value)
+
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.editable-popover button[type="submit"]'
+            ).click()
 
     @property
     def parent_title(self):
@@ -159,6 +185,37 @@ class NodePage(OsfPage):
          :returns: (``str``, )
         """
         return tuple([x.title for x in self.components])
+
+    @property
+    def public(self):
+        return (
+            'disabled' in
+            self.driver.find_element_by_css_selector(
+                '#overview div.btn-group:nth-of-type(1) > :nth-child(2)'
+            ).get_attribute('class')
+        )
+
+    @public.setter
+    def public(self, value):
+        if self.public == value:
+            return
+
+        # If public, the "Make private" element will be the only <a>.
+        # If private, the opposite is true.
+        self.driver.find_element_by_css_selector(
+            '#overview div.btn-group:nth-of-type(1) > a'
+        ).click()
+
+        WebDriverWait(self.driver, 1).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.modal.fade.in button.btn-primary')
+            )
+        )
+
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.modal.fade.in button.btn-primary'
+            ).click()
 
     def parent_project(self):
         """Navigate to the nodes's parent project.
@@ -353,6 +410,104 @@ class NodePage(OsfPage):
 
         return page
 
+    def add_file(self, f):
+        """Add a file to the node."""
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        self.driver.execute_script('''
+            $('input[type="file"]').offset({left : 50});
+        ''')
+
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type=file]')
+
+        # Enter file into input
+        field.send_keys(f if isinstance(f, basestring) else f.path)
+
+        # Upload files
+        self.driver.find_element_by_css_selector(
+            'div.fileupload-buttonbar button.start'
+        ).click()
+
+        # refresh the page. Normally this wouldn't be necessary, but BlueImp
+        # doesn't work well with Selenium.
+        self.driver.get(self.driver.current_url)
+
+    def delete_file(self, f):
+        """Delete a file from the node"""
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(self.driver, 1).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#filesTable')
+            )
+        )
+
+        row = [
+            x for x in
+            self.driver.find_elements_by_css_selector(
+                '#filesTable tbody.files tr'
+            )
+            if x.find_element_by_css_selector('td.name a').text == f
+        ]
+
+        row[0].find_element_by_css_selector('button.btn-delete').click()
+
+    @property
+    def files(self):
+        F = namedtuple(
+            'File',
+            ('name', 'date_modified', 'file_size', 'downloads', 'url')
+        )
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#filesTable')
+            )
+        )
+
+        return [F(
+            name=r.find_element_by_css_selector(
+                'td.name a'
+            ).text,
+            date_modified=dt.datetime.strptime(
+                r.find_element_by_css_selector(
+                    'td:nth-of-type(2)'
+                ).text,
+                '%Y/%m/%d %I:%M %p'
+            ),
+            file_size=r.find_element_by_css_selector(
+                'td.size'
+            ).text,
+            url=r.find_element_by_css_selector(
+                'td.name a'
+            ).get_attribute('href'),
+            downloads=r.find_element_by_css_selector(
+                'td:nth-of-type(4)'
+            ).text,
+        ) for r in self.driver.find_elements_by_css_selector(
+            '#filesTable tbody.files tr'
+        )]
+
     def delete(self):
         # Click "Settings"
         self.driver.find_element_by_css_selector(
@@ -368,7 +523,7 @@ class NodePage(OsfPage):
 
     def _clone(self):
         new_driver = self.driver.__class__()
-        new_driver.get('http://localhost:5000/')
+        new_driver.get(config.osf_home)
 
         # copy cookies
         for c in self.driver.get_cookies():
@@ -383,6 +538,27 @@ class NodePage(OsfPage):
 
 class ProjectPage(NodePage):
     """A project page, including subprojects."""
+
+    def __init__(self, *args, **kwargs):
+
+        # Require that an "id" or "driver" kwarg be passed
+        if not (
+            kwargs.get('id') or
+            kwargs.get('driver') or
+            kwargs.get('url')
+        ):
+            raise TypeError("A `url, `id`, or `driver` must be provided.")
+
+        # If an ID is provided, build the URL for the project
+        # TODO: Shouldn't this be in ProjectPage?
+        if 'id' in kwargs:
+            kwargs['url'] = '{}/project/{}/'.format(
+                config.osf_home,
+                kwargs['id'],
+            )
+            del kwargs['id']
+
+        super(NodePage, self).__init__(*args, **kwargs)
 
     def add_component(self, title, component_type=None):
         """Add a component to the project.
@@ -542,3 +718,26 @@ class ProjectRegistrationPage(ProjectPage):
         return self.driver.find_element_by_css_selector(
             '#overview a[href*="register"]'
         ).text
+
+
+class FilePage(NodePage):
+
+    @property
+    def versions(self):
+        log = self.driver.find_element_by_css_selector(
+            '#file-version-history tbody'
+        )
+
+        L = namedtuple('Log', ('version', 'date_uploaded', 'downloads', 'url'))
+
+        return [L(
+            x.find_element_by_css_selector('td:nth-child(1)').text,
+            dt.datetime.strptime(
+                x.find_element_by_css_selector('td:nth-child(2)').text,
+                '%Y/%m/%d %I:%M %p',
+            ),
+            int(x.find_element_by_css_selector('td:nth-child(3)').text),
+            x.find_element_by_css_selector(
+                'td:nth-child(4) a'
+            ).get_attribute('href'),
+        ) for x in log.find_elements_by_css_selector('tr')]

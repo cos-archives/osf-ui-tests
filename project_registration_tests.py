@@ -78,15 +78,12 @@ class RegistrationTests(base.ProjectSmokeTest):
         # click delete on a file
         self.get_element('table#filesTable button.btn.btn-danger').click()
 
-        # A javascript alert() should be thrown
-        alert = self.driver.switch_to_alert()
-        self.assertEquals(
-            alert.text,
-            'Error!'
-        )
+        self.driver.get(self.driver.current_url)
 
-        # dismiss the alert
-        alert.dismiss()
+        self.assertIn(
+            self.image_files['jpg']['filename'],
+            self.get_element('table#filesTable').text
+        )
 
     def test_registration_add_contributor(self):
         second_user = self.create_user()
@@ -136,18 +133,13 @@ class RegistrationTests(base.ProjectSmokeTest):
         # go to the registration's wiki
         self.goto('wiki', node_url=registration_url)
 
-        # click "Edit"
-        self.get_element(
-            '.subnav ul.nav > li:first-child > a[href$="edit"]'
-        ).click()
-
-        # should have been redirected to the homepage
+        # "Edit" should be disabled.
         self.assertEqual(
-            self.driver.current_url.strip('/'),
-            registration_url.strip('/'),
+            len(
+                self.driver.find_elements_by_css_selector(
+                    '.subnav ul.nav > li:first-child > a.disabled'
+                )
+            ),
+            1
         )
 
-        self.assertIn(
-            'Registrations are read-only',
-            self.get_element('#alert-container').text,
-        )

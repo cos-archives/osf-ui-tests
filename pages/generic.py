@@ -1,6 +1,12 @@
 from selenium import webdriver
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+
+from pages.exceptions import PageException
+
 
 class OsfPage(object):
+
+    default_url = None
 
     def __init__(self, *args, **kwargs):
         # If no driver was passed, make a new default driver
@@ -18,8 +24,10 @@ class OsfPage(object):
 
         # Verify the page is what you expect it to be.
         if not self._verify_page():
+            url = self.driver.current_url
+            self.driver.close()
             raise PageException('Unexpected page structure: `{}`'.format(
-                self.driver.current_url
+                url
             ))
 
     @property
@@ -35,6 +43,11 @@ class OsfPage(object):
             )
         ) > 0
 
+    def log_out(self):
+        self.driver.find_element_by_css_selector(
+            'ul#navbar-icons a[href="/logout"]'
+        ).click()
+
     def _make_driver(self):
         driver = webdriver.Firefox()
         driver.implicitly_wait(5)
@@ -43,6 +56,9 @@ class OsfPage(object):
     def _verify_page(self):
         raise NotImplementedError('Page classes must define a `._verify_page()`'
                                   ' method')
+
+    def reload(self):
+        self.driver.get(self.driver.current_url)
 
     def close(self):
         self.driver.quit()
