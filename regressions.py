@@ -1,4 +1,26 @@
+import unittest
+
+import requests
+
 from base import ProjectSmokeTest
+import config
+
+
+class RegressionTests2(unittest.TestCase):
+    def test_username_injection_account_creation(self):
+        r = requests.post(
+            url='/'.join((config.osf_home.strip('/'), 'register')),
+            data={
+                'register-fullname':  'Bad <script>alert("xss");</script>Guy',
+                'register-username': 'heinz@doofenshmirtz.com',
+                'register-username2': 'heinz@doofenshmirtz.com',
+                'register-password': 'password',
+                'register-password2': 'password',
+            },
+            verify=False,
+        )
+
+        self.assertIn("Illegal characters in field", r.content)
 
 
 class RegressionTests(ProjectSmokeTest):

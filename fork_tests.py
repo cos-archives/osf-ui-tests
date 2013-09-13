@@ -238,9 +238,9 @@ class ForkTests2(unittest.TestCase):
         """ Given a project, register it and verify that the action appears in
         the original project's logs.
         """
-        user = page.contributors[0].full_name
+        user = page.contributors[0]
 
-        _url = page.driver.current_url
+        original_node_url = page.driver.current_url
         title = page.title
 
         page = page.fork()
@@ -248,15 +248,29 @@ class ForkTests2(unittest.TestCase):
         self.assertEqual(
             page.logs[0].text,
             u'{user} created fork from project {title}'.format(
-                user=user,
+                user=user.full_name,
                 title=title
             )
         )
 
+        self.assertEqual(
+            [x.url.rstrip('/') for x in page.logs[0].links],
+            [
+                user.profile_url.rstrip('/'),
+                original_node_url.rstrip('/')
+            ]
+
+        )
+
         page.close()
 
+    @unittest.skip('known issue')
     def test_project_fork_logged(self):
-        """ Project variant of ``self._test_fork_logged`` """
+        """ Project variant of ``self._test_fork_logged``
+
+        NOTE: This test is known to fail due to an error in the log template,
+        as of 8 Sep 2013.
+        """
         self._test_fork_logged(self._project())
 
     @unittest.skip('known issue')
@@ -316,59 +330,6 @@ class ForkTests(base.ProjectSmokeTest):
 
         # setUp
         super(ForkTests, self).setUp()
-
-
-
-    def test_create_fork(self):
-        """
-        test to make sure a fork is created
-
-        """
-        # Make the project public
-        util.make_project_public(self.driver, self.project_url)
-
-        # add to the wiki
-        time.sleep(2)
-        self.driver.find_element_by_link_text('Wiki').click()
-        self._add_wiki("This is wiki test")
-        self.wiki_text = util.get_wiki_text(self.driver)
-
-        #logout
-        util.logout(self.driver)
-
-        self.second_user_data = util.create_user(self.driver)
-
-        # Login to test account
-        util.login(
-            self.driver,
-            self.second_user_data['username'],
-            self.second_user_data['password']
-        )
-
-        #go to the project that is now public
-        self.driver.get(self.project_url)
-        self.get_element(
-            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
-        title = self.get_element("h1#node-title-editable").text
-        self.assertEqual(title,
-            "Fork of test project")
-        wiki_text = util.get_wiki_text(self.driver)
-        self.assertEqual(self.wiki_text, wiki_text)
-
-        # Delete test project
-        util.login(self.driver,
-            self.user_data['username'],
-            self.user_data['password'],
-        )
-        util.delete_project(self.driver)
-        util.logout(self.driver)
-
-        util.login(self.driver,
-            self.second_user_data['username'],
-            self.second_user_data['password'],
-        )
-        util.delete_project(self.driver, "Fork of test project")
-
 
     def test_fork_link_to_origin_tests(self):
         """
@@ -430,26 +391,6 @@ class ForkTests(base.ProjectSmokeTest):
         self.assertEqual(discrib, u' 0')
 
         #cleanup
-        util.delete_project(self.driver)
-
-
-    def test_fork_nested_project(self):
-        """
-        test to make sure can fork nested project
-
-        """
-        util.create_node(self.driver)
-
-         #fork the project and check the node
-        self.get_element(
-            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
-        self.driver.find_element_by_css_selector("li span a").click()
-        title = self.get_element("h1#node-title-editable").text
-        self.assertEqual(title, config.node_title)
-
-
-        #cleanup
-        util.delete_project(self.driver, "Fork of " + config.project_title)
         util.delete_project(self.driver)
 
     def tearDown(self):

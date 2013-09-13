@@ -202,7 +202,8 @@ def create_user(driver=None, user_data=None):
             'register-username2': user_data['username'],
             'register-password': user_data['password'],
             'register-password2': user_data['password'],
-        }
+        },
+        verify=False
     )
 
     # Return user data

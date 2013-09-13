@@ -1,10 +1,12 @@
+import config
 from generic import OsfPage
+from helpers import WaitForPageReload
 from static import HomePage
 from project import ProjectPage
 
 
 class LoginPage(OsfPage):
-    default_url = 'http://localhost:5000/account'
+    default_url = '{}/account'.format(config.osf_home)
     page_name = 'account management'
 
     def __init__(self, *args, **kwargs):
@@ -24,11 +26,13 @@ class LoginPage(OsfPage):
         )
         return [x.text for x in alerts]
 
-    def log_in(self, username, password):
-        form = self.driver.find_element_by_name('signin')
-        form.find_element_by_id('username').send_keys(username)
-        form.find_element_by_id('password').send_keys(password)
-        form.find_element_by_css_selector('button[type=submit]').click()
+    def log_in(self, user):
+        with WaitForPageReload(self.driver):
+            form = self.driver.find_element_by_name('signin')
+            form.find_element_by_id('username').send_keys(user.email)
+            form.find_element_by_id('password').send_keys(user.password)
+            form.find_element_by_css_selector('button[type=submit]').click()
+
         return UserDashboardPage(driver=self.driver)
 
     def register(self, full_name, email, password, email2=None, password2=None):
@@ -53,6 +57,8 @@ class LoginPage(OsfPage):
 class UserDashboardPage(OsfPage):
 
     def __init__(self, *args, **kwargs):
+        super(UserDashboardPage, self).__init__(*args, **kwargs)
+
         self.driver = kwargs.get('driver')
 
     def _verify_page(self):

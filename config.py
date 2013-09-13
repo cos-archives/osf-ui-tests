@@ -5,9 +5,19 @@ Configuration for smokescreen testing
 # Default time for WebDriver.implicitly_wait
 selenium_wait_time = 5
 
-# 
-#osf_home = 'http://192.155.89.121'
-osf_home = 'http://50.116.49.207'
+# Domain to use for all tests.
+osf_home = 'https://staging.openscienceframework.org'
+
+# make sure there is no trailing slash.
+osf_home = osf_home.rstrip('/')
+
+# raise an exception if the root domain is production.
+if '/openscienceframwork.org' in osf_home:
+    raise Exception(
+        'OSF UI tests should *never* be run against production. '
+        '(A large number of database entries and files are generated '
+        'during testing.)'
+    )
 
 # Test project data
 project_title = 'test project'
