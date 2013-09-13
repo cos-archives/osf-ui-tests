@@ -25,16 +25,58 @@ class RegressionTests2(unittest.TestCase):
         self.assertIn("Illegal characters in field", r.content)
 
     def test_node_title_injection(self):
-        """A node's title should allow < and >, but should HTML encode them."""
+        """A node's title should allow < and >, but should HTML encode them.
+
+        This test verifies that when a project is renamed, the title is properly
+        encoded."""
 
         page = helpers.get_new_project()
         page.title = 'Bad <script>alert("xss");</script>Project'
+
         self.assertEqual(
             page.driver.find_element_by_id(
                 'node-title-editable'
             ).get_attribute('innerHTML'),
             'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
         )
+
+        page.close()
+
+    def test_node_title_injection_creation(self):
+        """A node's title should allow < and >, but should HTML encode them.
+
+        This test verifies that when a project is created, the title is properly
+        encoded."""
+        page = helpers.get_new_project(
+            title='Bad <script>alert("xss");</script>Project'
+        )
+
+        self.assertEqual(
+            page.driver.find_element_by_id(
+                'node-title-editable'
+            ).get_attribute('innerHTML'),
+            'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
+        )
+
+        page.close()
+
+    def test_node_description_injection_creation(self):
+        """A node's description should allow < and >, but should HTML encode
+        them.
+
+        This test verifies that when a project is created, the description is
+        properly encoded."""
+        page = helpers.get_new_project(
+            description='Bad <script>alert("xss");</script>Project'
+        )
+
+        self.assertIn(
+            'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
+            page.driver.find_element_by_id(
+                'contributors'
+            ).get_attribute('innerHTML'),
+        )
+
         page.close()
 
 
