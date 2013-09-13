@@ -176,3 +176,49 @@ class NodeModifyTests(unittest.TestCase):
         page = ProjectPage(driver=page.driver)
 
         self._test_title(page, can_modify=False)
+
+    def test_private_project_privacy_contributor(self):
+        page = helpers.get_new_project()
+
+        page.public = True
+        page.reload()
+        self.assertTrue(page.public)
+
+    def test_public_project_privacy_contributor(self):
+        page = helpers.get_new_project()
+
+        page.public = True
+        page.public = False
+
+        self.assertFalse(page.public)
+
+    def test_public_project_privacy_non_contributor(self):
+        page = helpers.get_new_project()
+
+        page.public = True
+
+        _url = page.driver.current_url
+        page.close()
+
+        page = LoginPage().log_in(user=helpers.create_user())
+        page.driver.get(_url)
+
+        page = ProjectPage(driver=page.driver)
+
+        with self.assertRaises(NoSuchElementException):
+            page.public = False
+
+
+    def test_public_project_privacy_anonymous(self):
+        page = helpers.get_new_project()
+
+        page.public = True
+
+        _url = page.driver.current_url
+
+        page.log_out()
+
+        page.driver.get(_url)
+
+        with self.assertRaises(NoSuchElementException):
+            page.public = False
