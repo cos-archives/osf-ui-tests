@@ -4,10 +4,12 @@ import requests
 
 from base import ProjectSmokeTest
 import config
+from pages import helpers
 
 
 class RegressionTests2(unittest.TestCase):
     def test_username_injection_account_creation(self):
+        """ Account creation should not allow < or > in fullname fields """
         r = requests.post(
             url='/'.join((config.osf_home.strip('/'), 'register')),
             data={
@@ -21,6 +23,19 @@ class RegressionTests2(unittest.TestCase):
         )
 
         self.assertIn("Illegal characters in field", r.content)
+
+    def test_node_title_injection(self):
+        """A node's title should allow < and >, but should HTML encode them."""
+
+        page = helpers.get_new_project()
+        page.title = 'Bad <script>alert("xss");</script>Project'
+        self.assertEqual(
+            page.driver.find_element_by_id(
+                'node-title-editable'
+            ).get_attribute('innerHTML'),
+            'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
+        )
+        page.close()
 
 
 class RegressionTests(ProjectSmokeTest):
