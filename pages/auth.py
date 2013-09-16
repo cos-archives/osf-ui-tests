@@ -86,9 +86,24 @@ class UserDashboardPage(OsfPage):
         return ProjectPage(driver=self.driver)
 
     @property
+    def profile(self):
+        self.driver.get(
+            self.driver.find_element_by_link_text(
+                'My Public Profile'
+            ).get_attribute('href')
+        )
+        return UserProfilePage(driver=self.driver)
+
+    @property
     def settings(self):
         self.driver.get('{}/settings'.format(config.osf_home))
         return UserSettingsPage(driver=self.driver)
+
+
+class UserProfilePage(OsfPage):
+    @property
+    def full_name(self):
+        return self.driver.find_element_by_id('profile-dfullname').text
 
 
 class UserSettingsPage(OsfPage):

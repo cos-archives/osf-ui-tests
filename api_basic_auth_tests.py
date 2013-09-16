@@ -1,4 +1,5 @@
 import httplib as http
+import json
 import unittest
 import requests
 
@@ -42,7 +43,6 @@ class ApiAuthTestCase(unittest.TestCase):
 
         self.assertIsInstance(key, ApiKey)
 
-    @unittest.skip('not yet implemented')
     def test_change_user_fullname(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user)
@@ -53,10 +53,10 @@ class ApiAuthTestCase(unittest.TestCase):
         page.close()
 
         r = requests.post(
-            profile_page,
+            profile_page + '/edit',
             auth=(
                 key.key,
-                ''
+                '',
             ),
             data={
                 'name': 'fullname',
@@ -65,4 +65,14 @@ class ApiAuthTestCase(unittest.TestCase):
         )
 
         self.assertEqual(r.status_code, http.OK)
+        self.assertEqual(
+            json.loads(r.content).get('response'),
+            'success',
+        )
 
+        page = LoginPage().log_in(user)
+        self.assertEqual(
+            page.profile.full_name,
+            'praC auhsoJ'
+        )
+        page.close()
