@@ -1,5 +1,6 @@
+from collections import namedtuple
+
 from selenium import webdriver
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 from pages.exceptions import PageException
 
@@ -61,3 +62,5 @@ class OsfPage(object):
 
     def close(self):
         self.driver.quit()
+
+ApiKey = namedtuple('ApiKey', ('label','key'))

@@ -9,7 +9,7 @@ from selenium.common import exceptions as exc
 
 import config
 import logs
-from generic import OsfPage
+from generic import ApiKey, OsfPage
 from helpers import WaitForPageReload
 
 
@@ -216,6 +216,16 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 'div.modal.fade.in button.btn-primary'
             ).click()
+
+    @property
+    def settings(self):
+        self.driver.get(
+            self.driver.find_element_by_link_text(
+                'Settings'
+            ).get_attribute('href')
+        )
+        return NodeSettingsPage(driver=
+        self.driver)
 
     def parent_project(self):
         """Navigate to the nodes's parent project.
@@ -534,6 +544,42 @@ class NodePage(OsfPage):
 
         # return a copy of this class, with the new driver.
         return self.__class__(driver=new_driver)
+
+
+class NodeSettingsPage(NodePage):
+    @property
+    def api_keys(self):
+        creds = self.driver.find_elements_by_css_selector(
+            'div.api-credential'
+        )[-1]
+
+        return [
+            ApiKey(
+                label=x.find_element_by_css_selector('span.api-label').text,
+                key=x.find_element_by_css_selector('span.api-key').text,
+            ) for x in creds
+        ]
+
+    def add_api_key(self, description=None):
+        self.driver.get('{}/settings'.format(config.osf_home))
+
+        form = self.driver.find_element_by_id('create_key')
+
+        form.find_element_by_css_selector('input[name="label"]').send_keys(
+            description or "Automatically generated key"
+        )
+
+        with WaitForPageReload(self.driver):
+            form.find_element_by_css_selector('button[type="submit"]').click()
+
+        cred = self.driver.find_elements_by_css_selector(
+            'div.api-credential'
+        )[-1]
+
+        return ApiKey(
+            label=cred.find_element_by_css_selector('span.api-label').text,
+            key=cred.find_element_by_css_selector('span.api-key').text,
+        )
 
 
 class ProjectPage(NodePage):

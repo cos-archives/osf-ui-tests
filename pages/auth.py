@@ -1,7 +1,5 @@
-from collections import namedtuple
-
 import config
-from generic import OsfPage
+from generic import ApiKey, OsfPage
 from helpers import WaitForPageReload
 from static import HomePage
 from project import ProjectPage
@@ -135,5 +133,3 @@ class UserSettingsPage(OsfPage):
             label=cred.find_element_by_css_selector('span.api-label').text,
             key=cred.find_element_by_css_selector('span.api-key').text,
         )
-
-ApiKey = namedtuple('ApiKey', ('label','key'))
