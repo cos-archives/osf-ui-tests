@@ -43,6 +43,48 @@ class ApiAuthTestCase(unittest.TestCase):
 
         self.assertIsInstance(key, ApiKey)
 
+
+class ApiNodeKeyTestCase(unittest.TestCase):
+    def _test_title(self, page):
+        project_url = page.driver.current_url
+        key = page.settings.add_api_key()
+
+        r = requests.post(
+            project_url + "edit",
+            auth=(key.key, ''),
+            data={
+                'name': 'title',
+                'value': 'Changed via API',
+            }
+        )
+
+        self.assertEqual(r.status_code, http.OK)
+        self.assertEqual(
+            json.loads(r.content).get('response'),
+            'success'
+        )
+
+        page.driver.get(project_url)
+        self.assertEqual(
+            page.title,
+            'Changed via API',
+        )
+        page.close()
+
+    def test_project_title(self):
+        self._test_title(helpers.get_new_project())
+
+    def test_subproject_title(self):
+        self._test_title(helpers.get_new_subproject())
+
+    def test_component_title(self):
+        self._test_title(helpers.get_new_component())
+
+    def test_nested_component_title(self):
+        self._test_title(helpers.get_new_nested_component())
+
+
+class ApiUserKeyTestCase(unittest.TestCase):
     def test_change_user_fullname(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user)
