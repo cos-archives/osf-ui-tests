@@ -2,7 +2,9 @@ from collections import namedtuple
 
 from selenium import webdriver
 
+import config
 from pages.exceptions import PageException
+
 
 class OsfPage(object):
 
@@ -61,5 +63,34 @@ class OsfPage(object):
 
     def close(self):
         self.driver.quit()
+
+    @property
+    def user_dashboard(self):
+        from pages.auth import UserDashboardPage
+        self.driver.get('{}/dashboard'.format(config.osf_home))
+        return UserDashboardPage(
+            driver=self.driver
+        )
+
+    @property
+    def user_login(self):
+        from pages.auth import LoginPage
+        self.driver.get('{}/account'.format(config.osf_home))
+        return LoginPage(driver=self.driver)
+
+    def node(self, node_id, parent_project=None):
+        from pages.project import ProjectPage
+        self.driver.get(
+            '{}/project/{}/'.format(
+                config.osf_home,
+                '{}/node/{}'.format(
+                    parent_project,
+                    node_id
+                ) if parent_project else node_id,
+            )
+        )
+
+        return ProjectPage(driver=self.driver)
+
 
 ApiKey = namedtuple('ApiKey', ('label','key'))

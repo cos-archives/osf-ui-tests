@@ -106,6 +106,16 @@ class NodePage(OsfPage):
         ).path.strip('/').split('/')[-1]
 
     @property
+    def parent_id(self):
+        """The node's parent's ID, parsed from the URL."""
+        pcs = urlparse.urlparse(
+            self.driver.current_url
+        ).path.strip('/').split('/')
+        if len(pcs) < 4:
+            return None
+        return pcs[1]
+
+    @property
     def title(self):
         """The node's title, parsed from the header
 
