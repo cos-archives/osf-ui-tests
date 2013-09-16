@@ -3,7 +3,6 @@ from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 from pages.exceptions import PageException
 
-
 class OsfPage(object):
 
     default_url = None

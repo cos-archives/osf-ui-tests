@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import config
 from generic import OsfPage
 from helpers import WaitForPageReload
@@ -84,3 +86,54 @@ class UserDashboardPage(OsfPage):
         ).click()
 
         return ProjectPage(driver=self.driver)
+
+    @property
+    def settings(self):
+        self.driver.get('{}/settings'.format(config.osf_home))
+        return UserSettingsPage(driver=self.driver)
+
+
+class UserSettingsPage(OsfPage):
+
+    def __init__(self, *args, **kwargs):
+        super(UserSettingsPage, self).__init__(*args, **kwargs)
+        self.driver = kwargs.get('driver')
+
+    def _verify_page(self):
+        return self.driver.current_url[-9:] == '/settings'
+
+    @property
+    def api_keys(self):
+        creds = self.driver.find_elements_by_css_selector(
+            'div.api-credential'
+        )[-1]
+
+        return [
+            ApiKey(
+                label=x.find_element_by_css_selector('span.api-label').text,
+                key=x.find_element_by_css_selector('span.api-key').text,
+            ) for x in creds
+        ]
+
+    def add_api_key(self, description=None):
+        self.driver.get('{}/settings'.format(config.osf_home))
+
+        form = self.driver.find_element_by_id('create_key')
+
+        form.find_element_by_css_selector('input[name="label"]').send_keys(
+            description or "Automatically generated key"
+        )
+
+        with WaitForPageReload(self.driver):
+            form.find_element_by_css_selector('button[type="submit"]').click()
+
+        cred = self.driver.find_elements_by_css_selector(
+            'div.api-credential'
+        )[-1]
+
+        return ApiKey(
+            label=cred.find_element_by_css_selector('span.api-label').text,
+            key=cred.find_element_by_css_selector('span.api-key').text,
+        )
+
+ApiKey = namedtuple('ApiKey', ('label','key'))
