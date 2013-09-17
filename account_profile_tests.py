@@ -25,7 +25,6 @@ class AccountProfileTests(base.UserSmokeTest):
         # Browse to profile
         util.goto_profile(self.driver)
 
-    @base.not_implemented
     def test_access_profile(self):
         """
         tests user ability to access page and verifies name on profile page
