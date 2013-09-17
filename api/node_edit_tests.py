@@ -98,7 +98,6 @@ class ApiUserKeyTestCase(unittest.TestCase):
         self._test_title(helpers.get_new_nested_component())
 
     def _test_title_non_contrib(self, page, user):
-        print user
 
         node_id = page.id
         parent_id = page.parent_id
@@ -111,12 +110,13 @@ class ApiUserKeyTestCase(unittest.TestCase):
             ) if parent_id else node_id,
         )
 
-        print edit_url
+        page = page.log_out()
 
-        page.log_out()
-        page = LoginPage().log_in(helpers.create_user())
+        page = page.user_login.log_in(helpers.create_user())
 
         key = page.user_dashboard.settings.add_api_key()
+
+        page = page.log_out()
 
         r = requests.post(
             edit_url,
@@ -127,11 +127,9 @@ class ApiUserKeyTestCase(unittest.TestCase):
             }
         )
 
-        self.assertEqual(r.status_code, http.UNAUTHORIZED)
-        self.assertEqual(
-            json.loads(r.content).get('response'),
-            'success'
-        )
+        self.assertEqual(r.status_code, http.FORBIDDEN)
+
+        page = page.user_login.log_in(user)
 
         page = page.node(node_id, parent_id)
 
@@ -142,28 +140,24 @@ class ApiUserKeyTestCase(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('fails: HTTP 200 (Redirect); expect Unauthorized')
     def test_project_title_non_contrib(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user).new_project('Unchanged')
         self._test_title_non_contrib(page, user)
 
-    @unittest.skip('fails: HTTP 200 (Redirect); expect Unauthorized')
     def test_subproject_title_non_contrib(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user).new_project('Parent Project')
         page = page.add_component('Unchanged', component_type='Project')
         self._test_title_non_contrib(page, user)
 
-    @unittest.skip('fails: HTTP 200 (Redirect); expect Unauthorized')
     def test_component_title_non_contrib(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user).new_project('Parent Project')
         page = page.add_component('Unchanged')
         self._test_title_non_contrib(page, user)
 
-    @unittest.skip('fails: HTTP 200 (Redirect); expect Unauthorized')
-    def test_subproject_title_non_contrib(self):
+    def test_nested_component_title_non_contrib(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user).new_project('Parent Project')
         page = page.add_component('Subproject', component_type='Project')

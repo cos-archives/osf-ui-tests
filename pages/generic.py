@@ -49,6 +49,7 @@ class OsfPage(object):
         self.driver.find_element_by_css_selector(
             'ul#navbar-icons a[href="/logout"]'
         ).click()
+        return OsfPage(driver=self.driver)
 
     def _make_driver(self):
         driver = webdriver.Firefox()
