@@ -28,6 +28,7 @@ import base
 import util
 import config
 
+
 class UITests(base.ProjectSmokeTest):
     
     def setUp(self):

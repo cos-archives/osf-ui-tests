@@ -113,7 +113,7 @@ class UserSettingsPage(OsfPage):
         self.driver = kwargs.get('driver')
 
     def _verify_page(self):
-        return self.driver.current_url[-9:] == '/settings'
+        return self.driver.current_url[-10:] == '/settings/'
 
     @property
     def api_keys(self):

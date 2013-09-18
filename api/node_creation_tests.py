@@ -8,7 +8,7 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
-            api_key=page.settings.add_api_key().key
+            api_key=page.settings.add_api_key()
         )
         page.close()
 
@@ -24,7 +24,7 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
 
         subproject = self.client.add_project(
             'Subproject',
-            parent=parent
+            parent_id=parent.id
         )
 
         # a project should be returned ...
@@ -35,15 +35,15 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
 
         # ... and its parent should be set
         self.assertEqual(
-            subproject.parent,
-            parent,
+            subproject.parent_id,
+            parent.id,
         )
 
     def test_create_component(self):
         parent = self.client.add_project('Parent Project')
         component = self.client.add_component(
-            title='Test Component',
-            parent=parent,
+            'Test Component',
+            parent.id,
             category='Hypothesis'
         )
 
@@ -55,8 +55,8 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
 
         # ... and its parent should be set
         self.assertEqual(
-            component.parent,
-            parent
+            component.parent_id,
+            parent.id
         )
 
     def test_create_nested_component(self):
@@ -64,12 +64,12 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
 
         subproject = self.client.add_project(
             'Subproject',
-            parent=parent_project
+            parent_project.id
         )
 
         component = self.client.add_component(
-            title='Test Component',
-            parent=subproject,
+            'Test Component',
+            subproject.id,
             category='Hypothesis'
         )
 
@@ -81,6 +81,6 @@ class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
 
         # ... and its parent should be set
         self.assertEqual(
-            component.parent,
-            subproject,
+            component.parent_id,
+            subproject.id,
         )

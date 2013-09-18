@@ -1,4 +1,5 @@
 import httplib as http
+import json
 
 from bs4 import BeautifulSoup
 import requests
@@ -14,13 +15,13 @@ class OsfClientException(Exception):
 
 class OsfClient(object):
     def __init__(self, api_key=None):
-        self.http_auth = (api_key, '')
+        self.http_auth = (api_key.key, '')
         # TODO: This should be a lazy list of projects, not a dict.
         self.projects = dict()
 
-    def add_component(self, title, parent, category=None):
+    def add_component(self, title, parent_id, category=None):
         r = requests.post(
-            endpoints.add_component(parent),
+            endpoints.add_component(parent_id),
             auth=self.http_auth,
             data={
                 'title': title,
@@ -35,34 +36,36 @@ class OsfClient(object):
             '#Nodes li h3 a'
         )[0]['href'].strip('/').split('/')[-1]
 
+        parent = OsfProject(parent_id)
+
         if category == 'Project':
             parent.components[component_id] = OsfProject(
-                parent=parent,
+                parent_id=parent_id,
                 project_id=component_id,
                 http_auth=self.http_auth,
             )
         else:
             parent.components[component_id] = OsfComponent(
-                parent=parent,
+                parent_id=parent_id,
                 component_id=component_id,
                 http_auth=self.http_auth,
             )
 
         return parent.components[component_id]
 
-    def add_project(self, title, description='', parent=None):
+    def add_project(self, title, description='', parent_id=None):
         """Adds a project; returns its project ID
 
         """
-        if parent:
+        if parent_id:
             return self.add_component(
                 title=title,
-                parent=parent,
+                parent_id=parent_id,
                 category='Project'
             )
 
         r = requests.post(
-            endpoints.add_project(parent),
+            endpoints.add_project(parent_id),
             auth=self.http_auth,
             data={
                 'title': title,
@@ -81,10 +84,11 @@ class OsfClient(object):
         )
         return self.projects[project_id]
 
-    def project(self, project_id):
+    def project(self, project_id, parent_id=None):
         return OsfProject(
             project_id=project_id,
-            http_auth=self.http_auth
+            parent_id=parent_id,
+            http_auth=self.http_auth,
         )
 
     def component(self, project_id, component_id):
@@ -98,53 +102,61 @@ class OsfClient(object):
 class OsfNode(object):
     def __init__(self, http_auth=None):
         self.http_auth = http_auth
+        self._call_api()
 
-    @property
-    def title(self):
+    def __getattr__(self, item):
+        try:
+            return self._api_summary[item]
+        except KeyError:
+            raise AttributeError
+
+    # @title.setter
+    # def title(self, value):
+    #     r = requests.post(
+    #         self._edit_endpoint,
+    #         auth=self.http_auth,
+    #         data={
+    #             'name': 'title',
+    #             'value': value,
+    #         },
+    #     )
+    #
+    #     if r.status_code is not http.OK:
+    #         raise OsfClientException('Title update failed')
+
+    def _call_api(self):
         r = requests.get(
-            self.url,
+            self._get_endpoint,
             auth=self.http_auth,
         )
 
-        if r.status_code == http.FORBIDDEN:
+        if r.status_code in (http.FORBIDDEN, http.UNAUTHORIZED):
             raise OsfClientException(
-                'Access Denied',
-                http_status_code=int(r.status_code)
+                'API call to {} returned HTTP {}'.format(
+                    self._get_endpoint,
+                    r.status_code
+                )
             )
-        elif r.status_code != http.OK:
-            raise OsfClientException(http_status_code=r.status_code)
-        soup = BeautifulSoup(r.content)
-
-        return soup.find(id='node-title-editable').text
-
-    @title.setter
-    def title(self, value):
-        r = requests.post(
-            self._edit_endpoint,
-            auth=self.http_auth,
-            data={
-                'name': 'title',
-                'value': value,
-            },
-        )
-
-        if r.status_code is not http.OK:
-            raise OsfClientException('Title update failed')
+        self._api_summary = json.loads(r.content)['summary']
 
 
 class OsfProject(OsfNode):
-    def __init__(self, project_id, *args, **kwargs):
+
+    def __init__(self, project_id, parent_id=None, *args, **kwargs):
         self.id = project_id
-        self.parent = kwargs.get('parent')
-        if self.parent:
-            del kwargs['parent']
+        self.parent_id = parent_id
 
         # TODO: This should be a lazy list of components, not a dict.
         self.components = dict()
 
-        self._edit_endpoint = endpoints.edit_project(project_id)
+        self._edit_endpoint = endpoints.edit_project(self.id)
+        self._get_endpoint = endpoints.get_project(self.id, self.parent_id)
 
         super(OsfProject, self).__init__(*args, **kwargs)
+
+    @property
+    def title(self):
+        return self._api_summary['title']
 
     @property
     def url(self):
@@ -152,13 +164,18 @@ class OsfProject(OsfNode):
 
 
 class OsfComponent(OsfNode):
-    def __init__(self, parent, component_id, *args, **kwargs):
-        self.parent = parent
+    def __init__(self, parent_id, component_id, *args, **kwargs):
+        self.parent_id = parent_id
         self.id = component_id
 
         self._edit_endpoint = endpoints.edit_component(
             component_id=component_id,
-            project_id=parent.id if parent else None,
+            project_id=parent_id,
+        )
+
+        self._get_endpoint = endpoints.get_component(
+            component_id=component_id,
+            parent_id=parent_id,
         )
 
         super(OsfComponent, self).__init__(*args, **kwargs)
