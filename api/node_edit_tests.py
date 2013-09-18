@@ -3,7 +3,6 @@ import json
 import unittest
 import requests
 
-import config
 from pages import helpers, LoginPage
 from osf_api import OsfClient
 from osf_api.osf_api import OsfClientException
@@ -115,49 +114,6 @@ class ApiUserKeyNonContributorTestCase(unittest.TestCase):
         self.non_contrib_client = OsfClient(
             api_key=page.settings.add_api_key().key
         )
-        page.close()
-
-    def _test_title_non_contrib(self, page, user):
-
-        node_id = page.id
-        parent_id = page.parent_id
-
-        edit_url = '{}/project/{}/edit'.format(
-            config.osf_home,
-            '{}/node/{}'.format(
-                parent_id,
-                node_id
-            ) if parent_id else node_id,
-        )
-
-        page = page.log_out()
-
-        page = page.user_login.log_in(helpers.create_user())
-
-        key = page.user_dashboard.settings.add_api_key()
-
-        page = page.log_out()
-
-        r = requests.post(
-            edit_url,
-            auth=(key.key, ''),
-            data={
-                'name': 'title',
-                'value': 'Changed via API',
-            }
-        )
-
-        self.assertEqual(r.status_code, http.FORBIDDEN)
-
-        page = page.user_login.log_in(user)
-
-        page = page.node(node_id, parent_id)
-
-        self.assertEqual(
-            page.title,
-            'Unchanged',
-        )
-
         page.close()
 
     def test_project_title_non_contrib(self):

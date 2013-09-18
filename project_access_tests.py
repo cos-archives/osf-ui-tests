@@ -1,6 +1,4 @@
-import config
 import unittest
-import util
 
 from base import ProjectSmokeTest, not_implemented
 from pages import helpers
@@ -77,6 +75,7 @@ class ProjectSecurityTests2(unittest.TestCase):
 
     def _test_can_access(self, page, user=None, can_access=True):
         _url = page.driver.current_url
+        _title = page.title
         _id = page.id
 
         page.close()
@@ -85,12 +84,13 @@ class ProjectSecurityTests2(unittest.TestCase):
             page = LoginPage().log_in(user)
             page.driver.get(_url)
 
-            assertion = self.assertTrue if can_access else self.assertFalse
-
-            # verify that we weren't redirected
-            assertion(
-                page.driver.current_url == _url
-            )
+            if can_access:
+                page = ProjectPage(driver=page.driver)
+                self.assertEqual(page.title, _title)
+            else:
+                with self.assertRaises(PageException):
+                    page = ProjectPage(driver=page.driver)
+                    self.assertNotEqual(page.title, _title)
 
             page.close()
         else:
@@ -293,9 +293,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         # There should be no project list, so just make sure the project title
         # isn't on the page.
-        self.assertTrue(
-            'not authorized' in self.get_element('div.alert').text
-        )
+        self.assert_forbidden()
 
         # log out and back in as the first user, so teardown will work
         self.log_out()
@@ -321,10 +319,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
         ]))
 
         # should have redirect the user elsewhere
-        self.assertNotIn(
-            'edit',
-            self.driver.current_url
-        )
+        self.assert_forbidden()
 
         # try to add a node
         self.goto('dashboard')
@@ -333,10 +328,7 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         # try to delete the project
         self.goto('settings')
-        self.assertNotIn(
-            'settings',
-            self.driver.current_url
-        )
+        self.assert_forbidden()
 
         # try to rename the project
         self.goto('dashboard')

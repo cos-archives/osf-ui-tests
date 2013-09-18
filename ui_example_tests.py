@@ -59,9 +59,7 @@ class UITests(base.ProjectSmokeTest):
         # point the browser at test project
         self.driver.get(self.project_url)
 
-        # grab text from alert box presented to user
-        alerts = util.get_alert_boxes(self.driver, 'you are not authorized')
-        self.assertEqual(len(alerts), 1)
+        self.assert_not_authorized()
 
     def test_attempted_access_nonexistent_project(self):
         """

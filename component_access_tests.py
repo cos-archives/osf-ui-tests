@@ -87,7 +87,7 @@ class ComponentAccessCase(ProjectSmokeTest):
         self.second_user = self.create_user()
         self.log_in(self.second_user)
 
-        self.assert_not_authorized(component_url)
+        self.assert_forbidden(component_url)
 
         # log back in so teardown doesn't fail.
         self.log_out()
@@ -196,7 +196,7 @@ class ComponentAccessCase(ProjectSmokeTest):
             node_url=component_url,
         )
 
-        self.assert_not_authorized()
+        self.assert_forbidden()
 
         # log back in so teardown doesn't fail.
         self.log_out()

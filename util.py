@@ -6,8 +6,6 @@ import os
 import re
 import time
 import uuid
-import inspect
-import unittest
 import requests
 
 # Selenium imports

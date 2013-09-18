@@ -4,9 +4,6 @@ Tests for creating project registrations.
 
 # Project imports
 import base
-from config import osf_home
-
-from selenium.common.exceptions import TimeoutException
 
 
 class RegistrationTests(base.ProjectSmokeTest):

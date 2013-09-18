@@ -418,16 +418,23 @@ class ProjectSmokeTest(UserSmokeTest):
         if url:
             self.driver.get(url)
 
-        # should have been redirected to the homepage
-        self.assertEqual(
-            self.driver.current_url.strip('/'),
-            self.site_root.strip('/'),
-        )
-
         # an alert should be present with the error message
         self.assertIn(
-            'not authorized',
-            self.get_element('div#alert-container').text,
+            'Unauthorized',
+            self.driver.find_element_by_css_selector('.span12 > h2').text,
+        )
+
+    def assert_forbidden(self, url=None):
+        """Navigate to the resource and verify the 403 (Forbidden) error is
+        present.
+        """
+
+        if url:
+            self.driver.get(url)
+
+        self.assertIn(
+            'Forbidden',
+            self.driver.find_element_by_css_selector('.span12 > h2').text
         )
 
     def create_fork(self, url=None):
