@@ -2,7 +2,7 @@ import unittest
 
 from pages import helpers, LoginPage
 from osf_api import OsfClient
-from osf_api.osf_api import OsfClientException
+from osf_api.exceptions import OsfClientException
 from osf_api.common import ApiKey
 
 
