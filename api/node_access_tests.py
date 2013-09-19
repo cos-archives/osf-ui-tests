@@ -2,6 +2,7 @@ import unittest
 
 from osf_api import OsfClient, OsfComponent, OsfProject
 
+from config import osf_home
 from pages import helpers, LoginPage
 
 
@@ -19,6 +20,11 @@ class NodeAccessTests(unittest.TestCase):
         self.assertEqual(
             project.title,
             'Project',
+        )
+
+        self.assertEqual(
+            '{}/project/{}/'.format(osf_home, project.id),
+            project.url,
         )
 
     def test_subproject_api_summary(self):
