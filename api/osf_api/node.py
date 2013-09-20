@@ -115,15 +115,16 @@ class OsfProject(OsfNode):
         # TODO: This should be a lazy list of components, not a dict.
         self.components = dict()
 
-        self._edit_endpoint = endpoints.edit_project(project_id)
-        self._get_endpoint = endpoints.get_project(project_id, self.parent_id)
-        self._get_api_keys_endpoint = endpoints.get_project_api_keys(
-            project_id=project_id,
-            parent_id=self.parent_id,
+        self._edit_endpoint = endpoints.edit_node(project_id)
+
+        self._get_endpoint = endpoints.get_node(project_id)
+
+        self._get_api_keys_endpoint = endpoints.get_node_api_keys(
+            project_id
         )
-        self._add_api_key_endpoint = endpoints.add_project_api_key(
-            project_id=project_id,
-            parent_id=self.parent_id,
+
+        self._add_api_key_endpoint = endpoints.add_node_api_key(
+            project_id
         )
 
         super(OsfProject, self).__init__(*args, **kwargs)
@@ -137,23 +138,23 @@ class OsfComponent(OsfNode):
     def __init__(self, parent_id, component_id, *args, **kwargs):
         self.parent_id = parent_id
 
-        self._edit_endpoint = endpoints.edit_component(
-            component_id=component_id,
-            project_id=parent_id,
-        )
-
-        self._get_endpoint = endpoints.get_component(
-            component_id=component_id,
+        self._edit_endpoint = endpoints.edit_node(
+            node_id=component_id,
             parent_id=parent_id,
         )
 
-        self._get_api_keys_endpoint = endpoints.get_component_api_keys(
-            component_id=component_id,
+        self._get_endpoint = endpoints.get_node(
+            node_id=component_id,
             parent_id=parent_id,
         )
 
-        self._add_api_key_endpoint = endpoints.add_component_api_key(
-            component_id=component_id,
+        self._get_api_keys_endpoint = endpoints.get_node_api_keys(
+            node_id=component_id,
+            parent_id=parent_id,
+        )
+
+        self._add_api_key_endpoint = endpoints.add_node_api_key(
+            node_id=component_id,
             parent_id=self.parent_id,
         )
 

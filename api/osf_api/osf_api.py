@@ -13,7 +13,7 @@ class OsfClient(object):
 
     def add_component(self, title, parent_id, category=None):
         r = requests.post(
-            endpoints.add_component(parent_id),
+            endpoints.add_node(parent_id),
             auth=self.http_auth,
             data={
                 'title': title,
@@ -57,7 +57,7 @@ class OsfClient(object):
             )
 
         r = requests.post(
-            endpoints.add_project(parent_id),
+            endpoints.add_node(parent_id),
             auth=self.http_auth,
             data={
                 'title': title,

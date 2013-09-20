@@ -17,7 +17,7 @@ class ApiUserKeyTestCase(unittest.TestCase):
         page.close()
 
         r = requests.post(
-            profile_page + '/edit',
+            profile_page + 'edit/',
             auth=(
                 key.key,
                 '',
