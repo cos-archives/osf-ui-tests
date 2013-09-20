@@ -3,6 +3,7 @@ import requests
 
 from . import endpoints, exceptions
 from .node import OsfComponent, OsfProject
+from .user import OsfUser
 
 
 class OsfClient(object):
@@ -88,3 +89,6 @@ class OsfClient(object):
             parent_id=project_id,
             http_auth=self.http_auth,
         )
+
+    def user(self, user_id=None):
+        return OsfUser(user_id=user_id, http_auth=self.http_auth)

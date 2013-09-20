@@ -1,6 +1,7 @@
 import config
 root = config.osf_home
 
+# Nodes
 
 def add_node(parent_id=None):
     """Builds the endpoint for adding a component to a project"""
@@ -44,3 +45,10 @@ def edit_node(node_id, parent_id=None):
         '{}/node/{}'.format(
             parent_id, node_id) if parent_id else node_id,
     )
+
+
+# Users
+
+
+def get_user(user_id=None):
+    return '{}/api/v1/profile/'.format(root)
