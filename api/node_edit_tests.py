@@ -105,7 +105,7 @@ class ApiUserKeyTestCase(unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
-            api_key=page.settings.add_api_key().key
+            api_key=page.settings.add_api_key()
         )
         page.log_out()
         page.close()
@@ -171,13 +171,13 @@ class ApiUserKeyNonContributorTestCase(unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
-            api_key=page.settings.add_api_key().key
+            api_key=page.settings.add_api_key()
         )
         page.log_out()
 
         page = page.user_login.log_in(helpers.create_user())
         self.non_contrib_client = OsfClient(
-            api_key=page.settings.add_api_key().key
+            api_key=page.settings.add_api_key()
         )
         page.close()
 
