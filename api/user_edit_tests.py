@@ -35,7 +35,6 @@ class ApiUserKeyTestCase(unittest.TestCase):
             len(self.client.user().id),
         )
 
-
     def test_change_user_fullname(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user)

@@ -37,6 +37,24 @@ class OsfNode(object):
         return self._log
 
     @property
+    def public(self):
+        return self._api_summary['public']
+
+    @public.setter
+    def public(self, value):
+        r = requests.post(
+            self._edit_endpoint,
+            auth=self.http_auth,
+            data={
+                'public': False
+            }
+        )
+
+        exceptions.assert_auth_passed(r)
+
+        self._call_api()
+
+    @property
     def title(self):
         return self._api_summary['title']
 

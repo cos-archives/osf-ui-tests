@@ -51,4 +51,10 @@ def edit_node(node_id, parent_id=None):
 
 
 def get_user(user_id=None):
+    if user_id:
+        return '{}/api/v1/profile/{}/'.format(root, user_id)
     return '{}/api/v1/profile/'.format(root)
+
+
+def get_user_public_projects(user_id):
+    return '{}/api/v1/profile/{}/public_projects'.format(root, user_id)
