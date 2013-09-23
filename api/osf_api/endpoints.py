@@ -7,12 +7,12 @@ root = config.osf_home
 def add_node(parent_id=None):
     """Builds the endpoint for adding a component to a project"""
     if parent_id:
-        return '{}/project/{}/newnode'.format(
+        return '{}/project/{}/newnode/'.format(
             config.osf_home,
             parent_id
         )
     else:
-        return '{}/project/new'.format(config.osf_home)
+        return '{}/project/new/'.format(config.osf_home)
 
 
 def add_node_api_key(node_id, parent_id=None):
@@ -67,6 +67,10 @@ def get_user_api_keys():
 
 def revoke_user_api_key():
     return '{}/api/v1/settings/revoke_key/'.format(root)
+
+
+def get_user_api_key_history(key):
+    return '{}/api/v1/settings/key_history/{}/'.format(root, key.key)
 
 
 def get_user_public_projects(user_id):

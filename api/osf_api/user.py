@@ -5,6 +5,7 @@ import requests
 from . import endpoints
 from . import exceptions
 from .common import ApiKey
+from .log import LogEntry
 
 
 class OsfUser(object):
@@ -36,6 +37,18 @@ class OsfUser(object):
             ]
 
             return self._api_keys
+
+    def api_key_history(self, key):
+        r = requests.get(
+            endpoints.get_user_api_key_history(key),
+            auth=self.http_auth
+        )
+
+        exceptions.assert_auth_passed(r)
+
+        return [
+            LogEntry(log_id=x['lid']) for x in json.loads(r.content)['logs']
+        ]
 
     @property
     def date_registered(self):

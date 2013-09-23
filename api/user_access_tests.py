@@ -73,6 +73,24 @@ class ApiUserProfilesTestCase(unittest.TestCase):
         with self.assertRaises(OsfClientException):
             user = new_client.user()
 
+    def test_api_key_history(self):
+        user = self.client.user()
+
+        project = self.client.add_project('Test Project')
+        subproject = self.client.add_project('Test Subproject',
+                                             parent_id=project.id)
+        component = self.client.add_component('Test Component',
+                                              parent_id=subproject.id)
+
+        project.title = 'Foo'
+        subproject.title = 'Bar'
+        component.title = 'Baz'
+        project.public = True
+
+
+        print user.api_key_history(
+            key=user.api_keys[0]
+        )
 
     def test_date_registered(self):
         self.assertEqual(
