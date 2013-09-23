@@ -3,6 +3,7 @@ root = config.osf_home
 
 # Nodes
 
+
 def add_node(parent_id=None):
     """Builds the endpoint for adding a component to a project"""
     if parent_id:
@@ -50,10 +51,22 @@ def edit_node(node_id, parent_id=None):
 # Users
 
 
+def add_user_api_key():
+    return '{}/api/v1/settings/create_key/'.format(root)
+
+
 def get_user(user_id=None):
     if user_id:
         return '{}/api/v1/profile/{}/'.format(root, user_id)
     return '{}/api/v1/profile/'.format(root)
+
+
+def get_user_api_keys():
+    return '{}/api/v1/settings/keys/'.format(root)
+
+
+def revoke_user_api_key():
+    return '{}/api/v1/settings/revoke_key/'.format(root)
 
 
 def get_user_public_projects(user_id):

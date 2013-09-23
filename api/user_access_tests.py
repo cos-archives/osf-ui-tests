@@ -3,6 +3,8 @@ import unittest
 
 from pages import helpers, LoginPage
 from osf_api import OsfClient
+from osf_api.common import ApiKey
+from osf_api.exceptions import OsfClientException
 
 
 class ApiUserProfilesTestCase(unittest.TestCase):
@@ -38,6 +40,39 @@ class ApiUserProfilesTestCase(unittest.TestCase):
             own_profile.id,
             other_profile.id,
         )
+
+    def test_api_keys(self):
+        self.assertEqual(1, len(self.client.user().api_keys))
+
+    def test_create_api_key(self):
+        profile = self.client.user()
+        self.assertEqual(1, len(profile.api_keys))
+
+        new_key = profile.add_api_key('Fizzpop')
+
+        self.assertIsInstance(new_key, ApiKey)
+        self.assertEqual(2, len(profile.api_keys))
+
+        self.assertIn(
+            'Fizzpop',
+            [x.label for x in profile.api_keys]
+        )
+
+    def test_revoke_api_key(self):
+        new_key = self.client.user().add_api_key('FizzPop')
+
+        new_client = OsfClient(api_key=new_key)
+
+        self.client.user().revoke_api_key(new_key)
+
+        self.assertNotIn(
+            new_key,
+            self.client.user().api_keys
+        )
+
+        with self.assertRaises(OsfClientException):
+            user = new_client.user()
+
 
     def test_date_registered(self):
         self.assertEqual(
