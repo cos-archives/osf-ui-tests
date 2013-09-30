@@ -66,7 +66,7 @@ def projects_in_solr():
 
 
 def is_project_in_solr(project_id):
-    r = solr.query(category='project').execute()
+    r = solr.query(category='project', id=project_id).execute()
     for p in r:
         if p.get(project_id + '_title'):
             return True
