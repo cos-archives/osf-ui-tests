@@ -28,6 +28,7 @@ from datetime import datetime, timedelta
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
+from pages.helpers import WaitForPageReload
 
 
 class SmokeTest(unittest.TestCase):
@@ -166,7 +167,7 @@ class ProjectSmokeTest(UserSmokeTest):
     def tearDown(self):
         
         # Delete test project
-        util.delete_project(self.driver)
+        #util.delete_project(self.driver)
 
         # Call parent tearDown
         super(ProjectSmokeTest, self).tearDown()
@@ -418,24 +419,24 @@ class ProjectSmokeTest(UserSmokeTest):
         if url:
             self.driver.get(url)
 
+        # should have been redirected to the homepage
+        self.assertEqual(
+            self.driver.current_url.strip('/'),
+            self.site_root.strip('/'),
+        )
+
         # an alert should be present with the error message
         self.assertIn(
-            'Unauthorized',
-            self.driver.find_element_by_css_selector('.span12 > h2').text,
+            'not authorized',
+            self.get_element('div#alert-container').text,
         )
 
     def assert_forbidden(self, url=None):
-        """Navigate to the resource and verify the 403 (Forbidden) error is
+        """Nav  igate to the resource and verify the 403 (Forbidden) error is
         present.
         """
 
-        if url:
-            self.driver.get(url)
-
-        self.assertIn(
-            'Forbidden',
-            self.driver.find_element_by_css_selector('.span12 > h2').text
-        )
+        self.assert_not_authorized(url=url)
 
     def create_fork(self, url=None):
         """Create a fork, and return its URL
@@ -446,23 +447,11 @@ class ProjectSmokeTest(UserSmokeTest):
         if url:
             self.driver.get(url)
 
-        # click the fork button
-        self.get_element(
-            'div.btn-toolbar div.btn-group:last-child a:last-child'
-        ).click()
-
-        # if the page isn't loaded yet, this code might help.
-        from selenium.common.exceptions import StaleElementReferenceException
-        wait(
-            driver=self.driver,
-            timeout=10,
-            ignored_exceptions=(StaleElementReferenceException,)
-        ).until(
-            method=lambda d: 'Forked from' in
-                             d.find_element_by_css_selector(
-                                 'p#contributors'
-                             ).text
-        )
+        with WaitForPageReload(self.driver):
+            # click the fork button
+            self.get_element(
+                'div.btn-toolbar div.btn-group:last-child a:last-child'
+            ).click()
 
         return self.driver.current_url
 
