@@ -10,14 +10,15 @@ solr = sunburnt.SolrInterface("http://localhost:8983/solr/")
 class SearchSecurity(unittest.TestCase):
     def setUp(self):
         solr.delete_all()
+        solr.commit()
         self.page = helpers.get_new_project('Top Project')
-
 
     def tearDown(self):
         self.page.close()
 
     def test_project_security(self):
         # Projects are private by default. There should be none in the index.
+
         self.assertEqual(0, projects_in_solr())
 
         self.page.public = True
