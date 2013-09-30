@@ -3,14 +3,15 @@ import unittest
 import sunburnt
 
 from pages import helpers
+import config
 
-solr = sunburnt.SolrInterface("http://localhost:8983/solr/")
+solr = sunburnt.SolrInterface(config.solr_home)
 
 
 class SearchSecurity(unittest.TestCase):
     def setUp(self):
-        solr.delete_all()
-        solr.commit()
+#        solr.delete_all()
+#        solr.commit()
         self.page = helpers.get_new_project('Top Project')
 
     def tearDown(self):

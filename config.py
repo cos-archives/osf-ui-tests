@@ -7,6 +7,7 @@ selenium_wait_time = 5
 
 # Domain to use for all tests.
 osf_home = 'https://staging.openscienceframework.org'
+solr_home = 'http://localhost:8983/solr/'
 
 # make sure there is no trailing slash.
 osf_home = osf_home.rstrip('/')
