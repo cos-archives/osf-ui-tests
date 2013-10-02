@@ -4,7 +4,7 @@ from pages import helpers, LoginPage
 from pages.generic import ApiKey
 
 
-class ApiCreateKeysTestCase(unittest.TestCase):
+class ApiCreateKeysTestCase(object):#unittest.TestCase):
     def test_user_key_creation(self):
         user = helpers.create_user()
         page = LoginPage().log_in(user)

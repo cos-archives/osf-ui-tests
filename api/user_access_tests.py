@@ -7,7 +7,7 @@ from osf_api.common import ApiKey
 from osf_api.exceptions import OsfClientException
 
 
-class ApiUserProfilesTestCase(unittest.TestCase):
+class ApiUserProfilesTestCase(object):#unittest.TestCase):
     def setUp(self):
         self.user = helpers.create_user()
         page = LoginPage().log_in(self.user)

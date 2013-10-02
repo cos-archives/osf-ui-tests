@@ -469,11 +469,11 @@ class NodePage(OsfPage):
             'Files'
         ).click()
 
-        WebDriverWait(self.driver, 1).until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#filesTable')
-            )
-        )
+        # WebDriverWait(self.driver, 1).until(
+        #     EC.visibility_of_element_located(
+        #         (By.CSS_SELECTOR, '#filesTable')
+        #     )
+        # )
 
         row = [
             x for x in
@@ -483,7 +483,8 @@ class NodePage(OsfPage):
             if x.find_element_by_css_selector('td.name a').text == f
         ]
 
-        row[0].find_element_by_css_selector('button.btn-delete').click()
+        # row[0].find_element_by_css_selector('button.btn-delete').click()
+        self.driver.find_elements_by_css_selector('button.btn-delete')[0].click()
 
     @property
     def files(self):

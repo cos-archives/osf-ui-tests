@@ -8,7 +8,7 @@ from osf_api import OsfClient
 from osf_api.user import OsfUser
 
 
-class ApiUserKeyTestCase(unittest.TestCase):
+class ApiUserKeyTestCase(object):#unittest.TestCase):
     def setUp(self):
         self.user = helpers.create_user()
         page = LoginPage().log_in(self.user)

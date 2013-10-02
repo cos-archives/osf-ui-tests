@@ -6,7 +6,7 @@ from config import osf_home
 from pages import helpers, LoginPage
 
 
-class NodeAccessTests(unittest.TestCase):
+class NodeAccessTests(object):#unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(

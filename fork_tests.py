@@ -340,6 +340,9 @@ class ForkTests(base.ProjectSmokeTest):
         self.get_element(
             'a[data-original-title="Number of times this node has been forked (copied)"]').click()
 
+        # Wait for JS; is there a better way to do this?
+        time.sleep(3)
+
         #click the link to original project
         self.driver.find_element_by_css_selector("header#overview.jumbotron.subhead p#contributors")\
             .find_element_by_xpath('a[contains(.,"/project/")]').click()

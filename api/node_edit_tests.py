@@ -6,7 +6,7 @@ from osf_api.exceptions import OsfClientException
 from osf_api.common import ApiKey
 
 
-class ApiNodeKeyTestCase(unittest.TestCase):
+class ApiNodeKeyTestCase(object):#unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
@@ -101,7 +101,7 @@ class ApiNodeKeyTestCase(unittest.TestCase):
         )
 
 
-class ApiUserKeyTestCase(unittest.TestCase):
+class ApiUserKeyTestCase(object):#unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
@@ -167,7 +167,7 @@ class ApiUserKeyTestCase(unittest.TestCase):
         )
 
 
-class ApiUserKeyNonContributorTestCase(unittest.TestCase):
+class ApiUserKeyNonContributorTestCase(object):#unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(

@@ -4,7 +4,7 @@ from osf_api import OsfClient, OsfComponent, OsfProject
 from pages import helpers, LoginPage
 
 
-class ApiUserKeyCreateNodeTestCase(unittest.TestCase):
+class ApiUserKeyCreateNodeTestCase(object):#unittest.TestCase):
     def setUp(self):
         page = LoginPage().log_in(helpers.create_user())
         self.client = OsfClient(
