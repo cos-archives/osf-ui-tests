@@ -1,7 +1,10 @@
 import time
 from collections import namedtuple
 
+import requests
+
 import util
+import config
 
 User = namedtuple('User', ['full_name', 'email', 'password'])
 
@@ -63,6 +66,20 @@ def get_new_nested_component(title='New Component', component_type='Other'):
         title=title,
         component_type=component_type,
     )
+
+
+def load_requests_cookies(cookie_jar, webdriver):
+    for x in cookie_jar:
+        c = {
+            'name': x.name,
+            'value': x.value,
+            'domain': 'localhost' if x.domain == 'localhost.local' else x.domain,
+            'path': x.path,
+            'secure': x.secure,
+            'expiry': x.expires,
+        }
+        print c
+        webdriver.add_cookie(c)
 
 
 class WaitForPageReload(object):

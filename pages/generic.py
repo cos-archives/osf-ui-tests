@@ -4,6 +4,7 @@ from selenium import webdriver
 
 import config
 from pages.exceptions import PageException
+from util import launch_driver
 
 
 class OsfPage(object):
@@ -52,9 +53,7 @@ class OsfPage(object):
         return OsfPage(driver=self.driver)
 
     def _make_driver(self):
-        driver = webdriver.Firefox()
-        driver.implicitly_wait(5)
-        return driver
+        return launch_driver()
 
     def _verify_page(self):
         return True
@@ -67,6 +66,7 @@ class OsfPage(object):
 
     @property
     def user_dashboard(self):
+        # TODO: property changes state
         from pages.auth import UserDashboardPage
         self.driver.get('{}/dashboard'.format(config.osf_home))
         return UserDashboardPage(
@@ -75,11 +75,13 @@ class OsfPage(object):
 
     @property
     def user_login(self):
+        # TODO: property changes state
         from pages.auth import LoginPage
         self.driver.get('{}/account'.format(config.osf_home))
         return LoginPage(driver=self.driver)
 
     def node(self, node_id, parent_project=None):
+        # TODO: rename "goto_node()"
         from pages.project import ProjectPage
         self.driver.get(
             '{}/project/{}/'.format(

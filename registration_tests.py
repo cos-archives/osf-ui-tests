@@ -26,60 +26,6 @@ class RegistrationTests(unittest.TestCase):
             component_type='Project',
         )
 
-    def _test_registration_template(self, page):
-        """ Given a project, register it and verify that the registration
-        template's name is displayed in the header.
-        """
-
-        meta = ('sample narrative', )
-        template = 'Open-Ended Registration'
-
-        page = page.add_registration(
-            registration_type=template,
-            meta=meta,
-        )
-
-        self.assertEqual(
-            page.registration_template,
-            template,
-        )
-
-        page.close()
-
-    def test_project_registration_template(self):
-        """ Project variant of ``self._test_registration_template`` """
-        self._test_registration_template(self._project())
-
-    def test_subproject_registration_template(self):
-        """ Subproject variant of ``self._test_registration_template`` """
-        self._test_registration_template(self._subproject())
-
-    def _test_registration_meta(self, page):
-        """ Given a project, register it and verify that the registration's meta
-         information is correct.
-        """
-        meta = ('sample narrative', )
-
-        page = page.add_registration(
-            registration_type='Open-Ended Registration',
-            meta=meta
-        )
-
-        self.assertEqual(
-            page.registration_meta,
-            meta
-        )
-
-        page.close()
-
-    def test_project_registration_meta(self):
-        """ Project variant of ``self._test_registration_meta`` """
-        self._test_registration_meta(self._project())
-
-    def test_subproject_registration_meta(self):
-        """ Subproject variant of ``self._test_registration_meta`` """
-        self._test_registration_meta(self._subproject())
-
     def _test_registration_list(self, page):
         """ Given a project, register it and verify that the new registration is
          in the project's registration list
@@ -183,20 +129,6 @@ class RegistrationTests(unittest.TestCase):
 
         page.close()
 
-    def test_project_registration_title(self):
-        """ Verify that a registration's title matches the original project """
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='title'
-        )
-
-    def test_subproject_registration_title(self):
-        """ Subproject variant of ``self._test_project_registration_title`` """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='title'
-        )
-
     # NOTE: This test only applies to subprojects
     @unittest.skip('known failure')
     def test_subproject_registration_parent_title(self):
@@ -207,23 +139,6 @@ class RegistrationTests(unittest.TestCase):
         self._test_registration_matches(
             page=self._subproject(),
             attribute='parent_title'
-        )
-
-    def test_project_registration_components_empty(self):
-        """ Verify that a registration's (empty) component list matches the
-        original project"""
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='component_names'
-        )
-
-    def test_subproject_registration_components_empty(self):
-        """ Subproject variant of
-        ``self._test_project_registration_components_empty``
-        """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='component_names'
         )
 
     def test_project_registration_components(self):
@@ -276,59 +191,6 @@ class RegistrationTests(unittest.TestCase):
             attribute='component_names'
         )
 
-    def test_project_registration_contributors(self):
-        """ Verify that a registration's contributor list matches the original
-        project """
-
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='contributors'
-        )
-
-    def test_subproject_registration_contributors(self):
-        """ Subproject variant of
-        ``self._test_project_registration_contributors``
-        """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='contributors'
-        )
-
-    def test_project_registration_created_date(self):
-        """ Verify that a registration's creation date matches the original
-        project
-        """
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='date_created'
-        )
-
-    def test_subproject_registration_created_date(self):
-        """ Subproject variant of
-        ``self._test_project_registration_created_date``
-        """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='date_created'
-        )
-
-    def test_project_registration_last_updated_date(self):
-        """ Verify that a registration's last updated date matches the original
-        project """
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='last_updated'
-        )
-
-    def test_subproject_registration_last_updated_date(self):
-        """ Subproject variant of
-        ``self._test_project_registration_updated_date``
-        """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='last_updated'
-        )
-
     def test_project_registration_wiki_home(self):
         """ Verify that a registration's wiki homepage content matches the
         original project """
@@ -351,22 +213,6 @@ class RegistrationTests(unittest.TestCase):
         self._test_registration_matches(
             page=page,
             attribute='wiki_home_content'
-        )
-
-    def test_project_registration_log_matches(self):
-        """ Verify that a registration's log matches the original project """
-        self._test_registration_matches(
-            page=self._project(),
-            attribute='logs',
-        )
-
-    def test_subproject_registration_log_matches(self):
-        """ Subproject variant of
-        ``self._test_project_registration_log_matches``
-        """
-        self._test_registration_matches(
-            page=self._subproject(),
-            attribute='logs',
         )
 
     def _test_registration_logged(self, page):
