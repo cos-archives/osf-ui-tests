@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
+from selenium.webdriver.common.keys import Keys
 
 import config
 import logs
@@ -183,6 +184,21 @@ class NodePage(OsfPage):
             ).click()
 
     @property
+    def tag(self):
+        """The node's title, parsed from the header
+
+        :returns: ``str``
+        """
+        return self._tag
+
+    def add_tag(self, value):
+
+        textbox = self.driver.find_element_by_css_selector(
+            'INPUT#node-tags_tag'
+        )
+        textbox.send_keys(value+'\n')
+
+    @property
     def watched(self):
         """Whether the user is watching the node
 
@@ -254,6 +270,14 @@ class NodePage(OsfPage):
         return self.driver.find_element_by_css_selector(
             '.node-parent-title a'
         ).get_attribute('href')
+
+    @property
+    def _tag(self):
+        """The node's tag element.
+
+        :returns: ``WebElement``
+        """
+        return self.driver.find_element_by_css_selector('span.tag').text
 
     @property
     def components(self):
