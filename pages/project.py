@@ -216,16 +216,16 @@ class NodePage(OsfPage):
             '#overview div.btn-group:nth-of-type(1) > a'
         ).click()
 
+        confirm_button = self.driver.find_element_by_css_selector(
+            'div.modal.fade.in button.btn-primary'
+        )
+
         WebDriverWait(self.driver, 1).until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.modal.fade.in button.btn-primary')
-            )
+            EC.visibility_of(confirm_button)
         )
 
         with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                'div.modal.fade.in button.btn-primary'
-            ).click()
+            confirm_button.click()
 
     @property
     def settings(self):
@@ -635,7 +635,8 @@ class ProjectPage(NodePage):
         # Wait for the modal to be visible
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.modal.fade.in')
+                #(By.CSS_SELECTOR, 'div.modal.fade.in')
+                (By.ID, 'newComponent')
             )
         )
 
@@ -649,6 +650,12 @@ class ProjectPage(NodePage):
             component_type or 'Other'
         )
         modal.find_element_by_css_selector('button[type="submit"]').click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.invisibility_of_element_located(
+                (By.ID, 'newComponent'),
+            )
+        )
 
         # get the link from the list of components
         components = [x for x
