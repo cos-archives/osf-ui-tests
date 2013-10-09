@@ -65,6 +65,12 @@ class Create(object):
             self.page.logs,
         )
 
+    def test_link_to_source_project(self):
+        assert_equal(
+            self.parent_values['url'],
+            self.page.source_link,
+        )
+
 
 class FromProject(Create, ProjectRegistrationFixture):
     pass

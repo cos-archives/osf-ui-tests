@@ -806,6 +806,14 @@ class ProjectRegistrationPage(ProjectPage):
             '#overview a[href*="register"]'
         ).text
 
+    @property
+    def source_link(self):
+        """ The URL of the node for which this is a registration."""
+
+        return self.driver.find_element_by_css_selector(
+            'span.label-important a'
+        ).get_attribute('href')
+
 
 class FilePage(NodePage):
 

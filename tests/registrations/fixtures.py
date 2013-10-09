@@ -17,6 +17,7 @@ class RegistrationFixture(object):
             'date_created': cls.page.date_created,
             'last_updated': cls.page.last_updated,
             'logs': cls.page.logs,
+            'url': cls.page.driver.current_url,
 
         }
 
