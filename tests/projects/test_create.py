@@ -2,7 +2,7 @@ import datetime as dt
 
 from nose.tools import *
 
-from tests.fixtures import ProjectFixture
+from tests.fixtures import ProjectFixture, UserFixture
 from tests.projects.fixtures import ProjectNoDescriptionFixture
 
 
@@ -23,10 +23,23 @@ class Create(object):
         assert_equal('Test Project Description', self.page.description)
 
 
-class ProjectCreationTests(Create, ProjectFixture):
+class CreationTests(Create, ProjectFixture):
     pass
 
 
-class ProjectNoDescriptionCreationTests(Create, ProjectNoDescriptionFixture):
+class CreateNoDescriptionTests(Create, ProjectNoDescriptionFixture):
     def test_description(self):
         assert_equal(None, self.page.description)
+
+
+class CreateNoTitleTests(UserFixture):
+    """This test case changes state"""
+    def test_create_no_title(self):
+        """ Create a project with no title.
+
+        User shouldn't be able to do this, but attempting it results in a 500,
+        and the correct behavior is not yet defined.
+        """
+        self.page = self.page.new_project(title='')
+
+        assert_true(False)
