@@ -69,6 +69,11 @@ def launch_driver(
             command_executor=command_executor
         )
 
+    elif driver_name == 'PhantomJS':
+
+        driver = driver_cls('/usr/local/bin/phantomjs')
+
+
     else:
             
         driver = driver_cls()
@@ -193,7 +198,7 @@ def create_user(driver=None, user_data=None):
     user_data = user_data or gen_user_data()
 
     requests.post(
-        url='/'.join((config.osf_home.strip('/'), 'register')),
+        url='/'.join((config.osf_home.strip('/'), 'register/')),
         data={
             'register-fullname': user_data['fullname'],
             'register-username': user_data['username'],

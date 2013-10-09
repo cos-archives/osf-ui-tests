@@ -23,7 +23,10 @@ class NodePage(OsfPage):
     def _verify_page(self):
         """ Return True if the current page is the one expected for a
         ``NodePage``."""
-        return len(self.driver.find_elements_by_id('node-title-editable')) == 1
+        return (
+            len(self.driver.find_elements_by_id('node-title-editable')) == 1 or
+            len(self.driver.find_elements_by_id('node-title')) == 1
+        )
 
     @property
     def contributors(self):
@@ -79,8 +82,8 @@ class NodePage(OsfPage):
 
         :returns: ``datetime.datetime``
         """
-        date_string = self.driver.find_element_by_css_selector(
-            '#contributors span.date:nth-of-type(1)').text
+        date_string = self.driver.find_elements_by_css_selector(
+            '#contributors span.date')[0].text
 
         return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
 
@@ -90,8 +93,8 @@ class NodePage(OsfPage):
 
         :returns: ``datetime.datetime``
         """
-        date_string = self.driver.find_element_by_css_selector(
-            '#contributors span.date:nth-of-type(2)').text
+        date_string = self.driver.find_elements_by_css_selector(
+            '#contributors span.date')[1].text
 
         return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
 
@@ -121,7 +124,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self._title.text
+        return self._title
 
     @title.setter
     def title(self, value):
@@ -168,7 +171,7 @@ class NodePage(OsfPage):
 
         :returns: ``WebElement``
         """
-        return self.driver.find_element_by_id('node-title-editable')
+        return self.driver.find_element_by_css_selector('h1.node-title').text
 
     @property
     def components(self):
