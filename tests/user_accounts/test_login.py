@@ -1,7 +1,9 @@
-from pages.fixtures import UserTestCase
+from nose.tools import *
+
+from tests.fixtures import UserTestCase
 
 
 class CreateUserTestCase(UserTestCase):
 
     def test_login(self):
-        self.assertTrue(self.page.logged_in)
+        assert_true(self.page.logged_in)

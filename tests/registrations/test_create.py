@@ -1,13 +1,21 @@
 from nose.tools import *
 
-from pages.fixtures import (
+from tests.registrations.fixtures import (
     ProjectRegistrationTestCase,
     SubprojectRegistrationTestCase,
 )
 
 
-
 class Create(object):
+    """ Create a registration.
+
+    This class inherits from object because it is technically not a test suite.
+    Below, it is subclassed twice - once for projects, and once for subprojects.
+
+    Note that self.parent_values is defined in the fixture class. If there are
+    additional attributes to be compared with their source project, those
+    attributes must be added to the fixture as well.
+    """
 
     def test_meta(self):
         assert_equal(
