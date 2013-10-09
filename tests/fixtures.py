@@ -18,7 +18,7 @@ and all object which inherit from it before committing.
 """
 
 
-class OsfTestCase(unittest.TestCase):
+class OsfBaseFixture(unittest.TestCase):
     page = None
     users = []
 
@@ -52,19 +52,19 @@ class OsfTestCase(unittest.TestCase):
         return cls
 
 
-class UserTestCase(OsfTestCase):
+class UserFixture(OsfBaseFixture):
     """User Dashboard for a freshly created user"""
     @classmethod
     def setUpClass(cls):
-        super(UserTestCase, cls).setUpClass()
+        super(UserFixture, cls).setUpClass()
         cls.create_user().log_in()
 
 
-class ProjectTestCase(UserTestCase):
+class ProjectFixture(UserFixture):
 
     @classmethod
     def setUpClass(cls):
-        super(ProjectTestCase, cls).setUpClass()
+        super(ProjectFixture, cls).setUpClass()
         cls.page = cls.page.new_project(
             title='Test Project',
             description='Test Project Description',
@@ -73,11 +73,11 @@ class ProjectTestCase(UserTestCase):
         cls.project_id = cls.page.id
 
 
-class SubprojectTestCase(ProjectTestCase):
+class SubprojectFixture(ProjectFixture):
 
     @classmethod
     def setUpClass(cls):
-        super(SubprojectTestCase, cls).setUpClass()
+        super(SubprojectFixture, cls).setUpClass()
         cls.page = cls.page.add_component(
             title='Test Subproject',
             component_type='Project',

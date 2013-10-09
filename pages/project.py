@@ -142,6 +142,15 @@ class NodePage(OsfPage):
             ).click()
 
     @property
+    def description(self):
+        try:
+            return self.driver.find_element_by_css_selector(
+                '.node-description'
+            ).text
+        except exc.NoSuchElementException:
+            return None
+
+    @property
     def parent_title(self):
         """The node's parent's title, parsed from the header.
 

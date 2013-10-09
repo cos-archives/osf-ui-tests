@@ -1,4 +1,4 @@
-from tests.fixtures import ProjectTestCase, SubprojectTestCase
+from tests.fixtures import ProjectFixture, SubprojectFixture
 
 
 #TODO: This should be a decorator.
@@ -31,9 +31,9 @@ def make_RegistrationTestCase(base_class):
     return RegistrationTestCase
 
 
-class ProjectRegistrationTestCase(make_RegistrationTestCase(ProjectTestCase)):
+class ProjectRegistrationTestCase(make_RegistrationTestCase(ProjectFixture)):
     pass
 
 
-class SubprojectRegistrationTestCase(make_RegistrationTestCase(SubprojectTestCase)):
+class SubprojectRegistrationTestCase(make_RegistrationTestCase(SubprojectFixture)):
     pass
