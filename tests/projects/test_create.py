@@ -22,7 +22,6 @@ class Create(object):
     def test_description(self):
         assert_equal('Test Project Description', self.page.description)
 
-
 class CreationTests(Create, ProjectFixture):
     pass
 
