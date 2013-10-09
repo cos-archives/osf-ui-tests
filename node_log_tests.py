@@ -33,7 +33,8 @@ class NodeLogTests(base.ProjectSmokeTest):
 
     def test_node_rename_log(self):
         """
-        test to make sure that project log works correctly on renaming the node
+            test to make sure that project log works correctly
+            on renaming the node
 
         """
 
@@ -62,7 +63,8 @@ class NodeLogTests(base.ProjectSmokeTest):
 
     def test_node_wiki_changes_log(self):
         """
-        test to make sure that project log works correctly on a node wiki change
+            test to make sure that project log works correctly
+            on a node wiki change
 
         """
         # Browse to wiki page
@@ -101,7 +103,8 @@ class NodeLogTests(base.ProjectSmokeTest):
 
     def test_node_add_contributor_log(self):
         """
-        test to make sure that project log works correctly on adding contributor to a node
+            test to make sure that project log works correctly on adding
+            contributor to a node
 
         """
        # Log out
@@ -145,7 +148,8 @@ class NodeLogTests(base.ProjectSmokeTest):
     @unittest.skip('known failure')
     def test_node_delete_contributor_log(self):
         """
-        test to make sure that project log works correctly on removing contributor from a node
+            test to make sure that project log works correctly on removing
+            contributor from a node
 
         """
         # as of 9 Sep 2013, the log says "project"; expected "component"
