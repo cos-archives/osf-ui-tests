@@ -11,6 +11,13 @@ from pages import FILES
 from pages.helpers import get_new_project
 from pages.project import FilePage
 
+import urlparse
+
+def prepend_api_url(url):
+
+    parsed_url = urlparse.urlparse(url)
+    prepended_url = parsed_url._replace(path='/api/v1' + parsed_url.path)
+    return urlparse.urlunparse(prepended_url)
 
 class FileTests(unittest.TestCase):
 
@@ -560,8 +567,8 @@ class FileTests(unittest.TestCase):
         os.close(fd)
         os.remove(temp_file_path)
 
-        file_url = '{}files/download/{}/version/1'.format(
-            page_url,
+        file_url = '{}files/download/{}/version/1/'.format(
+            prepend_api_url(page_url),
             os.path.basename(temp_file_path),
         )
 
@@ -615,7 +622,7 @@ class FileTests(unittest.TestCase):
         os.remove(temp_file_path)
 
         file_url = '{}files/{}'.format(
-            page_url,
+            prepend_api_url(page_url),
             os.path.basename(temp_file_path),
         )
 
@@ -627,8 +634,8 @@ class FileTests(unittest.TestCase):
             [0, 0]
         )
 
-        file_url = '{}files/download/{}/version/1'.format(
-            page_url,
+        file_url = '{}files/download/{}/version/1/'.format(
+            prepend_api_url(page_url),
             os.path.basename(temp_file_path),
         )
 
