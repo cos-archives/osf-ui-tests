@@ -584,7 +584,7 @@ class NodeSettingsPage(NodePage):
         ]
 
     def add_api_key(self, description=None):
-        self.driver.get('{}/settings'.format(config.osf_home))
+        self.driver.get('{}/settings/'.format(config.osf_home))
 
         form = self.driver.find_element_by_id('create_key')
 
@@ -603,6 +603,17 @@ class NodeSettingsPage(NodePage):
             label=cred.find_element_by_css_selector('span.api-label').text,
             key=cred.find_element_by_css_selector('span.api-key').text,
         )
+
+    def delete(self):
+        from pages import UserDashboardPage
+
+        self.driver.get('{}/settings/'.format(config.osf_home))
+
+        self.driver.find_element_by_link_text(
+            'Delete this component and all non-project components'
+        ).click()
+
+        return UserDashboardPage(driver=self.driver)
 
 
 class ProjectPage(NodePage):
