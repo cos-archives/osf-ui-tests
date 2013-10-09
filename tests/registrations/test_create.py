@@ -1,8 +1,8 @@
 from nose.tools import *
 
 from tests.registrations.fixtures import (
-    ProjectRegistrationTestCase,
-    SubprojectRegistrationTestCase,
+    ProjectRegistrationFixture,
+    SubprojectRegistrationFixture,
 )
 
 
@@ -66,9 +66,9 @@ class Create(object):
         )
 
 
-class FromProject(Create, ProjectRegistrationTestCase):
+class FromProject(Create, ProjectRegistrationFixture):
     pass
 
 
-class FromSubproject(Create, SubprojectRegistrationTestCase):
+class FromSubproject(Create, SubprojectRegistrationFixture):
     pass
