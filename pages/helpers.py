@@ -2,6 +2,7 @@ import time
 from collections import namedtuple
 
 import requests
+from selenium.common.exceptions import StaleElementReferenceException
 
 import util
 import config

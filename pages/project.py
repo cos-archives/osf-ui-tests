@@ -151,6 +151,15 @@ class NodePage(OsfPage):
             return None
 
     @property
+    def forked_from_url(self):
+        try:
+            return self.driver.find_element_by_css_selector(
+                'a.node-forked-from'
+            ).get_attribute('href')
+        except exc.TimeoutException:
+            return None
+
+    @property
     def parent_title(self):
         """The node's parent's title, parsed from the header.
 

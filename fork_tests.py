@@ -87,27 +87,6 @@ class ForkTests2(unittest.TestCase):
             'Fork of {}'.format(title),
         )
 
-    def _test_fork_title(self, page):
-        """Verify that a fork's title matches that of the original project -
-        with a "Fork of " prefix.
-        """
-        original_title = page.title
-        page = page.fork()
-        self.assertEqual(
-            page.title,
-            'Fork of ' + original_title,
-        )
-
-        page.close()
-
-    def test_project_fork_title(self):
-        """Project variant of ``self.test_project_fork_list_title``"""
-        self._test_fork_title(self._project())
-
-    def test_subproject_fork_title(self):
-        """Subproject variant of ``self.test_project_fork_list_title``"""
-        self._test_fork_title(self._subproject())
-
     def _test_fork_matches(self, page, attribute):
         """Given a project, fork it and verify that the attribute provided
          matches between the project and its fork.
@@ -127,21 +106,6 @@ class ForkTests2(unittest.TestCase):
         )
 
         page.close()
-
-    def test_project_fork_components_empty(self):
-        """ Verify that a fork's (empty) component list matches the
-        original project"""
-        self._test_fork_matches(
-            page=self._project(),
-            attribute='component_names'
-        )
-
-    def test_subproject_fork_components_empty(self):
-        """Subproject variant of ``self.test_project_fork_components_empty``"""
-        self._test_fork_matches(
-            page=self._subproject(),
-            attribute='component_names'
-        )
 
     def test_project_fork_components(self):
         """Verify that a fork's (non-empty) component list matches the original
@@ -197,19 +161,6 @@ class ForkTests2(unittest.TestCase):
         """Subproject variant of ``self._test_project_fork_contributors``"""
         pass
 
-    def test_project_fork_created_date(self):
-        """Verify that a fork's creation date matches the original project"""
-        self._test_fork_matches(
-            page=self._project(),
-            attribute='date_created'
-        )
-
-    def test_subproject_fork_created_date(self):
-        """Subproject variant of ``self._test_project_fork_created_date``"""
-        self._test_fork_matches(
-            page=self._subproject(),
-            attribute='date_created'
-        )
 
     def test_project_fork_wiki_home(self):
         """ Verify that a fork's wiki homepage content matches the original
@@ -280,26 +231,6 @@ class ForkTests2(unittest.TestCase):
         # "node" in the log.
         self._test_fork_logged(self._subproject())
 
-    def _test_fork_counter_increment(self, page):
-        _url = page.driver.current_url
-        num_forks = page.num_forks
-
-        page.fork()
-        page.driver.get(_url)
-
-        self.assertEqual(
-            page.num_forks,
-            num_forks + 1,
-        )
-
-        page.close()
-
-    def test_project_fork_counter_increment(self):
-        self._test_fork_counter_increment(self._project())
-
-    def test_subproject_fork_counter_increment(self):
-        self._test_fork_counter_increment(self._subproject())
-
     def _test_fork_counter_decrement(self, page):
         _url = page.driver.current_url
         num_forks = page.num_forks
@@ -330,32 +261,6 @@ class ForkTests(base.ProjectSmokeTest):
 
         # setUp
         super(ForkTests, self).setUp()
-
-    def test_fork_link_to_origin_tests(self):
-        """
-        test to make sure a fork links to original project
-
-        """
-        #fork a project
-        self.get_element(
-            'a[data-original-title="Number of times this node has been forked (copied)"]').click()
-
-        # Wait for JS; is there a better way to do this?
-        time.sleep(3)
-
-        #click the link to original project
-        self.driver.find_element_by_css_selector("header#overview.jumbotron.subhead p#contributors")\
-            .find_element_by_xpath('a[contains(.,"/project/")]').click()
-
-        #check the url and project title
-        title = self.get_element("h1#node-title-editable").text
-        self.assertEqual(title, config.project_title)
-        self.assertEqual(self.driver.current_url, self.project_url)
-
-        #cleanup
-        util.delete_project(self.driver)
-        util.delete_project(self.driver, "Fork of test project")
-
 
     def test_not_fork_a_component(self):
         """
