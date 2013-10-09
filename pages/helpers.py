@@ -91,7 +91,10 @@ class WaitForPageReload(object):
 
     def __exit__(self, *args, **kwargs):
         while(True):
-            if self.body == self.driver.find_element_by_css_selector('body'):
-                time.sleep(.1)
-            else:
-                break
+            try:
+                if self.body == self.driver.find_element_by_css_selector('body'):
+                    time.sleep(.1)
+                else:
+                    return
+            except StaleElementReferenceException:
+                return

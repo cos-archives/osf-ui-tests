@@ -610,7 +610,7 @@ class NodeSettingsPage(NodePage):
         self.driver.get('{}/settings/'.format(config.osf_home))
 
         self.driver.find_element_by_link_text(
-            'Delete this component and all non-project components'
+            'Delete component'
         ).click()
 
         return UserDashboardPage(driver=self.driver)
