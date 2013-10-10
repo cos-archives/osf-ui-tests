@@ -32,6 +32,12 @@ class Create(object):
             self.page.logs[0].text
         )
 
+    def test_log_link_to_user_profile(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url,
+        )
+
 
 class CreationTests(Create, ProjectFixture):
     pass

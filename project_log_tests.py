@@ -15,47 +15,6 @@ import uuid
 
 class ProjectLogTests(base.ProjectSmokeTest):
 
-    def test_project_rename_log(self):
-        """
-        test to make sure that rename the project log works correctly
-
-        """
-        #get user_url
-        user_url = self.get_user_url()
-
-        #rename the project
-        project_new_name = str(uuid.uuid1())[:6]
-        util.project_rename(self.driver, project_new_name)
-
-         #get log
-        message_log = self.get_log()
-
-        #assert the time
-        self._assert_time(message_log.log_time)
-
-        #assert the log
-        self.assertEqual(
-            message_log.log_text,
-            u"{} changed the title from {} to {}".format(
-                self.user_data["fullname"],
-                config.project_title,
-                project_new_name,
-                )
-        )
-
-        #check the user_url and project_url
-        self.assertEqual(
-            message_log.log_url[0]+"/",
-            user_url,
-        )
-        self.assertEqual(
-            message_log.log_url[1],
-            self.project_url,
-        )
-
-        #cleanup
-        util.project_rename(self.driver, config.project_title)
-
     def test_wiki_changes_log(self):
         """
         test to make sure that wiki_changes log works correctly
@@ -152,7 +111,6 @@ class ProjectLogTests(base.ProjectSmokeTest):
             message_log.log_url[2],
             project_url
         )
-
 
     def test_delete_contributor_log(self):
         # As of 9 Sep 2013, the log says "component"; expected "project"

@@ -60,6 +60,7 @@ class UserFixture(OsfBaseFixture):
     def setUpClass(cls):
         super(UserFixture, cls).setUpClass()
         cls.create_user().log_in()
+        cls.user_profile_url = cls.page.profile_link
 
 
 class ProjectFixture(UserFixture):
