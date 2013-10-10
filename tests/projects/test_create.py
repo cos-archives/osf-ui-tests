@@ -2,8 +2,10 @@ import datetime as dt
 
 from nose.tools import *
 
+from pages.exceptions import PageException
 from tests.fixtures import ProjectFixture, UserFixture
 from tests.projects.fixtures import ProjectNoDescriptionFixture
+
 
 
 class Create(object):
@@ -39,6 +41,10 @@ class CreateNoTitleTests(UserFixture):
         User shouldn't be able to do this, but attempting it results in a 500,
         and the correct behavior is not yet defined.
         """
-        self.page = self.page.new_project(title='')
+        with assert_raises(PageException):
+            self.page = self.page.new_project(title='')
 
-        assert_true(False)
+        assert_in(
+            'Title is required',
+            self.page.driver.find_element_by_css_selector('div.alert').text
+        )
