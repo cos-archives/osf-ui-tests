@@ -7,7 +7,6 @@ from tests.fixtures import ProjectFixture, UserFixture
 from tests.projects.fixtures import ProjectNoDescriptionFixture
 
 
-
 class Create(object):
 
     def test_date_created(self):
@@ -26,6 +25,12 @@ class Create(object):
 
     def test_forkable(self):
         assert_true(self.page.forkable)
+
+    def test_logged(self):
+        assert_equal(
+            u"{} created project".format(self.users[0].full_name),
+            self.page.logs[0].text
+        )
 
 
 class CreationTests(Create, ProjectFixture):

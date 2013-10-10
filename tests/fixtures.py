@@ -24,6 +24,8 @@ class OsfBaseFixture(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.page = None
+        cls.users = []
         cls.page = OsfPage(url=config.osf_home)
         cls._start_time = time.time()
 
