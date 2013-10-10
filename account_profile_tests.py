@@ -62,7 +62,7 @@ class AccountProfileTests(base.UserSmokeTest):
         # refresh page and assert change was made
         self.driver.refresh()
         profile_name = self.driver.find_element_by_id('profile-fullname').text
-        self.assertTrue(self.user_data['fullname'][::-1] in profile_name)
+        self.assertTrue(self.user_data['fullname'] in profile_name)
 
         # return the username back to its original -- same as above
         self.driver.find_element_by_id(
