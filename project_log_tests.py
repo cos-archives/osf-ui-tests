@@ -223,7 +223,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
             project_url
         )
 
-    @unittest.skip('known failure')
+
     def test_delete_contributor_log(self):
         # As of 9 Sep 2013, the log says "component"; expected "project"
 
@@ -243,14 +243,8 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #add contributor
         self.add_contributor(self.user_data)
 
-        time.sleep(3)
-
         #remove contributor
-        element_to_hover_over \
-            = self.driver.find_element_by_link_text(self.user_data['fullname'])
-        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
-        hover.perform()
-        time.sleep(3)
+        self.remove_contributor(self.user_data)
 
          #get log
         message_log = self.get_log()
