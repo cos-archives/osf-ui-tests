@@ -3,6 +3,7 @@ from nose.tools import *
 import pages.project
 from tests.forks.fixtures import (
     ForkedComplexProjectFixture,
+    ForkedComplexSubprojectFixture,
     ForkedProjectFixture,
     ForkedSubprojectFixture
 )
@@ -56,7 +57,7 @@ class FromSubproject(Create, ForkedSubprojectFixture):
     pass
 
 
-class FromComplexProject(Create, ForkedComplexProjectFixture):
+class CreateComplex(Create):
     def test_component_links(self):
         """Components of a fork should be copies of the original components"""
         for x, y in zip(self.page.components, self.parent_values['components']):
@@ -67,6 +68,14 @@ class FromComplexProject(Create, ForkedComplexProjectFixture):
             self.parent_values['wiki_content'],
             self.page.get_wiki_content(),
         )
+
+
+class FromComplexProject(CreateComplex, ForkedComplexProjectFixture):
+    pass
+
+
+class FromComplexSubproject(CreateComplex, ForkedComplexSubprojectFixture):
+    pass
 
 
 class ForkedFrom(object):
@@ -97,11 +106,11 @@ class ForkedFrom(object):
         )
 
 
-class ForkedFromProjectTestCase(ForkedFrom, ForkedProjectFixture):
+class SourceProjectTestCase(ForkedFrom, ForkedProjectFixture):
     """After forking a project, go back to the original page."""
     pass
 
 
-class ForkedFromSubprojectTestCase(ForkedFrom, ForkedSubprojectFixture):
+class SourceSubprojectTestCase(ForkedFrom, ForkedSubprojectFixture):
     """After forking a subproject, go back to the original page."""
     pass

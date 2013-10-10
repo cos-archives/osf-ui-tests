@@ -1,5 +1,8 @@
 from tests.fixtures import (
-    ProjectFixture, SubprojectFixture, ComplexProjectFixture
+    ProjectFixture,
+    SubprojectFixture,
+    ComplexProjectFixture,
+    ComplexSubprojectFixture,
 )
 
 
@@ -28,4 +31,21 @@ class ForkedSubprojectFixture(ForkFixture, SubprojectFixture):
 
 
 class ForkedComplexProjectFixture(ForkFixture, ComplexProjectFixture):
+    pass
+
+
+class ForkedComplexSubprojectFixture(ForkFixture, ComplexSubprojectFixture):
+    pass
+
+
+class DeletedForkFixture(ForkFixture):
+
+    @classmethod
+    def setUpClass(cls):
+        super(DeletedForkFixture, cls).setUpClass()
+        cls.page.delete()
+        cls.page.driver.get(cls.parent_values['url'])
+
+
+class DeletedProjectForkFixture(DeletedForkFixture, ProjectFixture):
     pass

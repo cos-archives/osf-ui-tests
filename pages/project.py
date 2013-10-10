@@ -559,9 +559,7 @@ class NodePage(OsfPage):
         ).click()
 
         # Click the delete button.
-        self.driver.find_element_by_css_selector(
-            '.container form:last-of-type button[type="submit"]'
-        ).click()
+        self.driver.find_element_by_id('delete-node').click()
 
     def _clone(self):
         new_driver = self.driver.__class__()

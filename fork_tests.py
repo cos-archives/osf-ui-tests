@@ -15,67 +15,6 @@ import util
 import config
 
 
-class ForkTests2(unittest.TestCase):
-    """This test case is for testing the act of creating a fork, and consistency
-    between a fork and its original node.
-    """
-
-    _project = lambda self: helpers.get_new_project()
-
-    def _subproject(self):
-        """ Create and return a (sub)project which is the child of a project.
-
-        The ``current_url`` of the driver is the subproject's overview.
-        """
-        return self._project().add_component(
-            title='New Subproject',
-            component_type='Project',
-        )
-
-    def _test_fork_matches(self, page, attribute):
-        """Given a project, fork it and verify that the attribute provided
-         matches between the project and its fork.
-
-         Note that the value of the project's attribute is stored before the
-         project is forked, as the act of forking may otherwise change the
-         state - for example, project's fork should include its log *before*
-         the project was forked.
-        """
-        parent_value = getattr(page, attribute)
-
-        page = page.fork()
-
-        self.assertEqual(
-            getattr(page, attribute),
-            parent_value,
-        )
-
-        page.close()
-
-    def _test_fork_counter_decrement(self, page):
-        _url = page.driver.current_url
-        num_forks = page.num_forks
-
-        page.fork()
-        page.delete()
-
-        page.driver.get(_url)
-
-        self.assertEqual(
-            page.num_forks,
-            num_forks,
-        )
-
-        page.close()
-
-    def test_project_fork_counter_decrement(self):
-        self._test_fork_counter_decrement(self._project())
-
-    def test_subproject_fork_counter_decrement(self):
-        self._test_fork_counter_decrement(self._subproject())
-
-
-
 class ForkTests(base.ProjectSmokeTest):
 
     def setUp(self):

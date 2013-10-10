@@ -84,11 +84,11 @@ class SubprojectFixture(ProjectFixture):
         )
 
 
-class ComplexProjectFixture(ProjectFixture):
+class ComplexFixture(object):
 
     @classmethod
     def setUpClass(cls):
-        super(ComplexProjectFixture, cls).setUpClass()
+        super(ComplexFixture, cls).setUpClass()
 
         # Add a couple of components
         cls.page = cls.page.add_component(
@@ -103,3 +103,11 @@ class ComplexProjectFixture(ProjectFixture):
         cls.page = cls.page.parent_project()
 
         cls.page.set_wiki_content('Test Wiki Content')
+
+
+class ComplexProjectFixture(ComplexFixture, ProjectFixture):
+    pass
+
+
+class ComplexSubprojectFixture(ComplexFixture, SubprojectFixture):
+    pass
