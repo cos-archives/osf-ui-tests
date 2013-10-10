@@ -404,6 +404,13 @@ class NodePage(OsfPage):
         return forks
 
     @property
+    def forkable(self):
+        """True if the node's fork button is active"""
+        return not 'disabled' in self.driver.find_element_by_css_selector(
+            'a.node-fork-btn'
+        ).get_attribute('class')
+
+    @property
     def num_forks(self):
         """The number of forks, as displayed in the icon's counter on the node's
         dashboard

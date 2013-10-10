@@ -24,6 +24,10 @@ class Create(object):
     def test_description(self):
         assert_equal('Test Project Description', self.page.description)
 
+    def test_forkable(self):
+        assert_true(self.page.forkable)
+
+
 class CreationTests(Create, ProjectFixture):
     pass
 

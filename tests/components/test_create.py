@@ -27,6 +27,9 @@ class Create(object):
             self.page.parent_link,
         )
 
+    def test_forkable(self):
+        assert_false(self.page.forkable)
+
 
 class ComponentOfProjectCreationTests(Create, ComponentOfProjectFixture):
     pass
