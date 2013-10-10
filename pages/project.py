@@ -558,13 +558,6 @@ class NodePage(OsfPage):
         )]
 
     def delete(self):
-        # Click "Settings"
-        self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
-        ).find_element_by_link_text(
-            'Settings'
-        ).click()
-
         # Click the delete button.
         self.driver.find_element_by_id('delete-node').click()
 
@@ -621,11 +614,7 @@ class NodeSettingsPage(NodePage):
     def delete(self):
         from pages import UserDashboardPage
 
-        self.driver.get('{}/settings/'.format(config.osf_home))
-
-        self.driver.find_element_by_link_text(
-            'Delete component'
-        ).click()
+        self.driver.find_element_by_id('delete-node').click()
 
         return UserDashboardPage(driver=self.driver)
 

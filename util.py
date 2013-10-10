@@ -22,7 +22,7 @@ import config
 
 
 def launch_driver(
-        driver_name='Firefox',
+        driver_name=None,
         desired_capabilities={},
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
@@ -32,6 +32,8 @@ def launch_driver(
         wait_time : Time to implicitly wait for element load
 
     """
+
+    driver_name = driver_name or config.driver_name
     
     driver_cls = getattr(webdriver, driver_name)
 
