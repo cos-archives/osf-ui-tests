@@ -4,9 +4,22 @@ Tests for creating project registrations.
 
 # Project imports
 import base
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class RegistrationTests(base.ProjectSmokeTest):
+
+    def test_create_open_ended_registration(self):
+        """ Create an Open-Ended Registration. """
+
+        registration_url = self.create_registration('Open-Ended Registration')
+
+        self.assertIn(
+            'This node is a registration of',
+            self.get_element('span.label.label-important').text,
+        )
 
     def test_create_osf_standard_registration(self):
         """ Create an OSF Standard registration """
@@ -19,19 +32,38 @@ class RegistrationTests(base.ProjectSmokeTest):
             self.get_element('span.label.label-important').text
         )
 
-    @base.not_implemented
+    def test_registration_link_to_parent_project(self):
+        """
+            Test that a link is created in the registration notice that points
+            to the project from which it was created.
+        """
+        registration_url = self.create_registration()
+
+        self.assertEqual(
+            self.get_element(
+                'span.label.label-important a'
+            ).get_attribute('href').strip('/'),
+            self.project_url.strip('/'),
+        )
+
     def test_registration_add_files(self):
         """Test that a user cannot add files to a registration"""
         # TODO: This test should work, but the functionality is
 
         self.project_url = self.create_registration()
 
-        self.add_file(self.image_files['jpg']['path'])
+        self.goto('files', node_url=self.project_url)
 
-        self.assertFalse(
-            self._file_exists_in_project(
-                self.image_files['jpg']['filename']
-            )
+        self.assertIn(
+            'disabled',
+            self.driver.find_element_by_css_selector("div.span7 span")
+            .get_attribute("class")
+        )
+
+        self.assertIn(
+            'disabled',
+            self.driver.find_element_by_css_selector("div.span7 button")
+            .get_attribute("class")
         )
 
     def test_registration_delete_files(self):
@@ -65,8 +97,14 @@ class RegistrationTests(base.ProjectSmokeTest):
 
         # add a contributor
         self.driver.get(registration_url)
+
         # with self.assertRaises(TimeoutException):
-        self.add_contributor(second_user)
+        self.assertTrue(
+            len(
+                self.get_element('#contributors')
+                .find_elements_by_link_text("add")
+            ) == 0
+        )
 
         # refresh the page
         self.driver.get(registration_url)
@@ -92,7 +130,14 @@ class RegistrationTests(base.ProjectSmokeTest):
 
         # remove them from the registration
         self.driver.get(registration_url)
-        self.remove_contributor(second_user)
+        element_to_hover_over = self.get_element('#contributors')\
+            .find_element_by_link_text(second_user["fullname"])
+        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
+        hover.perform()
+
+        self.assertTrue(
+            len(element_to_hover_over.find_elements_by_css_selector("i")) == 0
+        )
 
         # make sure they're still there
         self.driver.get(registration_url)
