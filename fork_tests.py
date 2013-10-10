@@ -3,12 +3,10 @@
 """
 
 import unittest
-import time
 
-# Selenium imports
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 
 # Project imports
 from pages import helpers
@@ -277,9 +275,9 @@ class ForkTests(base.ProjectSmokeTest):
         )
 
         # Wait for modal to stop moving
-        util.wait_until_stable(
-            self.driver.find_element_by_css_selector(
-                'input[name="title"]'
+        WebDriverWait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[name="title"]')
             )
         )
 
@@ -298,13 +296,7 @@ class ForkTests(base.ProjectSmokeTest):
             .text
         self.assertEqual(discrib, u' 0')
 
-        #cleanup
-        util.delete_project(self.driver)
-
     def tearDown(self):
-
-        util.logout(self.driver)
-
         # Close WebDriver
         self.driver.close()
 
