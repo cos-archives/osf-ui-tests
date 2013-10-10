@@ -622,7 +622,7 @@ class FileTests(unittest.TestCase):
         os.remove(temp_file_path)
 
         file_url = '{}files/{}'.format(
-            prepend_api_url(page_url),
+            page_url,
             os.path.basename(temp_file_path),
         )
 
