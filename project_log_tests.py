@@ -4,7 +4,7 @@ Tests for project logs.
 
 import time
 import unittest
-
+from selenium.webdriver.common.action_chains import ActionChains
 
 # Project imports
 import base
@@ -34,15 +34,14 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url and project_url
         self.assertEqual(
-            message_log.log_url[0],
+            message_log.log_url[0]+"/",
             self.get_user_url()
         )
         self.assertEqual(
             message_log.log_url[1],
-            self.project_url.strip('/')
+            self.project_url
         )
 
-    @unittest.skip('known failure')
     def test_add_component_log(self):
         """
         test to make sure that creating the node log works correctly
@@ -62,7 +61,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            u"{} created component {}".format(
+            u"{} created node {}".format(
                 self.user_data["fullname"],
                 config.node_title,
             )
@@ -70,7 +69,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url
         self.assertEqual(
-            message_log.log_url[0],
+            message_log.log_url[0]+"/",
             self.get_user_url()
         )
 
@@ -83,7 +82,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         # webpage
         self.assertEqual(
             message_log.log_url[1],
-            node_url.strip('/')
+            node_url
         )
 
     def test_project_rename_log(self):
@@ -116,12 +115,12 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url and project_url
         self.assertEqual(
-            message_log.log_url[0],
+            message_log.log_url[0]+"/",
             user_url,
         )
         self.assertEqual(
             message_log.log_url[1],
-            self.project_url.strip('/'),
+            self.project_url,
         )
 
         #cleanup
@@ -163,15 +162,14 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url and project_url
         self.assertEqual(
-            message_log.log_url[0],
+            message_log.log_url[0]+"/",
             self.get_user_url()
         )
         self.assertEqual(
-            message_log.log_url[1],
+            message_log.log_url[1]+"/",
             wiki_url
         )
 
-    @unittest.skip('known failure')
     def test_add_contributor_log(self):
         """
         test to make sure that add contributor log works correctly
@@ -204,7 +202,7 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #assert the log
         self.assertEqual(
             message_log.log_text,
-            u'{} added {} as contributor on node {}'.format(
+            u'{} added {} to node {}'.format(
                 second_user_data['fullname'],
                 self.user_data['fullname'],
                 config.project_title,
@@ -213,19 +211,19 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url and project_url
         self.assertEqual(
-            message_log.log_url[0],
+            message_log.log_url[0]+"/",
             self.get_user_url()
         )
         self.assertEqual(
-            message_log.log_url[1],
+            message_log.log_url[1]+"/",
             user_url
         )
         self.assertEqual(
             message_log.log_url[2],
-            project_url.strip('/')
+            project_url
         )
 
-    @unittest.skip('known failure')
+
     def test_delete_contributor_log(self):
         # As of 9 Sep 2013, the log says "component"; expected "project"
 
@@ -245,12 +243,8 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #add contributor
         self.add_contributor(self.user_data)
 
-        time.sleep(3)
-
         #remove contributor
         self.remove_contributor(self.user_data)
-
-        time.sleep(3)
 
          #get log
         message_log = self.get_log()

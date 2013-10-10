@@ -6,6 +6,7 @@ import unittest
 import time
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from datetime import datetime, timedelta
@@ -19,6 +20,7 @@ import uuid
 import os
 import shutil
 
+
 class NodeLogTests(base.ProjectSmokeTest):
 
     def setUp(self):
@@ -28,12 +30,12 @@ class NodeLogTests(base.ProjectSmokeTest):
         #create a new node
         util.create_node(self.driver)
         self.driver.find_element_by_css_selector("li span a").click()
-        self.node_url=self.driver.current_url
-
+        self.node_url = self.driver.current_url
 
     def test_node_rename_log(self):
         """
-        test to make sure that project log works correctly on renaming the node
+            test to make sure that project log works correctly
+            on renaming the node
 
         """
 
@@ -49,23 +51,25 @@ class NodeLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " changed the title from "
-                                               + config.node_title + " to " + node_new_name)
-
+        self.assertEqual(
+            message_log.log_text,
+            self
+            .user_data["fullname"]
+            + " changed the title from "
+            + config.node_title + " to " + node_new_name)
 
         #check the user_url and node_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1]+"/", self.node_url)
-
+        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
+        self.assertEqual(message_log.log_url[1], self.node_url)
 
     def test_node_wiki_changes_log(self):
         """
-        test to make sure that project log works correctly on a node wiki change
+            test to make sure that project log works correctly
+            on a node wiki change
 
         """
         # Browse to wiki page
         self.driver.find_element_by_link_text('Wiki').click()
-
 
          # Get original version number
         orig_version = util.get_wiki_version(self.driver)
@@ -88,22 +92,24 @@ class NodeLogTests(base.ProjectSmokeTest):
 
         #assert the log
         new_version = str(orig_version + 1)
-        self.assertEqual(message_log.log_text, self.user_data["fullname"] + " updated wiki page home to version "
-                                               + new_version)
-
+        self.assertEqual(
+            message_log.log_text,
+            self.user_data["fullname"]
+            + " updated wiki page home to version " + new_version
+        )
 
         #check the user_url and node_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1], wiki_url)
-
+        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+"/", wiki_url)
 
     def test_node_add_contributor_log(self):
         """
-        test to make sure that project log works correctly on adding contributor to a node
+            test to make sure that project log works correctly on adding
+            contributor to a node
 
         """
        # Log out
-        user_url=self.get_user_url()
+        user_url = self.get_user_url()
         util.logout(self.driver)
 
         # Create second user and get his url
@@ -116,7 +122,7 @@ class NodeLogTests(base.ProjectSmokeTest):
         util.create_project(self.driver)
         util.create_node(self.driver)
         self.driver.find_element_by_css_selector("li span a").click()
-        new_node_url=self.driver.current_url
+        new_node_url = self.driver.current_url
 
         #add contributor
         self.add_contributor(self.user_data)
@@ -129,18 +135,22 @@ class NodeLogTests(base.ProjectSmokeTest):
         self._assert_time(message_log.log_time)
 
         #assert the log
-        self.assertEqual(message_log.log_text, second_user_data["fullname"] + " added " + self.user_data['fullname']
-                                               + " as contributor on node " + config.node_title)
+        self.assertEqual(
+            message_log.log_text,
+            second_user_data["fullname"]
+            + " added " + self.user_data['fullname']
+            + " to node " + config.node_title)
 
         #check the second user_url, first user_url and node_url
-        self.assertEqual(message_log.log_url[0], self.get_user_url())
-        self.assertEqual(message_log.log_url[1], user_url)
-        self.assertEqual(message_log.log_url[2]+"/", new_node_url)
+        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
+        self.assertEqual(message_log.log_url[1]+"/", user_url)
+        self.assertEqual(message_log.log_url[2], new_node_url)
 
-    @unittest.skip('known failure')
+
     def test_node_delete_contributor_log(self):
         """
-        test to make sure that project log works correctly on removing contributor from a node
+            test to make sure that project log works correctly on removing
+            contributor from a node
 
         """
         # as of 9 Sep 2013, the log says "project"; expected "component"
@@ -162,8 +172,6 @@ class NodeLogTests(base.ProjectSmokeTest):
 
         # add contributor
         self.add_contributor(second_user)
-
-        time.sleep(3)
 
         # remove contributor
         self.remove_contributor(second_user)
