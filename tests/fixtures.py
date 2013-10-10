@@ -82,3 +82,24 @@ class SubprojectFixture(ProjectFixture):
             title='Test Subproject',
             component_type='Project',
         )
+
+
+class ComplexProjectFixture(ProjectFixture):
+
+    @classmethod
+    def setUpClass(cls):
+        super(ComplexProjectFixture, cls).setUpClass()
+
+        # Add a couple of components
+        cls.page = cls.page.add_component(
+            title='Hypothesis Component',
+            component_type='Hypothesis'
+        )
+        cls.page = cls.page.parent_project()
+        cls.page = cls.page.add_component(
+            title='Data Component',
+            component_type='Data',
+        )
+        cls.page = cls.page.parent_project()
+
+        cls.page.set_wiki_content('Test Wiki Content')

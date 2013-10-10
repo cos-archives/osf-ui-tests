@@ -1,4 +1,6 @@
-from tests.fixtures import ProjectFixture, SubprojectFixture
+from tests.fixtures import (
+    ProjectFixture, SubprojectFixture, ComplexProjectFixture
+)
 
 
 class ForkFixture(object):
@@ -12,6 +14,7 @@ class ForkFixture(object):
             'components': cls.page.components,
             'date_created': cls.page.date_created,
             'logs': cls.page.logs,
+            'wiki_content': cls.page.get_wiki_content(),
         }
         cls.page = cls.page.fork()
 
@@ -21,4 +24,8 @@ class ForkedProjectFixture(ForkFixture, ProjectFixture):
 
 
 class ForkedSubprojectFixture(ForkFixture, SubprojectFixture):
+    pass
+
+
+class ForkedComplexProjectFixture(ForkFixture, ComplexProjectFixture):
     pass
