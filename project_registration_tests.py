@@ -13,7 +13,7 @@ class RegistrationTests(base.ProjectSmokeTest):
 
     def test_create_open_ended_registration(self):
         """ Create an Open-Ended Registration. """
-
+        
         registration_url = self.create_registration('Open-Ended Registration')
 
         self.assertIn(
@@ -33,9 +33,8 @@ class RegistrationTests(base.ProjectSmokeTest):
         )
 
     def test_registration_link_to_parent_project(self):
-        """
-            Test that a link is created in the registration notice that points
-            to the project from which it was created.
+        """Test that a link is created in the registration notice that points to
+         the project from which it was created.
         """
         registration_url = self.create_registration()
 
@@ -45,6 +44,7 @@ class RegistrationTests(base.ProjectSmokeTest):
             ).get_attribute('href').strip('/'),
             self.project_url.strip('/'),
         )
+
 
     def test_registration_add_files(self):
         """Test that a user cannot add files to a registration"""
@@ -101,8 +101,9 @@ class RegistrationTests(base.ProjectSmokeTest):
         # with self.assertRaises(TimeoutException):
         self.assertTrue(
             len(
-                self.get_element('#contributors')
-                .find_elements_by_link_text("add")
+                self.driver.find_element_by_id(
+                    'contributors'
+                ).find_elements_by_link_text("add")
             ) == 0
         )
 

@@ -239,7 +239,6 @@ class RegistrationTests(unittest.TestCase):
 
         page.close()
 
-    # @unittest.skip('known failure')
     def test_project_registration_logged(self):
         """ Project variant of ``self._test_registration_logged`` """
         # As of 9 Sep 2013, the log reads "component" here instead of "project"
