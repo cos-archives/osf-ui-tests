@@ -14,7 +14,7 @@ osf_home = 'https://staging.openscienceframework.org'
 osf_home = osf_home.rstrip('/')
 
 # raise an exception if the root domain is production.
-if '/openscienceframwork.org' in osf_home:
+if '/openscienceframework.org' in osf_home:
     raise Exception(
         'OSF UI tests should *never* be run against production. '
         '(A large number of database entries and files are generated '

@@ -55,7 +55,7 @@ class ComponentAccessCase(ProjectSmokeTest):
         self.driver.get(component_url)
 
         self.assertEqual(
-            self.get_element('#node-title-editable').text,
+            self.get_element('.node-title').text,
             title
         )
 

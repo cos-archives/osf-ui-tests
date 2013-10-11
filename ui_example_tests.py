@@ -71,6 +71,4 @@ class UITests(base.ProjectSmokeTest):
         # point the browser at a non-existent project
         self.driver.get('%s/project/fakeproject/' % (config.osf_home))
         
-        # Must be exactly one matching alert
-        alerts = util.get_alert_boxes(self.driver, 'not a valid project')
-        self.assertEqual(len(alerts), 1)
+        self.assert_not_found()

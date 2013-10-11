@@ -729,7 +729,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 '#file-container img[src*="{filename}"]'.format(
                     filename=self.image_files[key]['filename']
                 )
-            ).get_attribute('src').split('/')[-1]
+            ).get_attribute('src').strip('/').split('/')[-1]
 
             self.assertEqual(
                 src_filename,
