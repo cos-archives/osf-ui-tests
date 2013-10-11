@@ -10,41 +10,19 @@ import requests
 
 # Selenium imports
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait
+
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
 
-def wait_until_visible(elm, ntry=50, delay=0.1):
-    """
-
-    """
-    for _ in range(ntry):
-        if elm.is_displayed():
-            return True
-        time.sleep(delay)
-
-    return False
-
-def wait_until_stable(elm, ntry=50, delay=0.1):
-    """
-
-    """
-    # Set initial size 
-    size = {}
-
-    for _ in range(ntry):
-        if elm.size == size:
-            return True
-        size = elm.size
-        time.sleep(delay)
-    
-    # Fail
-    return False
 
 def launch_driver(
-        driver_name='Firefox',
+        driver_name=None,
         desired_capabilities={},
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
@@ -54,6 +32,8 @@ def launch_driver(
         wait_time : Time to implicitly wait for element load
 
     """
+
+    driver_name = driver_name or config.driver_name
     
     driver_cls = getattr(webdriver, driver_name)
 
@@ -288,21 +268,6 @@ def goto_registrations(driver, project_name=config.project_title):
     # Click Registrations button
     driver.find_element_by_link_text('Registrations').click()
 
-def delete_project(driver, project_title=config.project_title):
-    """Delete a project. Note: There is no confirmation for
-    project deletion as of this writing, but should be soon.
-
-    Args:
-        driver : webdriver
-        project_title : project title
-
-    """
-    # Browse to project settings
-    goto_settings(driver, project_title)
-
-    # Click Delete button
-    driver.find_element_by_xpath('//button[@type="submit"]').click()
-
 def logout(driver):
     """ Log out of OSF.
 
@@ -372,9 +337,9 @@ def create_node(
     )
     
     # Wait for modal to stop moving
-    wait_until_stable(
-        driver.find_element_by_css_selector(
-            'input[name="title"]'
+    WebDriverWait(driver, 3).until(
+        ec.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'input[name="title"]')
         )
     )
     
@@ -386,31 +351,6 @@ def create_node(
             '#category' : 'Project',
         }
     )
-
-
-def make_project_public(driver, url):
-
-    driver.get(url)
-
-    driver.find_element_by_link_text("Make public").click()
-
-    yes_button = driver.find_element_by_xpath(
-        '//button[contains(@class, "modal-confirm")]'
-    )
-    wait_until_stable(yes_button)
-    yes_button.click()
-
-    #driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
-    return driver.current_url
-
-def make_project_private(driver, url):
-
-    driver.get(driver.current_url)
-    link = driver.find_element_by_link_text("Make private")
-    link.click()
-    time.sleep(3) #wait until modal box finishes moving
-    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
-    return driver.current_url
 
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.

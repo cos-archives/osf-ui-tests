@@ -1,5 +1,6 @@
 import datetime as dt
 
+from nose import SkipTest
 from nose.tools import *
 
 from tests.components.fixtures import (
@@ -25,6 +26,19 @@ class Create(object):
         assert_equal(
             self.parent_values['url'],
             self.page.parent_link,
+        )
+
+    def test_forkable(self):
+        assert_false(self.page.forkable)
+
+    def test_logged(self):
+        raise SkipTest('OSF Issue')
+        assert_equal(
+            u'{} created component {}'.format(
+                self.users[0].full_name,
+                self.page.title,
+            ),
+            self.page.logs[0].text
         )
 
 

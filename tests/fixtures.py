@@ -24,6 +24,8 @@ class OsfBaseFixture(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.page = None
+        cls.users = []
         cls.page = OsfPage(url=config.osf_home)
         cls._start_time = time.time()
 
@@ -58,6 +60,7 @@ class UserFixture(OsfBaseFixture):
     def setUpClass(cls):
         super(UserFixture, cls).setUpClass()
         cls.create_user().log_in()
+        cls.user_profile_url = cls.page.profile_link
 
 
 class ProjectFixture(UserFixture):
@@ -82,3 +85,32 @@ class SubprojectFixture(ProjectFixture):
             title='Test Subproject',
             component_type='Project',
         )
+
+
+class ComplexFixture(object):
+
+    @classmethod
+    def setUpClass(cls):
+        super(ComplexFixture, cls).setUpClass()
+
+        # Add a couple of components
+        cls.page = cls.page.add_component(
+            title='Hypothesis Component',
+            component_type='Hypothesis'
+        )
+        cls.page = cls.page.parent_project()
+        cls.page = cls.page.add_component(
+            title='Data Component',
+            component_type='Data',
+        )
+        cls.page = cls.page.parent_project()
+
+        cls.page.set_wiki_content('Test Wiki Content')
+
+
+class ComplexProjectFixture(ComplexFixture, ProjectFixture):
+    pass
+
+
+class ComplexSubprojectFixture(ComplexFixture, SubprojectFixture):
+    pass

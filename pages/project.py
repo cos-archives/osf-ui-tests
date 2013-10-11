@@ -404,6 +404,13 @@ class NodePage(OsfPage):
         return forks
 
     @property
+    def forkable(self):
+        """True if the node's fork button is active"""
+        return not 'disabled' in self.driver.find_element_by_css_selector(
+            'a.node-fork-btn'
+        ).get_attribute('class')
+
+    @property
     def num_forks(self):
         """The number of forks, as displayed in the icon's counter on the node's
         dashboard
@@ -551,17 +558,8 @@ class NodePage(OsfPage):
         )]
 
     def delete(self):
-        # Click "Settings"
-        self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
-        ).find_element_by_link_text(
-            'Settings'
-        ).click()
-
         # Click the delete button.
-        self.driver.find_element_by_css_selector(
-            '.container form:last-of-type button[type="submit"]'
-        ).click()
+        self.driver.find_element_by_id('delete-node').click()
 
     def _clone(self):
         new_driver = self.driver.__class__()
@@ -616,11 +614,7 @@ class NodeSettingsPage(NodePage):
     def delete(self):
         from pages import UserDashboardPage
 
-        self.driver.get('{}/settings/'.format(config.osf_home))
-
-        self.driver.find_element_by_link_text(
-            'Delete component'
-        ).click()
+        self.driver.find_element_by_id('delete-node').click()
 
         return UserDashboardPage(driver=self.driver)
 

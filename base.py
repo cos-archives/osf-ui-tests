@@ -29,6 +29,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from pages.helpers import WaitForPageReload
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class SmokeTest(unittest.TestCase):
@@ -218,17 +219,16 @@ class ProjectSmokeTest(UserSmokeTest):
         # click the "Add" button
         self.get_element('#addContributors button.btn.primary').click()
 
-    def remove_contributor(self, user):
+    def remove_contributor(self, user_data):
+        # mouse over to the contribute's name
+        element_to_hover_over \
+            = self.get_element('#contributors a[data-fullname="'
+                               + user_data["fullname"]+'"]')
+        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
+        hover.perform()
 
-        self.driver.execute_script(
-            u"""me = $('#contributors a:contains("{fullname}")')
-                .append('<i class="icon-remove"><i>');
-            removeUser(
-                me.attr("data-userid"),
-                me.attr("data-fullname"),
-                me
-            );""".format(fullname=user['fullname'])
-        )
+        # click the remove icon
+        element_to_hover_over.find_element_by_css_selector("i").click()
 
         self.driver.switch_to_alert().accept()
 

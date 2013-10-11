@@ -2,6 +2,7 @@ import datetime as dt
 
 from nose.tools import *
 
+from pages.exceptions import PageException
 from tests.fixtures import ProjectFixture, UserFixture
 from tests.projects.fixtures import ProjectNoDescriptionFixture
 
@@ -22,6 +23,22 @@ class Create(object):
     def test_description(self):
         assert_equal('Test Project Description', self.page.description)
 
+    def test_forkable(self):
+        assert_true(self.page.forkable)
+
+    def test_logged(self):
+        assert_equal(
+            u"{} created project".format(self.users[0].full_name),
+            self.page.logs[0].text
+        )
+
+    def test_log_link_to_user_profile(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url,
+        )
+
+
 class CreationTests(Create, ProjectFixture):
     pass
 
@@ -39,6 +56,10 @@ class CreateNoTitleTests(UserFixture):
         User shouldn't be able to do this, but attempting it results in a 500,
         and the correct behavior is not yet defined.
         """
-        self.page = self.page.new_project(title='')
+        with assert_raises(PageException):
+            self.page = self.page.new_project(title='')
 
-        assert_true(False)
+        assert_in(
+            'Title is required',
+            self.page.driver.find_element_by_css_selector('div.alert').text
+        )

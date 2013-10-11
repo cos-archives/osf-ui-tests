@@ -86,12 +86,14 @@ class UserDashboardPage(OsfPage):
         return ProjectPage(driver=self.driver)
 
     @property
+    def profile_link(self):
+        return self.driver.find_element_by_link_text(
+            'My Public Profile'
+        ).get_attribute('href')
+
+    @property
     def profile(self):
-        self.driver.get(
-            self.driver.find_element_by_link_text(
-                'My Public Profile'
-            ).get_attribute('href')
-        )
+        self.driver.get(self.profile_link)
         return UserProfilePage(driver=self.driver)
 
     @property
