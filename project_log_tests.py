@@ -59,59 +59,6 @@ class ProjectLogTests(base.ProjectSmokeTest):
             wiki_url
         )
 
-    def test_add_contributor_log(self):
-        """
-        test to make sure that add contributor log works correctly
-
-        """
-        # As of 9 Sep 2013, log says "component"; expected "project"
-
-        # Log out
-        user_url = self.get_user_url()
-        util.logout(self.driver)
-
-        # Create second user and get his url
-        second_user_data = util.create_user(self.driver)
-        util.login(
-            self.driver,
-            second_user_data['username'],
-            second_user_data['password']
-        )
-        project_url = util.create_project(self.driver)
-
-        #add contributor
-        self.add_contributor(self.user_data)
-
-        #get log
-        message_log = self.get_log()
-
-        #assert the time
-        self._assert_time(message_log.log_time)
-
-        #assert the log
-        self.assertEqual(
-            message_log.log_text,
-            u'{} added {} to node {}'.format(
-                second_user_data['fullname'],
-                self.user_data['fullname'],
-                config.project_title,
-            )
-        )
-
-        #check the user_url and project_url
-        self.assertEqual(
-            message_log.log_url[0]+"/",
-            self.get_user_url()
-        )
-        self.assertEqual(
-            message_log.log_url[1]+"/",
-            user_url
-        )
-        self.assertEqual(
-            message_log.log_url[2],
-            project_url
-        )
-
     def test_delete_contributor_log(self):
         # As of 9 Sep 2013, the log says "component"; expected "project"
 
