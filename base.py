@@ -274,6 +274,16 @@ class ProjectSmokeTest(UserSmokeTest):
             'div.popover-content button.btn.btn-primary'
         ).click()
 
+    def set_permission(self, permission, url=None):
+
+        url = url or self.project_url
+        url = url.strip('/')
+
+        self.driver.get('{url}/permissions/{prm}'.format(
+            url=url,
+            prm=permission,
+        ))
+
     def make_private(self, url=None):
         """Make a project or component private.
 
@@ -284,9 +294,7 @@ class ProjectSmokeTest(UserSmokeTest):
         url = url or self.project_url
 
         if self.is_public(url):
-            self.driver.get('{url}/makeprivate'.format(
-                url=url.strip('/') or self.project_url.strip('/'))
-            )
+            self.set_permission('private', url)
 
     def make_public(self, url=None):
         """Make a project or component private.
@@ -298,9 +306,7 @@ class ProjectSmokeTest(UserSmokeTest):
         url = url or self.project_url
 
         if not self.is_public(url):
-            self.driver.get('{url}/makepublic'.format(
-                url=url.strip('/') or self.project_url.strip('/'))
-            )
+            self.set_permission('public', url)
 
     def is_public(self, url=None):
         """Test whether a project or component is public.
@@ -411,32 +417,36 @@ class ProjectSmokeTest(UserSmokeTest):
         """
         raise NotImplementedError
 
-    def assert_not_authorized(self, url=None):
-        """Navigate to the page, and see if the item is accessible.
-        """
+    def assert_error_page(self, error_msg, url=None):
+        """Optionally navigate to page, then check for provided error
+        message.
 
+        :param error_msg: Error message
+        :param url: Optional URL
+
+        """
         # if a url was provided, go there
         if url:
             self.driver.get(url)
 
-        # should have been redirected to the homepage
-        self.assertEqual(
-            self.driver.current_url.strip('/'),
-            self.site_root.strip('/'),
-        )
-
         # an alert should be present with the error message
         self.assertIn(
-            'not authorized',
-            self.get_element('div#alert-container').text,
+            error_msg,
+            self.get_element('div.span12 h2').text,
         )
+
+    def assert_not_authorized(self, url=None):
+        """Navigate to the page, and see if the item is accessible.
+        """
+
+        self.assert_error_page('Unauthorized.', url)
 
     def assert_forbidden(self, url=None):
         """Nav  igate to the resource and verify the 403 (Forbidden) error is
         present.
         """
 
-        self.assert_not_authorized(url=url)
+        self.assert_error_page('Forbidden.', url)
 
     def create_fork(self, url=None):
         """Create a fork, and return its URL
