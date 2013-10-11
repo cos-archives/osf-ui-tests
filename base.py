@@ -435,6 +435,10 @@ class ProjectSmokeTest(UserSmokeTest):
             self.get_element('div.span12 h2').text,
         )
 
+    def assert_not_found(self, url=None):
+
+        self.assert_error_page('Page not found.', url)
+
     def assert_not_authorized(self, url=None):
         """Navigate to the page, and see if the item is accessible.
         """

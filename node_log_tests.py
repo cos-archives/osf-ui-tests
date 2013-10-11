@@ -59,7 +59,7 @@ class NodeLogTests(base.ProjectSmokeTest):
             + config.node_title + " to " + node_new_name)
 
         #check the user_url and node_url
-        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], self.node_url)
 
     def test_node_wiki_changes_log(self):
@@ -99,8 +99,8 @@ class NodeLogTests(base.ProjectSmokeTest):
         )
 
         #check the user_url and node_url
-        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
-        self.assertEqual(message_log.log_url[1]+"/", wiki_url)
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1], wiki_url)
 
     def test_node_add_contributor_log(self):
         """
@@ -142,8 +142,8 @@ class NodeLogTests(base.ProjectSmokeTest):
             + " to node " + config.node_title)
 
         #check the second user_url, first user_url and node_url
-        self.assertEqual(message_log.log_url[0]+"/", self.get_user_url())
-        self.assertEqual(message_log.log_url[1]+"/", user_url)
+        self.assertEqual(message_log.log_url[0], self.get_user_url())
+        self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(message_log.log_url[2], new_node_url)
 
 

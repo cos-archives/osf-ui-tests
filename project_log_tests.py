@@ -51,11 +51,11 @@ class ProjectLogTests(base.ProjectSmokeTest):
 
         #check the user_url and project_url
         self.assertEqual(
-            message_log.log_url[0]+"/",
+            message_log.log_url[0],
             self.get_user_url()
         )
         self.assertEqual(
-            message_log.log_url[1]+"/",
+            message_log.log_url[1],
             wiki_url
         )
 
