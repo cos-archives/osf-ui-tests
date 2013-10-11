@@ -53,7 +53,7 @@ class Create(object):
             self.page.date_created,
         )
 
-    def test_last_udpated(self):
+    def test_last_updated(self):
         assert_equal(
             self.parent_values['last_updated'],
             self.page.last_updated,
@@ -70,6 +70,18 @@ class Create(object):
             self.parent_values['url'],
             self.page.source_link,
         )
+
+    def test_file_upload_disabled(self):
+        assert_false(self.page.can_add_file)
+
+    def test_file_deletion_disabled(self):
+        assert_false(self.page.can_delete_files)
+
+    def test_add_contributors(self):
+        assert_false(self.page.can_add_contributors)
+
+    def test_remove_contributors(self):
+        assert_false(self.page.can_remove_contributors)
 
 
 class FromProject(Create, ProjectRegistrationFixture):

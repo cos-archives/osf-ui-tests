@@ -2,6 +2,7 @@ import datetime as dt
 import urlparse
 from collections import namedtuple
 
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,13 +13,31 @@ import logs
 from generic import ApiKey, OsfPage
 from helpers import WaitForPageReload
 
-
 class NodePage(OsfPage):
     """Base class for Component and Project pages. In other words, anything that
     is represented as a ``Node`` model in the backend.
 
     It should not be instantiated directly.
     """
+
+    def __init__(self, *args, **kwargs):
+        super(NodePage, self).__init__(*args, **kwargs)
+
+        _link = lambda x: self.driver.find_element_by_link_text(
+            x
+        ).get_attribute('href')
+
+        self._url_map = {
+            'dashboard': self.driver.current_url,
+            'wiki': _link('Wiki'),
+            'statistics': _link('Statistics'),
+            'files': _link('Files'),
+            'registrations': _link('Registrations'),
+            'forks': _link('Forks'),
+            'settings': _link('Settings'),
+        }
+
+
 
     def _verify_page(self):
         """ Return True if the current page is the one expected for a
@@ -48,6 +67,28 @@ class NodePage(OsfPage):
                 '#contributors a[href^="/profile"]'
             )
         ]
+
+    @property
+    def can_add_contributors(self):
+        if len(self.driver.find_elements_by_css_selector(
+                '#contributors > a[href="#addContributors"]'
+        )) == 0:
+            return False
+
+        return True
+
+    @property
+    def can_remove_contributors(self):
+        element_to_hover_over = self.driver.find_element_by_css_selector(
+            '#contributors span.contributor a')
+        ActionChains(
+            self.driver
+        ).move_to_element(element_to_hover_over).perform()
+
+        # click the remove icon
+        return bool(
+            len(element_to_hover_over.find_elements_by_css_selector("i"))
+        )
 
     def add_contributor(self, user):
         with WaitForPageReload(self.driver):
@@ -458,6 +499,50 @@ class NodePage(OsfPage):
 
         return page
 
+    @property
+    def can_add_file(self):
+
+        files_page = self.driver.find_element_by_link_text(
+            'Files'
+        ).get_attribute('href')
+
+        if files_page != self.driver.current_url:
+            _url = self.driver.current_url
+            self.driver.get(files_page)
+        else:
+            _url = None
+
+        upload_button_class = self.driver.find_element_by_css_selector(
+            'span.fileinput-button'
+        ).get_attribute('class')
+
+        if _url:
+            self.driver.get(_url)
+
+        return False if 'disabled' in upload_button_class else True
+
+    @property
+    def can_delete_files(self):
+
+        files_page = self.driver.find_element_by_link_text(
+            'Files'
+        ).get_attribute('href')
+
+        if files_page != self.driver.current_url:
+            _url = self.driver.current_url
+            self.driver.get(files_page)
+        else:
+            _url = None
+
+        delete_button_class = self.driver.find_elements_by_css_selector(
+            '.fileDeleteForm button.btn-delete'
+        )[0].get_attribute('class')
+
+        if _url:
+            self.driver.get(_url)
+
+        return False if 'disabled' in delete_button_class else True
+
     def add_file(self, f):
         """Add a file to the node."""
 
@@ -641,7 +726,7 @@ class ProjectPage(NodePage):
             )
             del kwargs['id']
 
-        super(NodePage, self).__init__(*args, **kwargs)
+        super(ProjectPage, self).__init__(*args, **kwargs)
 
     def add_component(self, title, component_type=None):
         """Add a component to the project.

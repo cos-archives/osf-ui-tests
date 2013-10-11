@@ -1,7 +1,7 @@
 import time
 import unittest
 import config
-from pages import helpers, LoginPage
+from pages import FILES, helpers, LoginPage
 from pages.generic import OsfPage
 
 
@@ -93,6 +93,8 @@ class ComplexFixture(object):
     def setUpClass(cls):
         super(ComplexFixture, cls).setUpClass()
 
+        _url  = cls.page.driver.current_url
+
         # Add a couple of components
         cls.page = cls.page.add_component(
             title='Hypothesis Component',
@@ -105,7 +107,13 @@ class ComplexFixture(object):
         )
         cls.page = cls.page.parent_project()
 
-        cls.page.set_wiki_content('Test Wiki Content')
+        # upload a file
+        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        cls.page.driver.get(_url)
+
+        # add some content to the wiki
+        # cls.page.set_wiki_content('Test Wiki Content')
 
 
 class ComplexProjectFixture(ComplexFixture, ProjectFixture):
