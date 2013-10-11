@@ -180,7 +180,7 @@ class NodePage(OsfPage):
         :returns: ``str`` or ``None``
         """
         return self.driver.find_element_by_css_selector(
-            '#node-title a'
+            '.node-parent-title a'
         ).get_attribute('href')
 
     @property
