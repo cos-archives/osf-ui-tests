@@ -311,6 +311,23 @@ class NodePage(OsfPage):
             # TODO: This doesn't seem like the right exception to raise.
             raise AttributeError("No parent project found.")
 
+    @property
+    def can_edit_wiki(self):
+        _url = self.driver.current_url
+
+        self.driver.get(
+            self.driver.find_element_by_link_text(
+                'Wiki').get_attribute('href') + 'home/'
+        )
+
+        edit_button_class = self.driver.find_elements_by_css_selector(
+            'ul.nav-pills'
+        )[1].find_element_by_link_text('Edit').get_attribute('class')
+
+        self.driver.get(_url)
+
+        return not 'disabled' in edit_button_class
+
     def set_wiki_content(self, content, page='home'):
         """Sets the content of a wiki page.
 
@@ -320,10 +337,8 @@ class NodePage(OsfPage):
         _url = self.driver.current_url
 
         self.driver.get(
-            '{}/wiki/{}/edit'.format(
-                _url.strip('/'),
-                page
-            )
+            self.driver.find_element_by_link_text(
+                'Wiki').get_attribute('href') + '{}/edit/'.format(page)
         )
 
         # clear existing input

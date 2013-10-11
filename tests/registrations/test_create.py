@@ -83,6 +83,9 @@ class Create(object):
     def test_remove_contributors(self):
         assert_false(self.page.can_remove_contributors)
 
+    def test_edit_wiki(self):
+        assert_false(self.page.can_edit_wiki)
+
 
 class FromProject(Create, ProjectRegistrationFixture):
     pass

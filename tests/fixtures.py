@@ -110,11 +110,10 @@ class ComplexFixture(object):
         # upload a file
         cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
 
-        cls.page.driver.get(_url)
-
         # add some content to the wiki
-        # cls.page.set_wiki_content('Test Wiki Content')
+        cls.page.set_wiki_content('Test Wiki Content')
 
+        cls.page.driver.get(_url)
 
 class ComplexProjectFixture(ComplexFixture, ProjectFixture):
     pass
