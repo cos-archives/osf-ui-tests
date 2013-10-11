@@ -9,261 +9,261 @@ from pages.exceptions import PageException
 from selenium.common.exceptions import TimeoutException
 
 
-# class ProjectSecurityTests2(unittest.TestCase):
-#     def _test_add_contributor_listed(self, page):
-#         second_user = helpers.create_user()
-#
-#         page.add_contributor(second_user)
-#
-#         self.assertIn(
-#             second_user.full_name,
-#             [x.full_name for x in page.contributors]
-#         )
-#
-#         page.close()
-#
-#     def test_project_add_contributors_listed(self):
-#         self._test_add_contributor_listed(helpers.get_new_project())
-#
-#     def test_subproject_add_contributors_listed(self):
-#         self._test_add_contributor_listed(helpers.get_new_subproject())
-#
-#     def test_component_add_contributors_listed(self):
-#         self._test_add_contributor_listed(helpers.get_new_component())
-#
-#     def test_nested_component_add_contributors_listed(self):
-#         self._test_add_contributor_listed(helpers.get_new_nested_component())
-#
-#     def _test_add_contributor_access(self, page):
-#         _url = page.driver.current_url
-#         second_user = helpers.create_user()
-#
-#         page.add_contributor(second_user)
-#
-#         self.assertIn(
-#             second_user.full_name,
-#             [x.full_name for x in page.contributors]
-#         )
-#
-#         page.close()
-#
-#         page = LoginPage()
-#         page.log_in(second_user)
-#
-#         page.driver.get(_url)
-#
-#         page = ProjectPage(driver=page.driver)
-#
-#         self.assertIn(
-#             second_user.full_name,
-#             [x.full_name for x in page.contributors],
-#         )
-#
-#         page.close()
-#
-#     def test_project_add_contributors_access(self):
-#         self._test_add_contributor_access(helpers.get_new_project())
-#
-#     def test_subproject_add_contributors_access(self):
-#         self._test_add_contributor_access(helpers.get_new_subproject())
-#
-#     def test_component_add_contributors_access(self):
-#         self._test_add_contributor_access(helpers.get_new_component())
-#
-#     def test_nested_component_add_contributors_access(self):
-#         self._test_add_contributor_access(helpers.get_new_nested_component())
-#
-#     def _test_can_access(self, page, user=None, can_access=True):
-#         _url = page.driver.current_url
-#         _title = page.title
-#         _id = page.id
-#
-#         page.close()
-#
-#         if user:
-#             page = LoginPage().log_in(user)
-#             page.driver.get(_url)
-#
-#             if can_access:
-#                 page = ProjectPage(driver=page.driver)
-#                 self.assertEqual(page.title, _title)
-#             else:
-#                 with self.assertRaises(PageException):
-#                     page = ProjectPage(driver=page.driver)
-#                     self.assertNotEqual(page.title, _title)
-#
-#             page.close()
-#         else:
-#             if can_access:
-#                 page = NodePage(url=_url)
-#                 page.close()
-#             else:
-#                 with self.assertRaises(PageException):
-#                     ProjectPage(id=_id)
-#
-#     def test_private_project_contributor_access(self):
-#         page = helpers.get_new_project()
-#         user = helpers.create_user()
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_private_project_non_contributor_access(self):
-#         page = helpers.get_new_project()
-#         user = helpers.create_user()
-#
-#         self._test_can_access(page, user, False)
-#
-#     def test_private_project_anonymous_access(self):
-#         page = helpers.get_new_project()
-#
-#         self._test_can_access(page, can_access=False)
-#
-#     def test_public_project_contributor_access(self):
-#         page = helpers.get_new_project()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_project_non_contributor_access(self):
-#         page = helpers.get_new_project()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_project_anonymous_access(self):
-#         page = helpers.get_new_project()
-#         page.public = True
-#
-#         self._test_can_access(page)
-#
-#     def test_private_subproject_contributor_access(self):
-#         page = helpers.get_new_subproject()
-#         user = helpers.create_user()
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_private_subproject_non_contributor_access(self):
-#         page = helpers.get_new_subproject()
-#         user = helpers.create_user()
-#
-#         self._test_can_access(page, user, False)
-#
-#     def test_private_subproject_anonymous_access(self):
-#         page = helpers.get_new_subproject()
-#
-#         self._test_can_access(page, can_access=False)
-#
-#     def test_public_subproject_contributor_access(self):
-#         page = helpers.get_new_subproject()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_subproject_non_contributor_access(self):
-#         page = helpers.get_new_subproject()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_subproject_anonymous_access(self):
-#         page = helpers.get_new_subproject()
-#         page.public = True
-#
-#         self._test_can_access(page)
-#
-#     def test_private_component_contributor_access(self):
-#         page = helpers.get_new_component()
-#         user = helpers.create_user()
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_private_component_non_contributor_access(self):
-#         page = helpers.get_new_component()
-#         user = helpers.create_user()
-#
-#         self._test_can_access(page, user, False)
-#
-#     def test_private_component_anonymous_access(self):
-#         page = helpers.get_new_component()
-#
-#         self._test_can_access(page, can_access=False)
-#
-#     def test_public_component_contributor_access(self):
-#         page = helpers.get_new_component()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_component_non_contributor_access(self):
-#         page = helpers.get_new_component()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_component_anonymous_access(self):
-#         page = helpers.get_new_component()
-#         page.public = True
-#
-#         self._test_can_access(page)
-#
-#     def test_private_nested_component_contributor_access(self):
-#         page = helpers.get_new_nested_component()
-#         user = helpers.create_user()
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_private_nested_component_non_contributor_access(self):
-#         page = helpers.get_new_nested_component()
-#         user = helpers.create_user()
-#
-#         self._test_can_access(page, user, False)
-#
-#     def test_private_nested_component_anonymous_access(self):
-#         page = helpers.get_new_nested_component()
-#
-#         self._test_can_access(page, can_access=False)
-#
-#     def test_public_nested_component_contributor_access(self):
-#         page = helpers.get_new_nested_component()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         page.add_contributor(user)
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_nested_component_non_contributor_access(self):
-#         page = helpers.get_new_nested_component()
-#         user = helpers.create_user()
-#         page.public = True
-#
-#         self._test_can_access(page, user)
-#
-#     def test_public_nested_component_anonymous_access(self):
-#         page = helpers.get_new_nested_component()
-#         page.public = True
-#
-#         self._test_can_access(page)
+class ProjectSecurityTests2(unittest.TestCase):
+    def _test_add_contributor_listed(self, page):
+        second_user = helpers.create_user()
+
+        page.add_contributor(second_user)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors]
+        )
+
+        page.close()
+
+    def test_project_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_project())
+
+    def test_subproject_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_subproject())
+
+    def test_component_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_component())
+
+    def test_nested_component_add_contributors_listed(self):
+        self._test_add_contributor_listed(helpers.get_new_nested_component())
+
+    def _test_add_contributor_access(self, page):
+        _url = page.driver.current_url
+        second_user = helpers.create_user()
+
+        page.add_contributor(second_user)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors]
+        )
+
+        page.close()
+
+        page = LoginPage()
+        page.log_in(second_user)
+
+        page.driver.get(_url)
+
+        page = ProjectPage(driver=page.driver)
+
+        self.assertIn(
+            second_user.full_name,
+            [x.full_name for x in page.contributors],
+        )
+
+        page.close()
+
+    def test_project_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_project())
+
+    def test_subproject_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_subproject())
+
+    def test_component_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_component())
+
+    def test_nested_component_add_contributors_access(self):
+        self._test_add_contributor_access(helpers.get_new_nested_component())
+
+    def _test_can_access(self, page, user=None, can_access=True):
+        _url = page.driver.current_url
+        _title = page.title
+        _id = page.id
+
+        page.close()
+
+        if user:
+            page = LoginPage().log_in(user)
+            page.driver.get(_url)
+
+            if can_access:
+                page = ProjectPage(driver=page.driver)
+                self.assertEqual(page.title, _title)
+            else:
+                with self.assertRaises(PageException):
+                    page = ProjectPage(driver=page.driver)
+                    self.assertNotEqual(page.title, _title)
+
+            page.close()
+        else:
+            if can_access:
+                page = NodePage(url=_url)
+                page.close()
+            else:
+                with self.assertRaises(PageException):
+                    ProjectPage(id=_id)
+
+    def test_private_project_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_project_non_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_project_anonymous_access(self):
+        page = helpers.get_new_project()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_project_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_project_non_contributor_access(self):
+        page = helpers.get_new_project()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_project_anonymous_access(self):
+        page = helpers.get_new_project()
+        page.public = True
+
+        self._test_can_access(page)
+
+    def test_private_subproject_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_subproject_non_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_subproject_anonymous_access(self):
+        page = helpers.get_new_subproject()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_subproject_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_subproject_non_contributor_access(self):
+        page = helpers.get_new_subproject()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_subproject_anonymous_access(self):
+        page = helpers.get_new_subproject()
+        page.public = True
+
+        self._test_can_access(page)
+
+    def test_private_component_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_component_non_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_component_anonymous_access(self):
+        page = helpers.get_new_component()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_component_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_component_non_contributor_access(self):
+        page = helpers.get_new_component()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_component_anonymous_access(self):
+        page = helpers.get_new_component()
+        page.public = True
+
+        self._test_can_access(page)
+
+    def test_private_nested_component_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_private_nested_component_non_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+
+        self._test_can_access(page, user, False)
+
+    def test_private_nested_component_anonymous_access(self):
+        page = helpers.get_new_nested_component()
+
+        self._test_can_access(page, can_access=False)
+
+    def test_public_nested_component_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+        page.public = True
+
+        page.add_contributor(user)
+
+        self._test_can_access(page, user)
+
+    def test_public_nested_component_non_contributor_access(self):
+        page = helpers.get_new_nested_component()
+        user = helpers.create_user()
+        page.public = True
+
+        self._test_can_access(page, user)
+
+    def test_public_nested_component_anonymous_access(self):
+        page = helpers.get_new_nested_component()
+        page.public = True
+
+        self._test_can_access(page)
 
 
 class ProjectSecurityTest(ProjectSmokeTest):
@@ -273,31 +273,31 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         self.second_user = self.create_user()
 
-    # def test_remove_contributor(self):
-    #
-    #     # Add a contributor
-    #     self.goto('dashboard')
-    #     self.add_contributor(self.second_user)
-    #
-    #     # refresh the page
-    #     self.goto('dashboard')
-    #
-    #     # remove the contributor
-    #     self.remove_contributor(self.second_user)
-    #
-    #     # log out and back in as the second user
-    #     self.log_out()
-    #     self.log_in(self.second_user)
-    #
-    #     self.goto('dashboard')
-    #
-    #     # There should be no project list, so just make sure the project title
-    #     # isn't on the page.
-    #     self.assert_forbidden()
-    #
-    #     # log out and back in as the first user, so teardown will work
-    #     self.log_out()
-    #     self.log_in(self.user_data)
+    def test_remove_contributor(self):
+
+        # Add a contributor
+        self.goto('dashboard')
+        self.add_contributor(self.second_user)
+
+        # refresh the page
+        self.goto('dashboard')
+
+        # remove the contributor
+        self.remove_contributor(self.second_user)
+
+        # log out and back in as the second user
+        self.log_out()
+        self.log_in(self.second_user)
+
+        self.goto('dashboard')
+
+        # There should be no project list, so just make sure the project title
+        # isn't on the page.
+        self.assert_forbidden()
+
+        # log out and back in as the first user, so teardown will work
+        self.log_out()
+        self.log_in(self.user_data)
 
     def test_public_non_contributor_modify(self):
         """ Users who are not contributors should not have access to the wiki
