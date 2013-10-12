@@ -1,4 +1,4 @@
-from tests.fixtures import ProjectFixture, SubprojectFixture
+from tests.fixtures import ComplexProjectFixture, ComplexSubprojectFixture
 
 
 class RegistrationFixture(object):
@@ -27,11 +27,12 @@ class RegistrationFixture(object):
         )
 
 
-class ProjectRegistrationFixture(RegistrationFixture, ProjectFixture):
+class ProjectRegistrationFixture(RegistrationFixture, ComplexProjectFixture):
     # The order here is important - fixtures' setUpClass() methods are called
     # right-to-left
     pass
 
 
-class SubprojectRegistrationFixture(RegistrationFixture, SubprojectFixture):
+class SubprojectRegistrationFixture(
+        RegistrationFixture, ComplexSubprojectFixture):
     pass
