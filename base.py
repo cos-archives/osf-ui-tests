@@ -230,7 +230,8 @@ class ProjectSmokeTest(UserSmokeTest):
         # click the remove icon
         element_to_hover_over.find_element_by_css_selector("i").click()
 
-        self.driver.switch_to_alert().accept()
+        self.get_element("div.modal-dialog button[class='btn btn-primary']")\
+            .click()
 
     def get_log(self):
 

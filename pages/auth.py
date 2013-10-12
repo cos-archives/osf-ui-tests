@@ -105,7 +105,29 @@ class UserDashboardPage(OsfPage):
 class UserProfilePage(OsfPage):
     @property
     def full_name(self):
-        return self.driver.find_element_by_id('profile-dfullname').text
+        return self.driver.find_element_by_id('profile-fullname').text
+
+    @full_name.setter
+    def full_name(self, value):
+        self.driver.find_element_by_id('profile-fullname').click()
+
+        field = self.driver.find_element_by_css_selector(
+            'div.popover.in input'
+        )
+
+        field.clear()
+        field.send_keys(value)
+
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.popover.in button[type="submit"]'
+            ).click()
+
+    @property
+    def profile_shortlink(self):
+        return self.driver.find_element_by_css_selector(
+            '.container table a'
+        ).get_attribute('href')
 
 
 class UserSettingsPage(OsfPage):
