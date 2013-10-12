@@ -343,7 +343,9 @@ class ProjectSecurityTest(ProjectSmokeTest):
         # try to remove a contributor
         self.goto('dashboard')
         # with self.assertRaises(TimeoutException):
-        self.remove_contributor(self.user_data)
+        with self.assertRaises(TimeoutException):
+            self.remove_contributor(self.user_data)
+
         self.goto('dashboard')
         self.assertIn(
             self.user_data['fullname'],
