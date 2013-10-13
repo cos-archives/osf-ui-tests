@@ -231,7 +231,7 @@ class RegistrationTests(unittest.TestCase):
 
         self.assertEqual(
             page.logs[0].text,
-            u'{user} registered project {title}'.format(
+            u'{user} registered component {title}'.format(
                 user=user,
                 title=page.title
             )
