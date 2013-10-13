@@ -198,5 +198,5 @@ class NodeLogTests(base.ProjectSmokeTest):
         # self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(
             message_log.log_url[2],
-            component_url.strip('/')
+            component_url
         )

@@ -111,7 +111,7 @@ class FileTests(unittest.TestCase):
             u'{user} added file {filename} to {node_type} {node_name}'.format(
                 user=user.full_name,
                 filename='test.jpg',
-                node_type='project',
+                node_type='component',
                 node_name=page.title,
             )
         )
@@ -296,7 +296,7 @@ class FileTests(unittest.TestCase):
             u'from {node_type} {node_name}'.format(
                 user=user.full_name,
                 filename='test.jpg',
-                node_type='project',
+                node_type='component',
                 node_name=page.title,
             )
         )
@@ -461,7 +461,7 @@ class FileTests(unittest.TestCase):
             u'{user} updated file {filename} in {node_type} {node_name}'.format(
                 user=user.full_name,
                 filename=filename,
-                node_type='project',
+                node_type='component',
                 node_name=page.title,
             )
         )
