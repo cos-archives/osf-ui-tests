@@ -130,7 +130,6 @@ class RegistrationTests(unittest.TestCase):
         page.close()
 
     # NOTE: This test only applies to subprojects
-    @unittest.skip('known failure')
     def test_subproject_registration_parent_title(self):
         """ Verify that a registration's parent project title matches the
         original project """
@@ -240,7 +239,7 @@ class RegistrationTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
+    # @unittest.skip('known failure')
     def test_project_registration_logged(self):
         """ Project variant of ``self._test_registration_logged`` """
         # As of 9 Sep 2013, the log reads "component" here instead of "project"
