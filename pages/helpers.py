@@ -8,6 +8,7 @@ import util
 import config
 
 User = namedtuple('User', ['full_name', 'email', 'password'])
+Project = namedtuple('Project', ('title', 'url'))
 
 
 def create_user():

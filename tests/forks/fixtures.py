@@ -43,7 +43,7 @@ class DeletedForkFixture(ForkFixture):
     @classmethod
     def setUpClass(cls):
         super(DeletedForkFixture, cls).setUpClass()
-        cls.page.delete()
+        cls.page.settings.delete()
         cls.page.driver.get(cls.parent_values['url'])
 
 

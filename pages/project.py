@@ -23,22 +23,6 @@ class NodePage(OsfPage):
     def __init__(self, *args, **kwargs):
         super(NodePage, self).__init__(*args, **kwargs)
 
-        _link = lambda x: self.driver.find_element_by_link_text(
-            x
-        ).get_attribute('href')
-
-        self._url_map = {
-            'dashboard': self.driver.current_url,
-            'wiki': _link('Wiki'),
-            'statistics': _link('Statistics'),
-            'files': _link('Files'),
-            'registrations': _link('Registrations'),
-            'forks': _link('Forks'),
-            'settings': _link('Settings'),
-        }
-
-
-
     def _verify_page(self):
         """ Return True if the current page is the one expected for a
         ``NodePage``."""
@@ -296,8 +280,7 @@ class NodePage(OsfPage):
                 'Settings'
             ).get_attribute('href')
         )
-        return NodeSettingsPage(driver=
-        self.driver)
+        return NodeSettingsPage(driver=self.driver)
 
     def parent_project(self):
         """Navigate to the nodes's parent project.
@@ -666,10 +649,6 @@ class NodePage(OsfPage):
             '#filesTable tbody.files tr'
         )]
 
-    def delete(self):
-        # Click the delete button.
-        self.driver.find_element_by_id('delete-node').click()
-
     def _clone(self):
         new_driver = self.driver.__class__()
         new_driver.get(config.osf_home)
@@ -723,7 +702,25 @@ class NodeSettingsPage(NodePage):
     def delete(self):
         from pages import UserDashboardPage
 
+        title = self.title
+
         self.driver.find_element_by_id('delete-node').click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.modal.in')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'div.modal.in input.bootbox-input'
+        ).send_keys(title)
+
+        with WaitForPageReload(self.driver):
+
+            self.driver.find_element_by_css_selector(
+                'div.modal.in button.btn-primary'
+            ).click()
 
         return UserDashboardPage(driver=self.driver)
 

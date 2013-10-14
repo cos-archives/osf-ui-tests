@@ -1,11 +1,17 @@
 from nose.tools import *
 
+from pages.auth import UserDashboardPage
 from tests.fixtures import ProjectFixture
 
 
 class DeleteTests(ProjectFixture):
-    """This test case changes state"""
-    def test_delete(self):
-        self.page = self.page.settings.delete()
+    @classmethod
+    def setUpClass(cls):
+        super(DeleteTests, cls).setUpClass()
+        cls.page = cls.page.settings.delete()
 
-        assert_true(False)
+    def test_on_user_dashboard(self):
+        assert_is_instance(self.page, UserDashboardPage)
+
+    def test_deleted(self):
+        assert_equal(0, len(self.page.projects))

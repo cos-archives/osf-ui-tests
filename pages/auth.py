@@ -1,6 +1,6 @@
 import config
 from generic import ApiKey, OsfPage
-from helpers import WaitForPageReload
+from helpers import WaitForPageReload, Project
 from static import HomePage
 from project import ProjectPage
 
@@ -100,6 +100,23 @@ class UserDashboardPage(OsfPage):
     def settings(self):
         self.driver.get('{}/settings'.format(config.osf_home))
         return UserSettingsPage(driver=self.driver)
+
+    @property
+    def projects(self):
+        ul = self.driver.find_element_by_css_selector(
+            'div.row > div.span6:first-child ul.list-group'
+        )
+
+        p = []
+
+        for li in ul.find_elements_by_css_selector('li.project'):
+            link = li.find_element_by_css_selector('h3 a')
+            p.append(Project(
+                title=link.text,
+                url=link.get_attribute('href')
+            ))
+
+        return p
 
 
 class UserProfilePage(OsfPage):
