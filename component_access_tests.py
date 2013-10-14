@@ -6,22 +6,6 @@ from base import ProjectSmokeTest
 
 
 class ComponentAccessCase(ProjectSmokeTest):
-    def test_add_component(self):
-        """Add a component and make sure its name appears in the dashboard"""
-        component_name = 'Test Hypothesis'
-
-        self.add_component('hypothesis', component_name)
-
-        self.assertTrue(
-            # name is the same as one of the components in the dashboard list.
-            component_name in [
-                x.text
-                for x
-                in self.driver.find_elements_by_css_selector(
-                    '#Nodes li.project h3'
-                )
-            ]
-        )
 
     @unittest.skip('Fails due to Selenium troubles')
     def test_reorder_components(self):

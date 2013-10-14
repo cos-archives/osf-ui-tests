@@ -26,6 +26,9 @@ class Create(object):
     def test_forkable(self):
         assert_true(self.page.forkable)
 
+    def test_private(self):
+        assert_false(self.page.public)
+
     def test_logged(self):
         assert_equal(
             u"{} created project".format(self.users[0].full_name),
