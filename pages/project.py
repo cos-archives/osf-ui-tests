@@ -608,6 +608,8 @@ class NodePage(OsfPage):
 
         self.driver.find_elements_by_css_selector("div.modal-dialog button[class='btn btn-primary']")[0].click()
 
+        self.driver.find_elements_by_css_selector("div.modal-dialog button[class='btn btn-primary']")[0].click()
+
     @property
     def files(self):
         F = namedtuple(
