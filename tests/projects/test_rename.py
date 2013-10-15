@@ -2,6 +2,8 @@ from nose.tools import *
 
 from tests.fixtures import ProjectFixture, SubprojectFixture
 
+from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
+
 
 class Rename(object):
 
@@ -42,4 +44,12 @@ class ProjectTest(Rename, ProjectFixture):
 
 
 class SubprojectTest(Rename, SubprojectFixture):
+    pass
+
+
+class ComponentOfProjectTest(Rename, ComponentOfProjectFixture):
+    pass
+
+
+class ComponentOfSubprojectTest(Rename, ComponentOfSubprojectFixture):
     pass
