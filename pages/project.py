@@ -596,6 +596,7 @@ class NodePage(OsfPage):
 
         # row[0].find_element_by_css_selector('button.btn-delete').click()
         self.driver.find_element_by_css_selector('button.btn-delete').click()
+
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, 'div.modal.in button.btn-primary')

@@ -1,7 +1,7 @@
 from nose.tools import *
 
 from pages.helpers import create_user
-from tests.fixtures import ProjectFixture
+from tests.fixtures import ProjectFixture, SubprojectFixture
 
 
 class AddContributorFixture(object):
@@ -18,7 +18,11 @@ class ProjectAddContributorFixture(AddContributorFixture, ProjectFixture):
     pass
 
 
-class Project(ProjectAddContributorFixture):
+class SubprojectAddContributorFixture(AddContributorFixture, SubprojectFixture):
+    pass
+
+
+class AddContributorTests(object):
     def test_contributor_added(self):
         assert_equal(2, len(self.page.contributors))
 
@@ -31,3 +35,11 @@ class Project(ProjectAddContributorFixture):
             ),
             self.page.logs[0].text,
         )
+
+
+class ProjectTests(AddContributorTests, ProjectAddContributorFixture):
+    pass
+
+
+class SubprojectTests(AddContributorTests, SubprojectAddContributorFixture):
+    pass
