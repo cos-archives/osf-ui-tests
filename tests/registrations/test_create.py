@@ -86,6 +86,16 @@ class Create(object):
     def test_edit_wiki(self):
         assert_false(self.page.can_edit_wiki)
 
+    def test_watermarked_background(self):
+        assert_equal(
+            1,
+            len(
+                self.page.driver.find_elements_by_css_selector(
+                    'div.watermarked'
+                )
+            ),
+        )
+
 
 class FromProject(Create, ProjectRegistrationFixture):
     pass
