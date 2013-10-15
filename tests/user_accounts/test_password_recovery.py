@@ -1,8 +1,6 @@
-"""
-
-"""
-
 import unittest
+
+from nose.tools import *
 
 # Project imports
 import base
@@ -24,14 +22,14 @@ class UserForgetPasswordTests(base.SmokeTest):
 
         # check for alert
         alerts = util.get_alert_boxes(self.driver, 'Email address is required')
-        self.assertEqual(len(alerts), 1)
+        assert_equal(len(alerts), 1)
 
     def test_too_short_email(self):
         #forgetpassowrd with too short and wrong email
         util.forget_password(self.driver, 'Alpha')
 
         # check for alert
-        self.assertEqual(
+        assert_equal(
             len(
                 util.get_alert_boxes(
                     self.driver,
@@ -40,11 +38,11 @@ class UserForgetPasswordTests(base.SmokeTest):
             ),
             1
         )
-        self.assertEqual(
+        assert_equal(
             len(
                 util.get_alert_boxes(
                     self.driver,
-                   'Email address is invalid'
+                    'Email address is invalid'
                 )
             ),
             1
@@ -56,7 +54,7 @@ class UserForgetPasswordTests(base.SmokeTest):
 
         # check for alert
         alerts = util.get_alert_boxes(self.driver, 'Email address is invalid')
-        self.assertEqual(len(alerts), 1)
+        assert_equal(len(alerts), 1)
 
     def test_not_registered_email(self):
         #forgetpassowrd with not registered email
@@ -67,7 +65,7 @@ class UserForgetPasswordTests(base.SmokeTest):
             self.driver,
             'Email bad@email.addr not found'
         )
-        self.assertEqual(len(alerts), 1)
+        assert_equal(len(alerts), 1)
 
     @unittest.skipIf(
         condition='localhost' in config.osf_home,
@@ -82,4 +80,4 @@ class UserForgetPasswordTests(base.SmokeTest):
 
         # check for alert
         alerts = util.get_alert_boxes(self.driver, 'Reset email sent')
-        self.assertEqual(len(alerts), 1)
+        assert_equal(len(alerts), 1)
