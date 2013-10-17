@@ -32,10 +32,6 @@ class OsfBaseFixture(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.page.close()
-        print('{} ran in {} seconds'.format(
-            cls.__name__,
-            round(time.time() - cls._start_time, 2),
-        ))
 
     @classmethod
     def create_user(cls):

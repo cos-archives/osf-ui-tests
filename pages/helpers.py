@@ -3,6 +3,10 @@ from collections import namedtuple
 
 import requests
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common import exceptions as exc
 
 import util
 import config
@@ -92,11 +96,40 @@ class WaitForPageReload(object):
         self.driver = driver
 
     def __exit__(self, *args, **kwargs):
-        while(True):
-            try:
-                if self.body == self.driver.find_element_by_css_selector('body'):
-                    time.sleep(.1)
-                else:
-                    return
-            except StaleElementReferenceException:
+        WebDriverWait(self.driver, 3).until(
+            EC.staleness_of(self.body)
+        )
+
+
+class WaitForFileUpload(object):
+    def __enter__(self):
+        pass
+
+    def __init__(self, driver, wait=3, interval=0.1):
+        self.driver = driver
+        self.wait = wait
+        self.interval = interval
+
+        self.files = len(
+            self.driver.find_elements_by_css_selector(
+                'tbody.files tr.start'
+            )
+        )
+
+        print(self.files)
+
+    def __exit__(self, *args, **kwargs):
+        entered = time.time()
+        while time.time() - entered < self.wait:
+            if len(
+                self.driver.find_elements_by_css_selector(
+                    'tbody.files td.start'
+                )
+            ) == self.files:
+                time.sleep(self.interval)
+            else:
+                self.driver.get(self.driver.current_url)
                 return
+        raise exc.TimeoutException(
+            '{} seconds passed without the upload completing'.format(self.wait)
+        )

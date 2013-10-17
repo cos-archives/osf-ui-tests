@@ -69,9 +69,10 @@ class UserDashboardPage(OsfPage):
 
     def new_project(self, title, description=None):
         # Click "New Project"
-        self.driver.find_element_by_css_selector(
-            'a[href="/project/new"]'
-        ).click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'a[href="/project/new"]'
+            ).click()
 
         # Fill the form
         self.driver.find_element_by_id('title').send_keys(title)
@@ -79,9 +80,10 @@ class UserDashboardPage(OsfPage):
             self.driver.find_element_by_id('description').send_keys(description)
 
         # Click "Create New Project"
-        self.driver.find_element_by_css_selector(
-            'form[name="newProject"] button[type="submit"]'
-        ).click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'form[name="newProject"] button[type="submit"]'
+            ).click()
 
         return ProjectPage(driver=self.driver)
 

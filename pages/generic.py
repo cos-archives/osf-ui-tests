@@ -17,6 +17,7 @@ class OsfPage(object):
             self.driver = kwargs.get('driver')
         else:
             self.driver = self._make_driver()
+            self.driver.implicitly_wait(0)
 
         if not kwargs.get('driver'):
             # If no driver was passed, go to the url passed or the default

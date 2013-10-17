@@ -11,7 +11,7 @@ from selenium.common import exceptions as exc
 import config
 import logs
 from generic import ApiKey, OsfPage
-from helpers import WaitForPageReload
+from helpers import WaitForFileUpload, WaitForPageReload
 
 class NodePage(OsfPage):
     """Base class for Component and Project pages. In other words, anything that
@@ -75,26 +75,42 @@ class NodePage(OsfPage):
         )
 
     def add_contributor(self, user):
+
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        # enter the user's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[type=text]'
+        ).send_keys(user.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button'
+        ).click()
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors input[type=radio]')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors input[type=radio]'
+        ).click()
+
         with WaitForPageReload(self.driver):
-            # click the "add" link
-            self.driver.find_element_by_css_selector(
-                '#contributors a[href="#addContributors"]'
-            ).click()
-
-            # enter the user's email address
-            self.driver.find_element_by_css_selector(
-                'div#addContributors input[type=text]'
-            ).send_keys(user.email)
-
-            # click the search button
-            self.driver.find_element_by_css_selector(
-                '#addContributors button'
-            ).click()
-
-            # click the radio button for the first result
-            self.driver.find_element_by_css_selector(
-                '#addContributors input[type=radio]'
-            ).click()
 
             # click the "Add" button
             self.driver.find_element_by_css_selector(
@@ -261,6 +277,12 @@ class NodePage(OsfPage):
         self.driver.find_element_by_css_selector(
             '#overview div.btn-group:nth-of-type(1) > a'
         ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.modal.fade.in button.btn-primary')
+            )
+        )
 
         confirm_button = self.driver.find_element_by_css_selector(
             'div.modal.fade.in button.btn-primary'
@@ -555,20 +577,21 @@ class NodePage(OsfPage):
             $('input[type="file"]').offset({left : 50});
         ''')
 
-        # Find file input
-        field = self.driver.find_element_by_css_selector('input[type=file]')
+        with WaitForFileUpload(self.driver, wait=5):
+            # Find file input
+            field = self.driver.find_element_by_css_selector('input[type=file]')
 
-        # Enter file into input
-        field.send_keys(f if isinstance(f, basestring) else f.path)
+            # Enter file into input
+            field.send_keys(f if isinstance(f, basestring) else f.path)
 
-        # Upload files
-        self.driver.find_element_by_css_selector(
-            'div.fileupload-buttonbar button.start'
-        ).click()
+            # Upload files
+            self.driver.find_element_by_css_selector(
+                'div.fileupload-buttonbar button.start'
+            ).click()
 
         # refresh the page. Normally this wouldn't be necessary, but BlueImp
         # doesn't work well with Selenium.
-        self.driver.get(self.driver.current_url)
+        #self.driver.get(self.driver.current_url)
 
     def delete_file(self, f):
         """Delete a file from the node"""
@@ -580,11 +603,11 @@ class NodePage(OsfPage):
             'Files'
         ).click()
 
-        # WebDriverWait(self.driver, 1).until(
-        #     EC.visibility_of_element_located(
-        #         (By.CSS_SELECTOR, '#filesTable')
-        #     )
-        # )
+        WebDriverWait(self.driver, 3).until(
+             EC.visibility_of_element_located(
+                 (By.CSS_SELECTOR, 'tbody.files')
+             )
+        )
 
         row = [
             x for x in
@@ -772,8 +795,6 @@ class ProjectPage(NodePage):
             )
         )
 
-
-
         # fill the modal form and submit it
         modal = self.driver.find_element_by_id('newComponent')
 
@@ -803,7 +824,9 @@ class ProjectPage(NodePage):
 
         # navigate to the new component
         # TODO: Make this option, but default?
-        components[0].click()
+
+        with WaitForPageReload(self.driver):
+            components[0].click()
 
         # return the correct subclass of ``NodePage``
         if component_type == 'Project':
@@ -830,9 +853,10 @@ class ProjectPage(NodePage):
         self.driver.find_element_by_link_text('New Registration').click()
 
         # Select the registration type
-        self.driver.find_element_by_css_selector(
-            '.container select'
-        ).send_keys(registration_type + "\n")
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                '.container select'
+            ).send_keys(registration_type + "\n")
 
         # Fill the registration template
         fields = self.driver.find_elements_by_css_selector(

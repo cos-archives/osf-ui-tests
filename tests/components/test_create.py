@@ -32,7 +32,6 @@ class Create(object):
         assert_false(self.page.forkable)
 
     def test_logged(self):
-        raise SkipTest('OSF Issue')
         assert_equal(
             u'{} created component {}'.format(
                 self.users[0].full_name,
