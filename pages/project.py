@@ -149,7 +149,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self._title
+        return self.driver.find_element_by_css_selector('h1.node-title').text
 
     @title.setter
     def title(self, value):
@@ -165,6 +165,37 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 'div.editable-popover button[type="submit"]'
             ).click()
+
+    @property
+    def watched(self):
+        """Whether the user is watching the node
+
+        :returns: ``bool``
+        """
+        return 'Unwatch' in self.driver.find_element_by_id('watchCount').text
+
+    @watched.setter
+    def watched(self, value):
+        if self.watched == value:
+            return
+
+        self.driver.find_element_by_id('watchCount').click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.text_to_be_present_in_element(
+                (By.ID, 'watchCount'),
+                'Unwatch' if value else 'Watch',
+            )
+        )
+
+
+    @property
+    def num_watchers(self):
+        """Number of watchers on the node
+
+        :returns: ``int``
+        """
+        return int(self.driver.find_element_by_id('watchCount').text.split(' ')[1])
 
     @property
     def description(self):
@@ -207,14 +238,6 @@ class NodePage(OsfPage):
         return self.driver.find_element_by_css_selector(
             '.node-parent-title a'
         ).get_attribute('href')
-
-    @property
-    def _title(self):
-        """The node's title element.
-
-        :returns: ``WebElement``
-        """
-        return self.driver.find_element_by_css_selector('h1.node-title').text
 
     @property
     def components(self):
