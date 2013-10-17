@@ -1,5 +1,8 @@
 import time
 import unittest
+
+import requests
+
 import config
 from pages import FILES, helpers, LoginPage
 from pages.generic import OsfPage
@@ -117,3 +120,30 @@ class ComplexProjectFixture(ComplexFixture, ProjectFixture):
 
 class ComplexSubprojectFixture(ComplexFixture, SubprojectFixture):
     pass
+
+
+class UserAccessFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(UserAccessFixture, cls).setUpClass()
+        cls.cookies = dict()
+        cls.cookies['contributor'] = cls.page.driver.get_cookies()
+
+        s = requests.session()
+        s.get(config.osf_home)
+        cls.cookies['noncontributor'] = helpers.convert_cookies(s.cookies)
+
+    def _as_contributor(self):
+        self.page.driver.delete_all_cookies()
+        self.page.driver = helpers.load_cookies(
+            self.page.driver, self.cookies.get('contributor')
+        )
+
+    def _as_anonymous(self):
+        self.page.driver.delete_all_cookies()
+
+    def _as_noncontributor(self):
+        self.page.driver.delete_all_cookies()
+        self.page.driver = helpers.load_cookies(
+            self.page.driver, self.cookies.get('noncontributor')
+        )

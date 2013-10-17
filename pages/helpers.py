@@ -74,18 +74,27 @@ def get_new_nested_component(title='New Component', component_type='Other'):
     )
 
 
-def load_requests_cookies(cookie_jar, webdriver):
-    for x in cookie_jar:
-        c = {
+def convert_cookies(cookie_jar):
+    """Converts a CookieJar from Requests into a list suitable for use by
+    Selenium's WebDriver."""
+    return [
+        {
             'name': x.name,
             'value': x.value,
-            'domain': 'localhost' if x.domain == 'localhost.local' else x.domain,
+            'domain': (
+                'localhost' if x.domain == 'localhost.local' else x.domain
+            ),
             'path': x.path,
             'secure': x.secure,
             'expiry': x.expires,
-        }
-        print c
+        } for x in cookie_jar
+    ]
+
+
+def load_cookies(webdriver, cookie_jar):
+    for c in cookie_jar:
         webdriver.add_cookie(c)
+    return webdriver
 
 
 class WaitForPageReload(object):
