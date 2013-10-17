@@ -10,8 +10,16 @@ class WatchFixture(object):
     def setUpClass(cls):
         super(WatchFixture, cls).setUpClass()
         cls.node_logs = cls.page.logs
-        cls.old_watchers = cls.page.num_watchers
+        cls.old_num_watchers = cls.page.num_watchers
         cls.page.watched = True
+
+
+class UnwatchFixture(WatchFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(UnwatchFixture, cls).setUpClass()
+        cls.old_num_watchers = cls.page.num_watchers
+        cls.page.watched = False
 
 
 class WatchTests(WatchFixture):
@@ -20,7 +28,7 @@ class WatchTests(WatchFixture):
 
     def test_watchers(self):
         assert_equal(
-            self.old_watchers + 1,
+            self.old_num_watchers + 1,
             self.page.num_watchers,
         )
 
@@ -41,19 +49,14 @@ class WatchComponentOfSubprojectTestCase(WatchTests, ComponentOfSubprojectFixtur
     pass
 
 
-class UnwatchTests(WatchFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(UnwatchTests, cls).setUpClass()
-        cls.old_watchers = cls.page.num_watchers
-        cls.page.watched = False
+class UnwatchTests(UnwatchFixture):
 
     def test_watched(self):
         assert_false(self.page.watched)
 
     def test_watchers(self):
         assert_equal(
-            self.old_watchers - 1,
+            self.old_num_watchers - 1,
             self.page.num_watchers,
         )
 
@@ -98,4 +101,31 @@ class WatchLogComponentOfProjectTestCase(WatchLogTests, ComponentOfProjectFixtur
 
 
 class WatchLogComponentOfSubprojectTestCase(WatchLogTests, ComponentOfSubprojectFixture):
+    pass
+
+
+class UnwatchLogTests(UnwatchFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(UnwatchLogTests, cls).setUpClass()
+        cls.page = cls.page.user_dashboard
+
+    def test_logs(self):
+        for log in self.node_logs:
+            assert_false(log in self.page.watch_logs)
+
+
+class UnwatchLogProjectTestCase(UnwatchLogTests, ProjectFixture):
+    pass
+
+
+class UnwatchLogSubprojectTestCase(UnwatchLogTests, SubprojectFixture):
+    pass
+
+
+class UnwatchLogComponentOfProjectTestCase(UnwatchLogTests, ComponentOfProjectFixture):
+    pass
+
+
+class UnwatchLogComponentOfSubprojectTestCase(UnwatchLogTests, ComponentOfSubprojectFixture):
     pass
