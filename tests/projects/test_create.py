@@ -41,6 +41,12 @@ class Create(object):
             self.page.logs[0].links[0].url,
         )
 
+    def test_watched(self):
+        assert_false(self.page.watched)
+
+    def test_num_watchers(self):
+        assert_equal(0, self.page.num_watchers)
+
 
 class CreationTests(Create, ProjectFixture):
     pass
