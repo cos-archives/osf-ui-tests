@@ -9,9 +9,10 @@ class WatchFixture(object):
     @classmethod
     def setUpClass(cls):
         super(WatchFixture, cls).setUpClass()
-        cls.first_log = cls.page.logs[0]
+        cls.node_logs = cls.page.logs
         cls.old_watchers = cls.page.num_watchers
         cls.page.watched = True
+
 
 class WatchTests(WatchFixture):
     def test_watched(self):
@@ -22,9 +23,6 @@ class WatchTests(WatchFixture):
             self.old_watchers + 1,
             self.page.num_watchers,
         )
-
-    def test_logs(self):
-        assert_true(self.first_log in self.page.logs)
 
 
 class WatchProjectTestCase(WatchTests, ProjectFixture):
@@ -59,6 +57,7 @@ class UnwatchTests(WatchFixture):
             self.page.num_watchers,
         )
 
+
 class UnwatchProjectTestCase(UnwatchTests, ProjectFixture):
     pass
 
@@ -72,4 +71,31 @@ class UnwatchComponentOfProjectTestCase(UnwatchTests, ComponentOfProjectFixture)
 
 
 class UnwatchComponentOfSubprojectTestCase(UnwatchTests, ComponentOfSubprojectFixture):
+    pass
+
+
+class WatchLogTests(WatchFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(WatchLogTests, cls).setUpClass()
+        cls.page = cls.page.user_dashboard
+
+    def test_logs(self):
+        for log in self.node_logs:
+            assert_true(log in self.page.watch_logs)
+
+
+class WatchLogProjectTestCase(WatchLogTests, ProjectFixture):
+    pass
+
+
+class WatchLogSubprojectTestCase(WatchLogTests, SubprojectFixture):
+    pass
+
+
+class WatchLogComponentOfProjectTestCase(WatchLogTests, ComponentOfProjectFixture):
+    pass
+
+
+class WatchLogComponentOfSubprojectTestCase(WatchLogTests, ComponentOfSubprojectFixture):
     pass

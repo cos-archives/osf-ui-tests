@@ -1,4 +1,5 @@
 import config
+import logs
 from generic import ApiKey, OsfPage
 from helpers import WaitForPageReload, Project
 from static import HomePage
@@ -118,6 +119,11 @@ class UserDashboardPage(OsfPage):
 
         return p
 
+    @property
+    def watch_logs(self):
+        return logs.parse_log(
+            container=self.driver.find_element_by_css_selector('div.span6:last-child')
+        )
 
 class UserProfilePage(OsfPage):
     @property
