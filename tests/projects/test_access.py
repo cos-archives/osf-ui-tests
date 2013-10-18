@@ -17,21 +17,21 @@ class PublicProjectFixture(ProjectFixture):
         cls.page.public = True
 
 
-class PublicSubprojectFixture(ProjectFixture):
+class PublicSubprojectFixture(SubprojectFixture):
     @classmethod
     def setUpClass(cls):
         super(PublicSubprojectFixture, cls).setUpClass()
         cls.page.public = True
 
 
-class PublicComponentOfProjectFixture(ProjectFixture):
+class PublicComponentOfProjectFixture(ComponentOfProjectFixture):
     @classmethod
     def setUpClass(cls):
         super(PublicComponentOfProjectFixture, cls).setUpClass()
         cls.page.public = True
 
 
-class PublicComponentOfSubprojectFixture(ProjectFixture):
+class PublicComponentOfSubprojectFixture(ComponentOfSubprojectFixture):
     @classmethod
     def setUpClass(cls):
         super(PublicComponentOfSubprojectFixture, cls).setUpClass()
@@ -82,36 +82,44 @@ class PublicAccessTests(DefaultAccessTests):
         assert_is_instance(page, ProjectPage)
 
 
-class ProjectAccessTestCase(DefaultAccessTests, ProjectFixture):
+class PrivateProjectAccessTestCase(DefaultAccessTests, ProjectFixture):
+    """Test access to a private project"""
     pass
 
 
-class SubprojectAccessTestCase(DefaultAccessTests, SubprojectFixture):
+class PrivateSubprojectAccessTestCase(DefaultAccessTests, SubprojectFixture):
+    """Test access to a private subproject of a private project"""
     pass
 
 
-class ComponentOfProjectAccessTestCase(DefaultAccessTests, ComponentOfProjectFixture):
+class PrivateComponentOfProjectAccessTestCase(DefaultAccessTests, ComponentOfProjectFixture):
+    """Test access to a private component of a private project"""
     pass
 
 
-class ComponentOfSubprojectAccessTestCase(DefaultAccessTests,
+class PrivateComponentOfSubprojectAccessTestCase(DefaultAccessTests,
                                           ComponentOfSubprojectFixture):
+    """Test access to a private component of a private subproject of a private project"""
     pass
 
 
 class PublicProjectAccessTestCase(PublicAccessTests, PublicProjectFixture):
+    """Test access to a public project"""
     pass
 
 
 class PublicSubprojectAccessTestCase(PublicAccessTests, PublicSubprojectFixture):
+    """Test access to a public subproject of a private project"""
     pass
 
 
 class PublicComponentOfProjectAccessTestCase(PublicAccessTests,
                                              PublicComponentOfProjectFixture):
+    """Test access to a public component of a private project"""
     pass
 
 
 class PublicComponentOfSubprojectAccessTestCase(PublicAccessTests,
                                                 PublicComponentOfSubprojectFixture):
+    """Test access to a public component of a private subproject of a private project"""
     pass
