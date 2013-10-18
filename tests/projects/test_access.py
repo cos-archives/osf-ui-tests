@@ -1,5 +1,4 @@
 import httplib as http
-from unittest import skip
 
 from nose.tools import *
 
@@ -20,7 +19,6 @@ class AccessTests(UserAccessFixture):
 
         assert_is_instance(page, ProjectPage)
 
-    @skip('OSF raises UNAUTHORIZED')
     def test_non_contributor(self):
         self._as_noncontributor()
         self.page.driver.refresh()
@@ -30,7 +28,7 @@ class AccessTests(UserAccessFixture):
         assert_equal(http.FORBIDDEN, cm.exception.code)
 
     def test_anonymous(self):
-        self._as_noncontributor()
+        self._as_anonymous()
         self.page.driver.refresh()
 
         with assert_raises(HttpError) as cm:

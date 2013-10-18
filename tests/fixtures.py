@@ -114,6 +114,7 @@ class ComplexFixture(object):
 
         cls.page.driver.get(_url)
 
+
 class ComplexProjectFixture(ComplexFixture, ProjectFixture):
     pass
 
@@ -130,7 +131,14 @@ class UserAccessFixture(object):
         cls.cookies['contributor'] = cls.page.driver.get_cookies()
 
         s = requests.session()
-        s.get(config.osf_home)
+        user = helpers.create_user()
+        resp = s.post(
+            config.osf_home + '/login/',
+            data = {
+                'username': user.email,
+                'password': user.password,
+            },
+        ),
         cls.cookies['noncontributor'] = helpers.convert_cookies(s.cookies)
 
     def _as_contributor(self):
