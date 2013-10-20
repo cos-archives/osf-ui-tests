@@ -113,4 +113,8 @@ class SourceProjectTestCase(ForkedFrom, ForkedProjectFixture):
 
 class SourceSubprojectTestCase(ForkedFrom, ForkedSubprojectFixture):
     """After forking a subproject, go back to the original page."""
-    pass
+    def test_fork_list_url(self):
+        assert_equal(
+            self.fork_url,
+            self.page.forks.url
+        )
