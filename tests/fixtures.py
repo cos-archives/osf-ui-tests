@@ -52,6 +52,18 @@ class OsfBaseFixture(unittest.TestCase):
 
         return cls
 
+    @classmethod
+    def log_in_check(cls, email,password):
+        cls.page.driver.get(LoginPage.default_url)
+        cls.page = LoginPage(
+            driver=cls.page.driver
+        ).log_in_check(
+            email,
+            password
+        )
+
+        return cls
+
 
 class UserFixture(OsfBaseFixture):
     """User Dashboard for a freshly created user"""
