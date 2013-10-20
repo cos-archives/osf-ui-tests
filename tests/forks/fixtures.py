@@ -7,7 +7,6 @@ from tests.fixtures import (
 
 
 class ForkFixture(object):
-
     @classmethod
     def setUpClass(cls):
         super(ForkFixture, cls).setUpClass()
