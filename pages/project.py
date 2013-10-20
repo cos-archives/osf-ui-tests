@@ -9,10 +9,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 from selenium.webdriver.common.keys import Keys
 
+
 import config
 import logs
 from generic import ApiKey, OsfPage
 from helpers import WaitForFileUpload, WaitForPageReload
+
 
 class NodePage(OsfPage):
     """Base class for Component and Project pages. In other words, anything that
@@ -91,31 +93,31 @@ class NodePage(OsfPage):
 
         # enter the user's email address
         self.driver.find_element_by_css_selector(
-            'div#addContributors input[type=text]'
+            'div#addContributors input[data-bind="value:query"]'
         ).send_keys(user.email)
 
         # click the search button
         self.driver.find_element_by_css_selector(
-            '#addContributors button'
+            '#addContributors button.btn'
         ).click()
 
         # wait for a result to display
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#addContributors input[type=radio]')
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
             )
         )
 
         # click the radio button for the first result
         self.driver.find_element_by_css_selector(
-            '#addContributors input[type=radio]'
+            '#addContributors a.btn.contrib-button'
         ).click()
 
         with WaitForPageReload(self.driver):
 
             # click the "Add" button
             self.driver.find_element_by_css_selector(
-                '#addContributors button.btn.primary'
+                '#addContributors a[data-bind="click:submit"]'
             ).click()
 
     @property
@@ -936,7 +938,7 @@ class ProjectPage(NodePage):
         with WaitForPageReload(self.driver):
             # click "Register"
             self.driver.find_element_by_css_selector(
-                '.container form button'
+                '#register-submit'
             ).click()
 
         return ProjectRegistrationPage(driver=self.driver)
