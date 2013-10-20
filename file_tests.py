@@ -6,7 +6,6 @@ import base
 import os
 import requests
 import tempfile
-import time
 
 from pages import FILES
 from pages.helpers import get_new_project, WebDriverWait
@@ -17,11 +16,13 @@ from selenium.webdriver.common.by import By
 
 import urlparse
 
+
 def prepend_api_url(url):
 
     parsed_url = urlparse.urlparse(url)
     prepended_url = parsed_url._replace(path='/api/v1' + parsed_url.path)
     return urlparse.urlunparse(prepended_url)
+
 
 class FileTests(unittest.TestCase):
 
