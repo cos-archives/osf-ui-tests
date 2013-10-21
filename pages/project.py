@@ -77,6 +77,146 @@ class NodePage(OsfPage):
             len(element_to_hover_over.find_elements_by_css_selector("i"))
         )
 
+    def add_multi_contributor(self, user1, user2):
+
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user1.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+         # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).clear()
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user2.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        with WaitForPageReload(self.driver):
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind="click:submit"]'
+            ).click()
+
+    def add_multi_contributor_delete(self, user1, user2):
+
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user1.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+         # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).clear()
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user2.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_elements_by_css_selector(
+            "#addContributors A.btn.btn-default.contrib-button"
+        )[0].click()
+
+        with WaitForPageReload(self.driver):
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind="click:submit"]'
+            ).click()
+
     def add_contributor(self, user):
 
         # click the "add" link
