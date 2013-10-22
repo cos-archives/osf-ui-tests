@@ -101,28 +101,6 @@ class ProjectSecurityTests2(unittest.TestCase):
                 with self.assertRaises(PageException):
                     ProjectPage(id=_id)
 
-    def test_public_project_contributor_access(self):
-        page = helpers.get_new_project()
-        user = helpers.create_user()
-        page.public = True
-
-        page.add_contributor(user)
-
-        self._test_can_access(page, user)
-
-    def test_public_project_non_contributor_access(self):
-        page = helpers.get_new_project()
-        user = helpers.create_user()
-        page.public = True
-
-        self._test_can_access(page, user)
-
-    def test_public_project_anonymous_access(self):
-        page = helpers.get_new_project()
-        page.public = True
-
-        self._test_can_access(page)
-
     def test_private_subproject_contributor_access(self):
         page = helpers.get_new_subproject()
         user = helpers.create_user()
