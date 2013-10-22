@@ -101,55 +101,6 @@ class ProjectSecurityTests2(unittest.TestCase):
                 with self.assertRaises(PageException):
                     ProjectPage(id=_id)
 
-    def test_private_subproject_contributor_access(self):
-        page = helpers.get_new_subproject()
-        user = helpers.create_user()
-
-        page.add_contributor(user)
-
-        self._test_can_access(page, user)
-
-    def test_private_subproject_non_contributor_access(self):
-        page = helpers.get_new_subproject()
-        user = helpers.create_user()
-
-        self._test_can_access(page, user, False)
-
-    def test_private_subproject_anonymous_access(self):
-        page = helpers.get_new_subproject()
-
-        self._test_can_access(page, can_access=False)
-
-    def test_public_subproject_contributor_access(self):
-        page = helpers.get_new_subproject()
-        user = helpers.create_user()
-        page.public = True
-
-        page.add_contributor(user)
-
-        self._test_can_access(page, user)
-
-    def test_public_subproject_non_contributor_access(self):
-        page = helpers.get_new_subproject()
-        user = helpers.create_user()
-        page.public = True
-
-        self._test_can_access(page, user)
-
-    def test_public_subproject_anonymous_access(self):
-        page = helpers.get_new_subproject()
-        page.public = True
-
-        self._test_can_access(page)
-
-    def test_private_component_contributor_access(self):
-        page = helpers.get_new_component()
-        user = helpers.create_user()
-
-        page.add_contributor(user)
-
-        self._test_can_access(page, user)
-
     def test_private_component_non_contributor_access(self):
         page = helpers.get_new_component()
         user = helpers.create_user()
