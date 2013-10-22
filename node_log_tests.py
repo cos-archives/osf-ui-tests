@@ -139,7 +139,7 @@ class NodeLogTests(base.ProjectSmokeTest):
             message_log.log_text,
             second_user_data["fullname"]
             + " added " + self.user_data['fullname']
-            + " to node " + config.node_title)
+            + " to project " + config.node_title)
 
         #check the second user_url, first user_url and node_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
@@ -198,5 +198,5 @@ class NodeLogTests(base.ProjectSmokeTest):
         # self.assertEqual(message_log.log_url[1], user_url)
         self.assertEqual(
             message_log.log_url[2],
-            component_url.strip('/')
+            component_url
         )
