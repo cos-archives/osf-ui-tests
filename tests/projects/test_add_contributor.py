@@ -35,16 +35,20 @@ class AddContributorTests(AddContributorFixture):
 
 
 class ProjectTestCase(AddContributorTests, ProjectFixture):
+    """Test that a contributor was added to a project"""
     pass
 
 
 class SubprojectTestCase(AddContributorTests, SubprojectFixture):
+    """Test that a contributor was added to a subproject"""
     pass
 
 
 class ComponentOfProjectTestCase(AddContributorTests, ComponentOfProjectFixture):
+    """Test that a contributor was added to a project component"""
     pass
 
 
 class ComponentOfSubprojectTestCase(AddContributorTests, ComponentOfSubprojectFixture):
+    """Test that a contributor was added to a subproject component"""
     pass
