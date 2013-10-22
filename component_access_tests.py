@@ -26,58 +26,6 @@ class ComponentAccessCase(ProjectSmokeTest):
             'second',
         )
 
-    def test_public_component_of_private_project(self):
-        """ Test that a public component or a private project is accessible"""
-        title = 'Public Hypothesis'
-
-        component_url = self.add_component('hypothesis', title)
-
-        self.make_public(component_url)
-        self.log_out()
-
-        # navigate to the component as a non-logged-in user.
-        self.driver.get(component_url)
-
-        self.assertEqual(
-            self.get_element('.node-title').text,
-            title
-        )
-
-        # log back in so the teardown works.
-        self.log_in()
-
-    def test_private_component_of_public_project(self):
-        """Test that a private component of a public project is not accessible
-        """
-
-        # make the project public
-        self.make_public()
-
-        # create a component
-        title = "Private Hypothesis"
-        component_url = self.add_component('hypothesis', title)
-
-        # verify that the component is private
-        if self.is_public(component_url):
-            self.make_private(component_url)
-
-        # test that the component is not accessible to an anonymous user
-
-        self.log_out()
-
-        self.assert_not_authorized(component_url)
-
-        # test that the component is not accessible to a non-contributor
-
-        self.second_user = self.create_user()
-        self.log_in(self.second_user)
-
-        self.assert_forbidden(component_url)
-
-        # log back in so teardown doesn't fail.
-        self.log_out()
-        self.log_in()
-
     def test_private_component_of_public_project_not_forked(self):
         """Test that a private components of public projects are not forked
         when the project is forked
