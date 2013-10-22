@@ -10,30 +10,7 @@ from selenium.common.exceptions import TimeoutException
 
 
 class ProjectSecurityTests2(unittest.TestCase):
-    def _test_add_contributor_listed(self, page):
-        second_user = helpers.create_user()
-
-        page.add_contributor(second_user)
-
-        self.assertIn(
-            second_user.full_name,
-            [x.full_name for x in page.contributors]
-        )
-
-        page.close()
-
-    def test_project_add_contributors_listed(self):
-        self._test_add_contributor_listed(helpers.get_new_project())
-
-    def test_subproject_add_contributors_listed(self):
-        self._test_add_contributor_listed(helpers.get_new_subproject())
-
-    def test_component_add_contributors_listed(self):
-        self._test_add_contributor_listed(helpers.get_new_component())
-
-    def test_nested_component_add_contributors_listed(self):
-        self._test_add_contributor_listed(helpers.get_new_nested_component())
-
+    # TODO Are these tests technically covered in projects.test_access?
     def _test_add_contributor_access(self, page):
         _url = page.driver.current_url
         second_user = helpers.create_user()
@@ -72,34 +49,6 @@ class ProjectSecurityTests2(unittest.TestCase):
 
     def test_nested_component_add_contributors_access(self):
         self._test_add_contributor_access(helpers.get_new_nested_component())
-
-    def _test_can_access(self, page, user=None, can_access=True):
-        _url = page.driver.current_url
-        _title = page.title
-        _id = page.id
-
-        page.close()
-
-        if user:
-            page = LoginPage().log_in(user)
-            page.driver.get(_url)
-
-            if can_access:
-                page = ProjectPage(driver=page.driver)
-                self.assertEqual(page.title, _title)
-            else:
-                with self.assertRaises(PageException):
-                    page = ProjectPage(driver=page.driver)
-                    self.assertNotEqual(page.title, _title)
-
-            page.close()
-        else:
-            if can_access:
-                page = NodePage(url=_url)
-                page.close()
-            else:
-                with self.assertRaises(PageException):
-                    ProjectPage(id=_id)
 
 
 class ProjectSecurityTest(ProjectSmokeTest):
