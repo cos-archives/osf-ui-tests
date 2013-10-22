@@ -100,4 +100,4 @@ class ProjectLogTests(base.ProjectSmokeTest):
         #check the second user_url, first user_url and project_url
         self.assertEqual(message_log.log_url[0], self.get_user_url())
         self.assertEqual(message_log.log_url[1], user_url)
-        self.assertEqual(message_log.log_url[2]+"/", project_url)
+        self.assertEqual(message_log.log_url[2], project_url)
