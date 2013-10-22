@@ -470,7 +470,7 @@ class NodePage(OsfPage):
                     ),
                     date=dt.datetime.strptime(
                         r.text.split('registered: ')[-1],
-                        '%Y/%m/%d %I:%M %p'
+                        '%m/%d/%y %I:%M %p'
                     ),
                 )
             )
@@ -897,7 +897,10 @@ class ProjectPage(NodePage):
         ).click()
 
         # Click "New Registration"
-        self.driver.find_element_by_link_text('New Registration').click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.page-header a.btn'
+            ).click()
 
         # Select the registration type
         with WaitForPageReload(self.driver):
