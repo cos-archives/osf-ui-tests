@@ -469,7 +469,7 @@ class NodePage(OsfPage):
                         'href'
                     ),
                     date=dt.datetime.strptime(
-                        r.text.split('registered: ')[-1],
+                        r.text.split('Registered: ')[-1],
                         '%m/%d/%y %I:%M %p'
                     ),
                 )
