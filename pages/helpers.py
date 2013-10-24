@@ -142,3 +142,5 @@ class WaitForFileUpload(object):
         raise exc.TimeoutException(
             '{} seconds passed without the upload completing'.format(self.wait)
         )
+
+

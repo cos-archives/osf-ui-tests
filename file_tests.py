@@ -8,16 +8,21 @@ import requests
 import tempfile
 
 from pages import FILES
-from pages.helpers import get_new_project
+from pages.helpers import get_new_project, WebDriverWait
 from pages.project import FilePage
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
+
 
 import urlparse
+
 
 def prepend_api_url(url):
 
     parsed_url = urlparse.urlparse(url)
     prepended_url = parsed_url._replace(path='/api/v1' + parsed_url.path)
     return urlparse.urlunparse(prepended_url)
+
 
 class FileTests(unittest.TestCase):
 
@@ -672,6 +677,15 @@ class FileTests(unittest.TestCase):
         page.log_out()
 
         page.driver.get(files_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    '#fileupload div.fileupload-buttonbar .disabled'
+                )
+            )
+        )
 
         # all three buttons in the upload header should be disabled
         self.assertEqual(
