@@ -936,7 +936,7 @@ class ProjectPage(NodePage):
         with WaitForPageReload(self.driver):
             # click "Register"
             self.driver.find_element_by_css_selector(
-                '.container form button'
+                '#register-submit'
             ).click()
 
         return ProjectRegistrationPage(driver=self.driver)

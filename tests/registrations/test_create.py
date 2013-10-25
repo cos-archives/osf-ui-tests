@@ -77,7 +77,7 @@ class Create(object):
     def test_file_deletion_disabled(self):
         assert_false(self.page.can_delete_files)
 
-    def test_add_contributors(self):
+    def test_can_add_contributors(self):
         assert_false(self.page.can_add_contributors)
 
     def test_remove_contributors(self):
