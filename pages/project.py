@@ -485,7 +485,7 @@ class NodePage(OsfPage):
 
          :returns: [``Fork``, ... ]
         """
-
+        forks = []
         # Click "Forks"
         self.driver.find_element_by_css_selector(
             '#overview div.subnav'
@@ -495,11 +495,17 @@ class NodePage(OsfPage):
 
         F = namedtuple('Fork', ('title', 'url'))
 
-        forks = []
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'ul.list-group li#projects-widget.project.list-group-item h3'
+                )
+            )
+        )
 
         # for each list entry
         for f in self.driver.find_elements_by_css_selector(
-            'ul.list-group li.project h3'
+            'ul.list-group li#projects-widget.project.list-group-item h3'
         ):
             forks.append(
                 # build the Registration instance
@@ -560,11 +566,9 @@ class NodePage(OsfPage):
                 '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
             ).click()
 
-
-
         # Wait at least until the page has unloaded to continue.
         # TODO: I think this is where the 2-3 second delay is. Fix that.
-        #WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
+        #WebDriverWait(self.driver, 1).until(EC.staleness_of('body'))
 
         return page
 
@@ -635,7 +639,7 @@ class NodePage(OsfPage):
 
             # Upload files
             self.driver.find_element_by_css_selector(
-                'div.fileupload-buttonbar button.start'
+                'div.fileupload-buttonbar BUTTON.btn.btn-primary.start'
             ).click()
 
         # refresh the page. Normally this wouldn't be necessary, but BlueImp

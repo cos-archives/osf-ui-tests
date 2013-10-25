@@ -78,7 +78,6 @@ class FileTests(unittest.TestCase):
     def test_component_add_file(self):
         self._test_add_file(self._component())
 
-    @unittest.skip('known failure')
     def test_project_add_file_logged(self):
         # log says "component"; expected "project"
 
@@ -139,7 +138,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_component_add_file_logged(self):
         # log says "project"; expected "component"
 
@@ -174,7 +172,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_nested_component_add_file_logged(self):
         # log says "project"; expected "component"
         page = self._subproject_component()
@@ -201,14 +198,6 @@ class FileTests(unittest.TestCase):
 
         page = page.parent_project()
 
-        self.assertEqual(
-            page.logs[0].text,
-            expected_log
-        )
-
-        page = page.parent_project()
-
-        # Note: tests don't bubble up to this point
         self.assertEqual(
             page.logs[0].text,
             expected_log
