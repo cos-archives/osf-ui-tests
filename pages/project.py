@@ -100,7 +100,8 @@ class NodePage(OsfPage):
         self.driver.find_element_by_css_selector(
             '#addContributors button.btn'
         ).click()
-         # wait for a result to display
+
+        # wait for a result to display
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
@@ -116,7 +117,7 @@ class NodePage(OsfPage):
             'div#addContributors input[data-bind="value:query"]'
         ).clear()
 
-        # enter the user1's email address
+        # enter the user2's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
         ).send_keys(user2.email)
@@ -168,7 +169,8 @@ class NodePage(OsfPage):
         self.driver.find_element_by_css_selector(
             '#addContributors button.btn'
         ).click()
-         # wait for a result to display
+
+        # wait for a result to display
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
@@ -184,7 +186,7 @@ class NodePage(OsfPage):
             'div#addContributors input[data-bind="value:query"]'
         ).clear()
 
-        # enter the user1's email address
+        # enter the user2's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
         ).send_keys(user2.email)
@@ -206,6 +208,7 @@ class NodePage(OsfPage):
             '#addContributors a.btn.contrib-button'
         ).click()
 
+        # click the radio button to remove first user
         self.driver.find_elements_by_css_selector(
             "#addContributors A.btn.btn-default.contrib-button"
         )[0].click()

@@ -70,8 +70,8 @@ class AddMultiContributorTests(AddMultiContributorFixture):
         assert_equal(3, len(self.page.contributors))
 
     def test_contributor_present(self):
-        assert_equal(self.users[-1].full_name, self.page.contributors[-1].full_name)
-        assert_equal(self.users[-2].full_name, self.page.contributors[-2].full_name)
+        assert_equal(self.users[1].full_name, self.page.contributors[1].full_name)
+        assert_equal(self.users[2].full_name, self.page.contributors[2].full_name)
 
     def test_logged(self):
         assert_equal(
@@ -86,22 +86,22 @@ class AddMultiContributorTests(AddMultiContributorFixture):
         )
 
 
-class ProjectAddMultiContributor(AddMultiContributorTests, ProjectFixture):
+class ProjectAddMultiContributorTestCase(AddMultiContributorTests, ProjectFixture):
     """Test that multiple contributors were added to a project"""
     pass
 
 
-class SubprojectAddMultiContributor(AddMultiContributorTests, SubprojectFixture):
+class SubprojectAddMultiContributorTestCase(AddMultiContributorTests, SubprojectFixture):
     """Test that multiple contributors were added to a subproject"""
     pass
 
 
-class ComponentOfProjectAddMultiContributorTest(AddMultiContributorTests, ComponentOfProjectFixture):
+class ComponentOfProjectAddMultiContributorTestCase(AddMultiContributorTests, ComponentOfProjectFixture):
     """Test that multiple contributors were added to a project component"""
     pass
 
 
-class ComponentOfSubprojectAddMultiContributorTest(AddMultiContributorTests, ComponentOfSubprojectFixture):
+class ComponentOfSubprojectAddMultiContributorTestCase(AddMultiContributorTests, ComponentOfSubprojectFixture):
     """Test that multiple contributors were added to a subproject component"""
     pass
 
@@ -113,64 +113,43 @@ class AddMultiContributorDeleteFixture(object):
 
         cls.users.append(create_user())
         cls.users.append(create_user())
+        cls.page.add_multi_contributor_delete(cls.users[-2], cls.users[-1])
+        cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
 
-        cls.page.add_multi_contributor_delete(cls.users[1], cls.users[2])
 
+class AddMultiContributorDeleteTests(AddMultiContributorDeleteFixture):
     def test_contributor_added(self):
         assert_equal(2, len(self.page.contributors))
 
+    def test_contributor_present(self):
+        assert_equal(self.users[2].full_name, self.page.contributors[1].full_name)
+
     def test_logged(self):
         assert_equal(
-            u'{} added {} to project {}'.format(
+            u'{} added {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[2].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,
         )
 
 
-class ProjectAddMultiContributorDelete(
-    AddMultiContributorDeleteFixture,
-    ProjectFixture
-):
+class ProjectAddMultiContributorDelete(AddMultiContributorDeleteTests, ProjectFixture):
+    """Test that contributor deleted from "Add Contributors" page of project is not added"""
     pass
 
 
-class SubprojectAddMultiContributorDelete(
-    AddMultiContributorDeleteFixture,
-    SubprojectFixture
-):
+class SubprojectAddMultiContributorDelete(AddMultiContributorDeleteTests, SubprojectFixture):
+    """Test that contributor deleted from "Add Contributors" page of subproject is not added"""
     pass
 
 
-class ComponentOfProjectAddMultiContributorDeleteTest(
-    AddMultiContributorDeleteFixture,
-    ComponentOfProjectFixture
-):
+class ComponentOfProjectAddMultiContributorDelete(AddMultiContributorDeleteTests, ComponentOfProjectFixture):
+    """Test that contributor deleted from "Add Contributors" page of project component is not added"""
+    pass
 
-    def test_logged(self):
-        assert_equal(
-            u'{} added {} to component {}'.format(
-                self.users[0].full_name,
-                self.users[2].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
-
-
-class ComponentOfSubprojectAddMultiContributorDeleteTest(
-    AddMultiContributorDeleteFixture,
-    ComponentOfSubprojectFixture
-):
-
-    def test_logged(self):
-        assert_equal(
-            u'{} added {} to component {}'.format(
-                self.users[0].full_name,
-                self.users[2].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
+class ComponentOfSubprojectAddMultiContributorDelete(AddMultiContributorDeleteTests, ComponentOfSubprojectFixture):
+    """Test that contributor deleted from "Add Contributors" page of subproject component is not added"""
+    pass
