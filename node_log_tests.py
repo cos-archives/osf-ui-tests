@@ -40,7 +40,7 @@ class NodeLogTests(base.ProjectSmokeTest):
         """
 
         #rename the project
-        node_new_name=str(uuid.uuid1())[:6]
+        node_new_name = str(uuid.uuid1())[:6]
         util.project_rename(self.driver, node_new_name)
 
          #get log

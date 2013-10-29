@@ -17,7 +17,7 @@ class RegistrationTests(base.ProjectSmokeTest):
         registration_url = self.create_registration('Open-Ended Registration')
 
         self.assertIn(
-            'This node is a registration of',
+            'THIS NODE IS A REGISTRATION OF',
             self.get_element('span.label.label-important').text,
         )
 
@@ -28,7 +28,7 @@ class RegistrationTests(base.ProjectSmokeTest):
         )
 
         self.assertIn(
-            'This node is a registration of',
+            'THIS NODE IS A REGISTRATION OF',
             self.get_element('span.label.label-important').text
         )
 

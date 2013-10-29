@@ -500,19 +500,18 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # Fill out the form
         self.get_element(
-            'textarea.ember-view'
+            'textarea[data-bind="value:value, attr:{name:id}, disable:disable"]'
         ).send_keys('Test content for a textarea.')
 
         for elem in self.driver.find_elements_by_css_selector(
                 'div#registration_template select'):
             elem.send_keys('Yes')
 
-
         self.get_element(
-            'form.form-horizontal div.control-group input.ember-view'
+            'form.form-horizontal div.control-group input'
         ).send_keys('continue')
 
-        self.get_element('div.ember-view button.btn.primary').click()
+        self.get_element('button#register-submit.btn').click()
 
         # Hack: Wait for registration label so that we can get the
         # correct URL for the registration
