@@ -70,6 +70,9 @@ class AddContributorAccessTests(AddContributorAccessFixture):
     def test_contributor_access(self):
         assert_is_instance(self.page, ProjectPage)
 
+    def test_contributor_present(self):
+        assert_equal(self.users[1].full_name, self.page.contributors[1].full_name)
+
 
 class ProjectAddContributorAccessTestCase(AddContributorAccessTests, ProjectFixture):
     pass
