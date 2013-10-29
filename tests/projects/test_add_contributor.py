@@ -1,6 +1,8 @@
 from nose.tools import *
 
+from pages import LoginPage
 from pages.helpers import create_user
+from pages.project import ProjectPage
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
 
@@ -13,6 +15,7 @@ class AddContributorFixture(object):
         cls.users.append(create_user())
         cls.page.add_contributor(cls.users[-1])
         cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
+        cls.old_id = cls.page.id
 
 
 class AddContributorTests(AddContributorFixture):
@@ -51,6 +54,36 @@ class ComponentOfProjectTestCase(AddContributorTests, ComponentOfProjectFixture)
 
 class ComponentOfSubprojectTestCase(AddContributorTests, ComponentOfSubprojectFixture):
     """Test that a contributor was added to a subproject component"""
+    pass
+
+
+class AddContributorAccessFixture(AddContributorFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(AddContributorAccessFixture, cls).setUpClass()
+        cls.page.log_out()
+        cls.log_in(cls.users[1])
+        cls.page = cls.page.node(cls.old_id, cls.project_id)
+
+
+class AddContributorAccessTests(AddContributorAccessFixture):
+    def test_contributor_access(self):
+        assert_is_instance(self.page, ProjectPage)
+
+
+class ProjectAddContributorAccessTestCase(AddContributorAccessTests, ProjectFixture):
+    pass
+
+
+class SubprojectAddContributorAccessTestCase(AddContributorAccessTests, SubprojectFixture):
+    pass
+
+
+class ComponentOfProjectAddContributorAccessTestCase(AddContributorAccessTests, ComponentOfProjectFixture):
+    pass
+
+
+class ComponentOfSubprojectAddContributorAccessTestCase(AddContributorAccessTests, ComponentOfSubprojectFixture):
     pass
 
 
