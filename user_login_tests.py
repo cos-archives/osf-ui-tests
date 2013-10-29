@@ -13,14 +13,18 @@ from selenium.common.exceptions import NoSuchElementException
 import base
 import util
 import config
+import datetime as dt
+import unittest
+
+from pages import helpers
 
 class UserLoginTests(base.SmokeTest):
 
-    def setUp(self):    
-        
+    def setUp(self):
+
         # Call parent setUp
         super(UserLoginTests, self).setUp()
-        
+
         # Create user data
         self.user_data = util.create_user(self.driver)
 

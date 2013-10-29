@@ -206,18 +206,18 @@ class ProjectSmokeTest(UserSmokeTest):
         self.get_element('#contributors a[href="#addContributors"]').click()
 
         # enter the user's email address
-        self.get_element('div#addContributors input[type=text]').send_keys(
+        self.get_element('div#addContributors input[data-bind="value:query"]').send_keys(
             user['username']
         )
 
         # click the search button
-        self.get_element('#addContributors button').click()
+        self.get_element('#addContributors button.btn').click()
 
         # click the radio button for the first result
-        self.get_element('#addContributors input[type=radio]').click()
+        self.get_element('#addContributors a.btn.contrib-button').click()
 
         # click the "Add" button
-        self.get_element('#addContributors button.btn.primary').click()
+        self.get_element('#addContributors a[data-bind="click:submit"]').click()
 
     def remove_contributor(self, user_data):
         # mouse over to the contribute's name

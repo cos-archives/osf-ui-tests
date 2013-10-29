@@ -7,11 +7,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
+from selenium.webdriver.common.keys import Keys
+
 
 import config
 import logs
 from generic import ApiKey, OsfPage
 from helpers import WaitForFileUpload, WaitForPageReload
+
 
 class NodePage(OsfPage):
     """Base class for Component and Project pages. In other words, anything that
@@ -74,6 +77,146 @@ class NodePage(OsfPage):
             len(element_to_hover_over.find_elements_by_css_selector("i"))
         )
 
+    def add_multi_contributor(self, user1, user2):
+
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user1.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+         # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).clear()
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user2.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        with WaitForPageReload(self.driver):
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind="click:submit"]'
+            ).click()
+
+    def add_multi_contributor_delete(self, user1, user2):
+
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user1.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+         # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).clear()
+
+        # enter the user1's email address
+        self.driver.find_element_by_css_selector(
+            'div#addContributors input[data-bind="value:query"]'
+        ).send_keys(user2.email)
+
+        # click the search button
+        self.driver.find_element_by_css_selector(
+            '#addContributors button.btn'
+        ).click()
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
+            )
+        )
+
+        # click the radio button for the first result
+        self.driver.find_element_by_css_selector(
+            '#addContributors a.btn.contrib-button'
+        ).click()
+
+        self.driver.find_elements_by_css_selector(
+            "#addContributors A.btn.btn-default.contrib-button"
+        )[0].click()
+
+        with WaitForPageReload(self.driver):
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind="click:submit"]'
+            ).click()
+
     def add_contributor(self, user):
 
         # click the "add" link
@@ -90,31 +233,31 @@ class NodePage(OsfPage):
 
         # enter the user's email address
         self.driver.find_element_by_css_selector(
-            'div#addContributors input[type=text]'
+            'div#addContributors input[data-bind="value:query"]'
         ).send_keys(user.email)
 
         # click the search button
         self.driver.find_element_by_css_selector(
-            '#addContributors button'
+            '#addContributors button.btn'
         ).click()
 
         # wait for a result to display
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#addContributors input[type=radio]')
+                (By.CSS_SELECTOR, '#addContributors a.btn.contrib-button')
             )
         )
 
         # click the radio button for the first result
         self.driver.find_element_by_css_selector(
-            '#addContributors input[type=radio]'
+            '#addContributors a.btn.contrib-button'
         ).click()
 
         with WaitForPageReload(self.driver):
 
             # click the "Add" button
             self.driver.find_element_by_css_selector(
-                '#addContributors button.btn.primary'
+                '#addContributors a[data-bind="click:submit"]'
             ).click()
 
     @property
@@ -181,6 +324,21 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 'div.editable-popover button[type="submit"]'
             ).click()
+
+    @property
+    def tag(self):
+        """The node's title, parsed from the header
+
+        :returns: ``str``
+        """
+        return self._tag
+
+    def add_tag(self, value):
+
+        textbox = self.driver.find_element_by_css_selector(
+            'INPUT#node-tags_tag'
+        )
+        textbox.send_keys(value+'\n')
 
     @property
     def watched(self):
@@ -254,6 +412,14 @@ class NodePage(OsfPage):
         return self.driver.find_element_by_css_selector(
             '.node-parent-title a'
         ).get_attribute('href')
+
+    @property
+    def _tag(self):
+        """The node's tag element.
+
+        :returns: ``WebElement``
+        """
+        return self.driver.find_element_by_css_selector('span.tag').text
 
     @property
     def components(self):
@@ -445,8 +611,8 @@ class NodePage(OsfPage):
                         'href'
                     ),
                     date=dt.datetime.strptime(
-                        r.text.split('registered: ')[-1],
-                        '%Y/%m/%d %I:%M %p'
+                        r.text.split('Registered: ')[-1],
+                        '%m/%d/%y %I:%M %p'
                     ),
                 )
             )
@@ -459,7 +625,7 @@ class NodePage(OsfPage):
 
          :returns: [``Fork``, ... ]
         """
-
+        forks = []
         # Click "Forks"
         self.driver.find_element_by_css_selector(
             '#overview div.subnav'
@@ -469,11 +635,17 @@ class NodePage(OsfPage):
 
         F = namedtuple('Fork', ('title', 'url'))
 
-        forks = []
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'ul.list-group li#projects-widget.project.list-group-item h3'
+                )
+            )
+        )
 
         # for each list entry
         for f in self.driver.find_elements_by_css_selector(
-            'ul.list-group li.project h3'
+            'ul.list-group li#projects-widget.project.list-group-item h3'
         ):
             forks.append(
                 # build the Registration instance
@@ -534,11 +706,9 @@ class NodePage(OsfPage):
                 '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
             ).click()
 
-
-
         # Wait at least until the page has unloaded to continue.
         # TODO: I think this is where the 2-3 second delay is. Fix that.
-        #WebDriverWait(self.driver, 1).until(EC.staleness_of(body))
+        #WebDriverWait(self.driver, 1).until(EC.staleness_of('body'))
 
         return page
 
@@ -609,7 +779,7 @@ class NodePage(OsfPage):
 
             # Upload files
             self.driver.find_element_by_css_selector(
-                'div.fileupload-buttonbar button.start'
+                'div.fileupload-buttonbar BUTTON.btn.btn-primary.start'
             ).click()
 
         # refresh the page. Normally this wouldn't be necessary, but BlueImp
@@ -873,7 +1043,10 @@ class ProjectPage(NodePage):
         ).click()
 
         # Click "New Registration"
-        self.driver.find_element_by_link_text('New Registration').click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'div.page-header a.btn'
+            ).click()
 
         # Select the registration type
         with WaitForPageReload(self.driver):
@@ -909,7 +1082,7 @@ class ProjectPage(NodePage):
         with WaitForPageReload(self.driver):
             # click "Register"
             self.driver.find_element_by_css_selector(
-                '.container form button'
+                '#register-submit'
             ).click()
 
         return ProjectRegistrationPage(driver=self.driver)

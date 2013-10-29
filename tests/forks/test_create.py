@@ -79,30 +79,30 @@ class FromComplexSubproject(CreateComplex, ForkedComplexSubprojectFixture):
 
 
 class ForkedFrom(object):
-
     @classmethod
     def setUpClass(cls):
         super(ForkedFrom, cls).setUpClass()
         cls.fork_url = cls.page.driver.current_url
         cls.page.driver.get(cls.page.forked_from_url)
         cls.page = pages.project.ProjectPage(driver=cls.page.driver)
+        cls.fork_list= cls.page.forks
 
     def test_fork_count(self):
         assert_equal(1, self.page.num_forks)
 
     def test_fork_listed(self):
-        assert_equal(1, len(self.page.forks))
+        assert_equal(1, len(self.fork_list))
 
     def test_fork_list_title(self):
         assert_equal(
             'Fork of {}'.format(self.page.title),
-            self.page.forks[0].title
+            self.fork_list[0].title
         )
 
     def test_fork_list_url(self):
         assert_equal(
             self.fork_url,
-            self.page.forks[0].url
+            self.fork_list[0].url
         )
 
 

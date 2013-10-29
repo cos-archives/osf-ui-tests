@@ -5,8 +5,10 @@ from pages import helpers
 from pages.auth import LoginPage
 from pages.project import NodePage, ProjectPage
 from pages.exceptions import PageException
-
+from pages.helpers import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
 
 
 class ProjectSecurityTests2(unittest.TestCase):
@@ -16,6 +18,12 @@ class ProjectSecurityTests2(unittest.TestCase):
         second_user = helpers.create_user()
 
         page.add_contributor(second_user)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#contributors a[href^="/profile"]')
+            )
+        )
 
         self.assertIn(
             second_user.full_name,

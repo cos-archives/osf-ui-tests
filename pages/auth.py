@@ -36,6 +36,13 @@ class LoginPage(OsfPage):
 
         return UserDashboardPage(driver=self.driver)
 
+    def log_in_check(self, email, password):
+        with WaitForPageReload(self.driver):
+            form = self.driver.find_element_by_name('signin')
+            form.find_element_by_id('username').send_keys(email)
+            form.find_element_by_id('password').send_keys(password)
+            form.find_element_by_css_selector('button[type=submit]').click()
+
     def register(self, full_name, email, password, email2=None, password2=None):
         form = self.driver.find_element_by_name('registration')
         form.find_element_by_id('register-fullname').send_keys(full_name)
