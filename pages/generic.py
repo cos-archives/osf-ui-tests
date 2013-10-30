@@ -59,28 +59,6 @@ class OsfPage(object):
             )
         ) > 0
 
-    @property
-    def get_alert_boxes(self, alert_text):
-        """Check page for alert boxes. Asserts that there is exactly
-        one matching alert.
-
-        Args:
-            driver : WebDriver instance
-            alert_text : Text to search for in alert box
-        Returns:
-            matching alert boxes
-
-        """
-
-        # Find alerts
-        alerts = self.driver.find_elements_by_xpath(
-            '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
-            (alert_text.upper(), alert_text.lower(), alert_text.lower())
-        )
-
-        # Return matching alert boxes
-        return alerts
-
     def log_out(self):
         self.driver.find_element_by_css_selector(
             'ul#navbar-icons a[href="/logout"]'
