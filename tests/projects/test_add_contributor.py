@@ -2,8 +2,8 @@ from nose.tools import *
 
 from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
-from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
-
+from tests.components.fixtures import ComponentOfProjectFixture
+from tests.components.fixtures import ComponentOfSubprojectFixture
 
 class AddContributorFixture(object):
     @classmethod
@@ -25,6 +25,22 @@ class AddContributorFixture(object):
                 self.page.title,
             ),
             self.page.logs[0].text,
+        )
+
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[2].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[1]),
+            self.page.logs[0].links[1].url
         )
 
 
@@ -92,6 +108,25 @@ class AddMultiContributorFixture(object):
             self.page.logs[0].text,
         )
 
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[3].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[1]),
+            self.page.logs[0].links[1].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[2]),
+            self.page.logs[0].links[2].url
+        )
 
 class ProjectAddMultiContributor(AddMultiContributorFixture, ProjectFixture):
     pass
@@ -134,6 +169,7 @@ class ComponentOfSubprojectAddMultiContributorTest(
             self.page.logs[0].text,
         )
 
+
 class AddMultiContributorDeleteFixture(object):
     @classmethod
     def setUpClass(cls):
@@ -157,6 +193,21 @@ class AddMultiContributorDeleteFixture(object):
             self.page.logs[0].text,
         )
 
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[2].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[2]),
+            self.page.logs[0].links[1].url
+        )
 
 class ProjectAddMultiContributorDelete(
     AddMultiContributorDeleteFixture,

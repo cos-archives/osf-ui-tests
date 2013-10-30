@@ -16,6 +16,7 @@ import base
 import util
 import config
 
+
 class UserCreationTests(base.SmokeTest):
     
     def setUp(self):

@@ -41,6 +41,12 @@ class NodePage(OsfPage):
 
         :returns: [``Contributor``, ...]
         """
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'p#contributors a[href^="/profile"]')
+            )
+        )
+
         # TODO: This doesn't take into account non-registered users.
         C = namedtuple('Contributor', ('full_name', 'profile_url', 'id'))
 
@@ -51,7 +57,7 @@ class NodePage(OsfPage):
                 id=x.get_attribute('href').split('/')[-1],
             )
             for x in self.driver.find_elements_by_css_selector(
-                '#contributors a[href^="/profile"]'
+                'p#contributors a[href^="/profile"]'
             )
         ]
 
@@ -145,6 +151,7 @@ class NodePage(OsfPage):
                 '#addContributors a[data-bind="click:submit"]'
             ).click()
 
+
     def add_multi_contributor_delete(self, user1, user2):
 
         # click the "add" link
@@ -216,6 +223,38 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 '#addContributors a[data-bind="click:submit"]'
             ).click()
+
+    def remove_contributor(self, user):
+        # mouse over to the contribute's name
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    '#contributors a[data-fullname="' + user.full_name+'"]'
+                )
+            )
+        )
+        element_to_hover_over = self.driver.find_element_by_css_selector(
+            '#contributors a[data-fullname="' + user.full_name+'"]'
+        )
+        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
+        hover.perform()
+
+        # click the remove icon
+        element_to_hover_over.find_element_by_css_selector("i").click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    "div.modal-dialog button[class='btn btn-primary']"
+                )
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            "div.modal-dialog button[class='btn btn-primary']"
+        ).click()
 
     def add_contributor(self, user):
 
@@ -690,6 +729,33 @@ class NodePage(OsfPage):
         return logs.parse_log(
             container=self.driver.find_element_by_id('main-log')
         )
+
+    def log_user_link(self, user):
+        project_url = self.driver.current_url
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div#main-log dd')
+            )
+        )
+        self.driver.find_elements_by_css_selector(
+            'div#main-log dd'
+        )[0].find_element_by_link_text(user.full_name).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'tbody')
+            )
+        )
+
+        user_url = self.driver.find_element_by_css_selector(
+            "tbody tr td a"
+        ).get_attribute("href")
+
+        self.driver.get(project_url)
+
+        return user_url
+
+
 
     def fork(self, split_driver=False):
         """Create a fork of the node.
