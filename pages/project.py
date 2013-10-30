@@ -41,6 +41,12 @@ class NodePage(OsfPage):
 
         :returns: [``Contributor``, ...]
         """
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#contributors a[href^="/profile"]')
+            )
+        )
+
         # TODO: This doesn't take into account non-registered users.
         C = namedtuple('Contributor', ('full_name', 'profile_url', 'id'))
 
@@ -216,6 +222,38 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 '#addContributors a[data-bind="click:submit"]'
             ).click()
+
+    def remove_contributor(self, user):
+        # mouse over to the contribute's name
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    '#contributors a[data-fullname="' + user.full_name+'"]'
+                )
+            )
+        )
+        element_to_hover_over = self.driver.find_element_by_css_selector(
+            '#contributors a[data-fullname="' + user.full_name+'"]'
+        )
+        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
+        hover.perform()
+
+        # click the remove icon
+        element_to_hover_over.find_element_by_css_selector("i").click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    "div.modal-dialog button[class='btn btn-primary']"
+                )
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            "div.modal-dialog button[class='btn btn-primary']"
+        ).click()
 
     def add_contributor(self, user):
 

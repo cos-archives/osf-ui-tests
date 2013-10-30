@@ -2,8 +2,8 @@ from nose.tools import *
 
 from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
-from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
-
+from tests.components.fixtures import ComponentOfProjectFixture
+from tests.components.fixtures import ComponentOfSubprojectFixture
 
 class AddContributorFixture(object):
     @classmethod
