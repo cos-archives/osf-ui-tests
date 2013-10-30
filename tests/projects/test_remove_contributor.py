@@ -4,6 +4,7 @@ from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture
 from tests.components.fixtures import ComponentOfSubprojectFixture
+import datetime as dt
 
 
 class RemoveContributorFixture(object):
@@ -45,6 +46,13 @@ class RemoveContributorFixture(object):
         assert_in(
             self.page.log_user_link(self.users[1]),
             self.page.logs[0].links[1].url
+        )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
         )
 
 

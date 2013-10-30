@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 from selenium.webdriver.common.keys import Keys
 
-
+import re
 import config
 import logs
 from generic import ApiKey, OsfPage
@@ -150,7 +150,6 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 '#addContributors a[data-bind="click:submit"]'
             ).click()
-
 
     def add_multi_contributor_delete(self, user1, user2):
 
@@ -615,6 +614,39 @@ class NodePage(OsfPage):
         self.driver.get(_url)
 
         return content
+
+    def get_wiki_version(self, page='home'):
+        """ Get the version of a wiki page.
+
+        :param page: Optional. Defaults to "home".
+
+        :returns: ``str``
+        """
+        _url = self.driver.current_url
+
+        self.driver.get(
+            '{}/wiki/{}'.format(
+                _url.strip('/'),
+                page
+            )
+        )
+
+        # set the new content
+        version = self.driver.find_element_by_xpath(
+            '//dt[text()="Version"]/following-sibling::*'
+        ).text
+
+        # Strip (current) from version string
+        version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
+
+        # Go back to the project page.
+        self.driver.get(_url)
+
+        # Return version number or 0
+        try:
+            return int(version)
+        except ValueError:
+            return 0
 
     @property
     def wiki_home_content(self):
