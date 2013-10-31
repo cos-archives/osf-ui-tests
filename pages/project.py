@@ -831,7 +831,7 @@ class NodePage(OsfPage):
             self.driver.get(files_page)
         else:
             _url = None
-
+w
         upload_button_class = self.driver.find_element_by_css_selector(
             'span.fileinput-button'
         ).get_attribute('class')
@@ -886,7 +886,7 @@ class NodePage(OsfPage):
 
             # Upload files
             self.driver.find_element_by_css_selector(
-                'div.fileupload-buttonbar BUTTON.btn.btn-primary.start'
+                'div.container h3 A#clickable.dz-clickable'
             ).click()
 
         # refresh the page. Normally this wouldn't be necessary, but BlueImp
@@ -905,35 +905,35 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
              EC.visibility_of_element_located(
-                 (By.CSS_SELECTOR, 'tbody.files')
+                 (By.CSS_SELECTOR, 'div.grid-canvas')
              )
         )
 
         row = [
             x for x in
             self.driver.find_elements_by_css_selector(
-                '#filesTable tbody.files tr'
+                'div.grid-canvas'
             )
-            if x.find_element_by_css_selector('td.name a').text == f
+            if x.find_element_by_css_selector(
+                'div.slick-cell.l0.r0.cell-title a'
+            ).text == f
         ]
 
         # row[0].find_element_by_css_selector('button.btn-delete').click()
-        self.driver.find_element_by_css_selector('button.btn-delete').click()
-        WebDriverWait(self.driver, 3).until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.modal.in button.btn-primary')
-            )
-        )
-
         self.driver.find_element_by_css_selector(
-            'div.modal.in button.btn-primary'
+            'button.btn.btn-danger.btn-mini'
         ).click()
+        self.driver.switchTo().alert().accept()
 
     @property
     def files(self):
         F = namedtuple(
             'File',
-            ('name', 'date_modified', 'file_size', 'downloads', 'url')
+            ('name',
+             #'date_modified',
+             'file_size',
+             'downloads',
+             'url')
         )
 
         # Click "Files" in the node's subnav
@@ -945,31 +945,31 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#filesTable')
+                (By.CSS_SELECTOR, 'div.grid-canvas')
             )
         )
 
         return [F(
             name=r.find_element_by_css_selector(
-                'td.name a'
+                'div.slick-cell.l0.r0.cell-title a'
             ).text,
-            date_modified=dt.datetime.strptime(
-                r.find_element_by_css_selector(
-                    'td:nth-of-type(2)'
-                ).text,
-                '%Y/%m/%d %I:%M %p'
-            ),
+            #date_modified=dt.datetime.strptime(
+            #    r.find_element_by_css_selector(
+            #        'td:nth-of-type(2)'
+            #    ).text,
+            #    '%Y/%m/%d %I:%M %p'
+            #),
             file_size=r.find_element_by_css_selector(
-                'td.size'
+                'div.slick-cell.l1.r1'
             ).text,
             url=r.find_element_by_css_selector(
-                'td.name a'
+                'div.slick-cell.l0.r0.cell-title a'
             ).get_attribute('href'),
             downloads=r.find_element_by_css_selector(
-                'td:nth-of-type(4)'
+                'div.slick-cell.l2.r2'
             ).text,
         ) for r in self.driver.find_elements_by_css_selector(
-            '#filesTable tbody.files tr'
+            'div.grid-canvas'
         )]
 
     def _clone(self):
