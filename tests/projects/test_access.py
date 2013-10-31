@@ -4,6 +4,7 @@ from nose.tools import *
 
 from pages import FILES
 from pages.exceptions import HttpError
+from pages.helpers import create_user
 from pages.project import ProjectPage, FilePage
 from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
 from tests.components.fixtures import (
@@ -236,4 +237,67 @@ class FileOfComponentOfPublicSubprojectTestCase(PrivateFileAccessTests, FileFixt
 class FileOfComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateFileAccessTests, FileFixture,
                                                                ComponentOfPublicSubprojectOfPublicProjectFixture):
     """Test access to files of a private component of a public subproject of a public project"""
+    pass
+
+
+class ForkAccessFixture(object):
+    @classmethod
+    @unittest.skip('Not completed')
+    def setUpClass(cls):
+        super(ForkAccessFixture, cls).setUpClass()
+
+        cls.old_id = cls.page.id
+
+        #create public and private subprojects and components
+        cls.page = cls.page.add_component(
+            title='Public Subproject',
+            component_type='Project',
+        )
+        cls.page.public = True
+        cls.page = cls.page.node(cls.old_id)
+
+        cls.page = cls.page.add_component(
+            title='Public Component',
+        )
+        cls.page.public = True
+        cls.page = cls.page.node(cls.old_id)
+
+        cls.page.add_component(
+            title='Private Subproject',
+            component_type='Project',
+        )
+        cls.page = cls.page.node(cls.old_id)
+
+        cls.page.add_component(
+            title='Private Component'
+        )
+        cls.page = cls.page.node(cls.old_id)
+
+        # fork as new user
+        cls.page.log_out()
+        cls.users.append(create_user())
+        cls.log_in(cls.users[-1])
+
+        cls.page = cls.page.node(cls.old_id)
+
+
+class ForkAccessTests(ForkAccessFixture):
+    def test_public_subproject_present(self):
+        assert_in(u'Public Subproject', self.page.components)
+
+    def test_public_component_present(self):
+        assert_in(u'Public Component', self.page.components)
+
+    def test_private_subproject_absent(self):
+        assert_in(u'Private Subproject', self.page.components)
+
+    def test_private_component_absent(self):
+        assert_in(u'Private Component', self.page.components)
+
+
+class ForkAccessTestCase(ForkAccessTests, PublicProjectFixture):
+    pass
+
+
+class ForkSubprojectAccessTestCase(ForkAccessTests, PublicSubprojectFixture):
     pass
