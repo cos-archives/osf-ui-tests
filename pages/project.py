@@ -831,7 +831,7 @@ class NodePage(OsfPage):
             self.driver.get(files_page)
         else:
             _url = None
-w
+
         upload_button_class = self.driver.find_element_by_css_selector(
             'span.fileinput-button'
         ).get_attribute('class')
