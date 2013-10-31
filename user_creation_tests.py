@@ -16,6 +16,7 @@ import base
 import util
 import config
 
+
 class UserCreationTests(base.SmokeTest):
     
     def setUp(self):
@@ -119,7 +120,7 @@ class UserCreationTests(base.SmokeTest):
     def test_valid_account(self):
         
         # Submit original form data
-        self._submit_and_check(self.user_data, 'you may now login')
+        self._submit_and_check(self.user_data, 'You may now log in')
         
         # Make sure we can log in
         util.login(

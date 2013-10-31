@@ -88,14 +88,15 @@ def get_alert_boxes(driver, alert_text):
 
     # Find alerts
     alerts = driver.find_elements_by_xpath(
-        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' % \
-            (alert_text.upper(), alert_text.lower(), alert_text.lower())
+        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
+        (alert_text.upper(), alert_text.lower(), alert_text.lower())
     )
 
     # Return matching alert boxes
     return alerts
     
 find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+
 
 def fill_form(
         root, 
@@ -214,6 +215,7 @@ def goto_profile(driver):
 
     # Click Public Profile link
     driver.find_element_by_link_text('My Public Profile').click()
+
 
 def goto_project(driver, project_title=config.project_title):
 
@@ -488,6 +490,7 @@ def forget_password(driver, email):
 
     })
 
+
 def project_rename(driver, text):
 
         driver.find_element_by_id('node-title-editable').click()
@@ -497,7 +500,8 @@ def project_rename(driver, text):
             '//div[@class="popover-content"]//input[@class="span2"]'
         )
 
-        # delete the current project name
+        # delete the curr
+        # ent project name
         edit_profile_name_field.clear()
 
         # enter the new project name
@@ -508,7 +512,7 @@ def project_rename(driver, text):
             '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
         ).click()
         driver.refresh()
-        goto_project(driver, text)
+
 
 
 

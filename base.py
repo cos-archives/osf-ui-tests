@@ -21,6 +21,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 # Project imports
 import config
 import util
+import urlparse
 import os
 import shutil
 import tempfile
@@ -278,12 +279,16 @@ class ProjectSmokeTest(UserSmokeTest):
     def set_permission(self, permission, url=None):
 
         url = url or self.project_url
-        url = url.strip('/')
+        self.driver.get(url)
 
-        self.driver.get('{url}/permissions/{prm}'.format(
-            url=url,
-            prm=permission,
-        ))
+        if permission == 'public':
+            self.get_element('div.btn-toolbar a#publicButton.btn').click()
+            self.get_element('div.modal-dialog button.btn.btn-primary').click()
+
+        else:
+            self.get_element('div.btn-toolbar a#privateButton.btn').click()
+            self.get_element('div.modal-dialog button.btn.btn-primary').click()
+
 
     def make_private(self, url=None):
         """Make a project or component private.
@@ -465,7 +470,7 @@ class ProjectSmokeTest(UserSmokeTest):
         with WaitForPageReload(self.driver):
             # click the fork button
             self.get_element(
-                'div.btn-toolbar div.btn-group:last-child a:last-child'
+                'div.btn-toolbar div.btn-group a.btn.node-fork-btn'
             ).click()
 
         return self.driver.current_url
@@ -500,19 +505,18 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # Fill out the form
         self.get_element(
-            'textarea.ember-view'
+            'textarea[data-bind="value:value, attr:{name:id}, disable:disable"]'
         ).send_keys('Test content for a textarea.')
 
         for elem in self.driver.find_elements_by_css_selector(
                 'div#registration_template select'):
             elem.send_keys('Yes')
 
-
         self.get_element(
-            'form.form-horizontal div.control-group input.ember-view'
+            'form.form-horizontal div.control-group input'
         ).send_keys('continue')
 
-        self.get_element('div.ember-view button.btn.primary').click()
+        self.get_element('button#register-submit.btn').click()
 
         # Hack: Wait for registration label so that we can get the
         # correct URL for the registration

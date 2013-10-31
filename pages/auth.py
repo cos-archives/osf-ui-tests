@@ -1,9 +1,11 @@
 import config
 import logs
 from generic import ApiKey, OsfPage
-from helpers import WaitForPageReload, Project
+from helpers import WaitForPageReload, Project, WebDriverWait
 from static import HomePage
 from project import ProjectPage
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
 
 
 class LoginPage(OsfPage):
@@ -42,6 +44,8 @@ class LoginPage(OsfPage):
             form.find_element_by_id('username').send_keys(email)
             form.find_element_by_id('password').send_keys(password)
             form.find_element_by_css_selector('button[type=submit]').click()
+        
+        return LoginPage(driver=self.driver)
 
     def register(self, full_name, email, password, email2=None, password2=None):
         form = self.driver.find_element_by_name('registration')
@@ -94,7 +98,24 @@ class UserDashboardPage(OsfPage):
             ).click()
 
         return ProjectPage(driver=self.driver)
-
+    
+    def get_alert_boxes(self, alert_text):
+        WebDriverWait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                 By.CSS_SELECTOR,
+                 'div.alert.alert-block.alert-warning.fade.in'
+                )
+            )
+        )
+        alerts = self.driver.find_elements_by_xpath(
+            '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
+            (alert_text.upper(), alert_text.lower(), alert_text.lower())
+        )
+        
+        # Return matching alert boxes
+        return alerts
+ 
     @property
     def profile_link(self):
         return self.driver.find_element_by_link_text(

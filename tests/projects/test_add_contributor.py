@@ -4,7 +4,9 @@ from pages import LoginPage
 from pages.helpers import create_user
 from pages.project import ProjectPage
 from tests.fixtures import ProjectFixture, SubprojectFixture
-from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
+from tests.components.fixtures import ComponentOfProjectFixture
+from tests.components.fixtures import ComponentOfSubprojectFixture
+import datetime as dt
 
 
 class AddContributorFixture(object):
@@ -34,6 +36,29 @@ class AddContributorTests(AddContributorFixture):
                 self.page.title,
             ),
             self.page.logs[0].text,
+        )
+
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[2].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[1]),
+            self.page.logs[0].links[1].url
+        )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
         )
 
 
@@ -121,6 +146,33 @@ class AddMultiContributorTests(AddMultiContributorFixture):
             self.page.logs[0].text,
         )
 
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[3].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[1]),
+            self.page.logs[0].links[1].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[2]),
+            self.page.logs[0].links[2].url
+        )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
+        )
+
 
 class ProjectAddMultiContributorTestCase(AddMultiContributorTests, ProjectFixture):
     """Test that multiple contributors were added to a project"""
@@ -140,6 +192,7 @@ class ComponentOfProjectAddMultiContributorTestCase(AddMultiContributorTests, Co
 class ComponentOfSubprojectAddMultiContributorTestCase(AddMultiContributorTests, ComponentOfSubprojectFixture):
     """Test that multiple contributors were added to a subproject component"""
     pass
+
 
 
 class AddMultiContributorDeleteFixture(object):
@@ -169,6 +222,29 @@ class AddMultiContributorDeleteTests(AddMultiContributorDeleteFixture):
                 self.page.title,
             ),
             self.page.logs[0].text,
+        )
+
+    def test_project_links(self):
+        assert_equal(
+            self.page.driver.current_url,
+            self.page.logs[0].links[2].url
+        )
+
+    def test_user_links(self):
+        assert_equal(
+            self.user_profile_url,
+            self.page.logs[0].links[0].url
+        )
+        assert_in(
+            self.page.log_user_link(self.users[2]),
+            self.page.logs[0].links[1].url
+        )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
         )
 
 
