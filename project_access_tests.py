@@ -11,54 +11,6 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 
 
-class ProjectSecurityTests2(unittest.TestCase):
-    # TODO Are these tests technically covered in projects.test_access?
-    def _test_add_contributor_access(self, page):
-        _url = page.driver.current_url
-        second_user = helpers.create_user()
-
-        page.add_contributor(second_user)
-
-        WebDriverWait(page.driver, 3).until(
-            ec.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#contributors a[href^="/profile"]')
-            )
-        )
-
-        self.assertIn(
-            second_user.full_name,
-            [x.full_name for x in page.contributors]
-        )
-
-        page.close()
-
-        page = LoginPage()
-        page.log_in(second_user)
-
-        page.driver.get(_url)
-
-        page = ProjectPage(driver=page.driver)
-
-        self.assertIn(
-            second_user.full_name,
-            [x.full_name for x in page.contributors],
-        )
-
-        page.close()
-
-    def test_project_add_contributors_access(self):
-        self._test_add_contributor_access(helpers.get_new_project())
-
-    def test_subproject_add_contributors_access(self):
-        self._test_add_contributor_access(helpers.get_new_subproject())
-
-    def test_component_add_contributors_access(self):
-        self._test_add_contributor_access(helpers.get_new_component())
-
-    def test_nested_component_add_contributors_access(self):
-        self._test_add_contributor_access(helpers.get_new_nested_component())
-
-
 class ProjectSecurityTest(ProjectSmokeTest):
 
     def setUp(self):
