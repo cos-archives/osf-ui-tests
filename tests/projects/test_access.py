@@ -242,7 +242,6 @@ class FileOfComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateFileAccess
 
 class ForkAccessFixture(object):
     @classmethod
-    @unittest.skip('Not completed')
     def setUpClass(cls):
         super(ForkAccessFixture, cls).setUpClass()
 
@@ -283,19 +282,19 @@ class ForkAccessFixture(object):
 
 class ForkAccessTests(ForkAccessFixture):
     def test_public_subproject_present(self):
-        assert_in(u'Public Subproject', self.page.components)
+        assert_in('Public Subproject', str(self.page.components))
 
     def test_public_component_present(self):
-        assert_in(u'Public Component', self.page.components)
+        assert_in('Public Component', str(self.page.components))
 
     def test_private_subproject_absent(self):
-        assert_in(u'Private Subproject', self.page.components)
+        assert_in('Private Subproject', str(self.page.components))
 
     def test_private_component_absent(self):
-        assert_in(u'Private Component', self.page.components)
+        assert_in('Private Component', str(self.page.components))
 
 
-class ForkAccessTestCase(ForkAccessTests, PublicProjectFixture):
+class ForkProjectAccessTestCase(ForkAccessTests, PublicProjectFixture):
     pass
 
 
