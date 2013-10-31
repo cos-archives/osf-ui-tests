@@ -4,6 +4,8 @@ from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture
 from tests.components.fixtures import ComponentOfSubprojectFixture
+import datetime as dt
+
 
 class AddContributorFixture(object):
     @classmethod
@@ -41,6 +43,13 @@ class AddContributorFixture(object):
         assert_in(
             self.page.log_user_link(self.users[1]),
             self.page.logs[0].links[1].url
+        )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
         )
 
 
@@ -128,6 +137,14 @@ class AddMultiContributorFixture(object):
             self.page.logs[0].links[2].url
         )
 
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
+        )
+
+
 class ProjectAddMultiContributor(AddMultiContributorFixture, ProjectFixture):
     pass
 
@@ -208,6 +225,14 @@ class AddMultiContributorDeleteFixture(object):
             self.page.log_user_link(self.users[2]),
             self.page.logs[0].links[1].url
         )
+
+    def test_date_created(self):
+        assert_almost_equal(
+            self.page.logs[0].date,
+            dt.datetime.utcnow(),
+            delta=dt.timedelta(minutes=2)
+        )
+
 
 class ProjectAddMultiContributorDelete(
     AddMultiContributorDeleteFixture,
