@@ -857,7 +857,3 @@ class FileHandlingTests(base.ProjectSmokeTest):
     @skip('Not Implemented')
     def test_access_file_not_found(self):
         raise NotImplementedError
-
-    @skip('Not Implemented')
-    def test_download_count(self):
-        raise NotImplementedError
