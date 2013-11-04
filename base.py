@@ -355,20 +355,33 @@ class ProjectSmokeTest(UserSmokeTest):
         node_url = node_url or self.project_url
         self.goto('files', node_url=node_url)
 
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.container h3 a#clickable.dz-clickable')
+            )
+        )
+
         self.driver.execute_script('''
-            $('input[type="file"]').offset({left : 50});
+            $('input[type="file"]').attr('style', "");
         ''')
 
-        # Find file input
-        field = self.driver.find_element_by_css_selector('input[type=file]')
-
-        # Enter file into input
-        field.send_keys(path)
+        #with WaitForFileUpload(self.driver, wait=5):
 
         # Upload files
         self.driver.find_element_by_css_selector(
-            'div.fileupload-buttonbar button.start'
+            'div.container h3 A#clickable.dz-clickable'
         ).click()
+
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[type="file"]')
+            )
+        )
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type="file"]')
+
+        # Enter file into input
+        field.send_keys(path)
 
     # Component methods
 

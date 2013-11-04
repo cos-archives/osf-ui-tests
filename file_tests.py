@@ -236,7 +236,6 @@ class FileTests(unittest.TestCase):
     def test_component_delete_file(self):
         self._test_delete_file(self._component())
 
-    @unittest.skip('known failure')
     def test_project_delete_file_logged(self):
         # log says "component"; expected "project"
         page = get_new_project()
@@ -311,7 +310,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_component_delete_file_logged(self):
         # log says "project"; expected "component"
         page = self._component()
@@ -425,7 +423,6 @@ class FileTests(unittest.TestCase):
 
         return page, os.path.basename(temp_file_path)
 
-    @unittest.skip('expected failure')
     def test_project_file_update_logged(self):
         # log says "component", expected "project"
         page, filename = self._test_file_update_logged(get_new_project())
@@ -505,7 +502,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('expected failure')
     def test_component_file_update_logged(self):
         # expected "component"; got "project"
         page, filename = self._test_file_update_logged(self._component())
@@ -671,7 +667,7 @@ class FileTests(unittest.TestCase):
             ec.visibility_of_element_located(
                 (
                     By.CSS_SELECTOR,
-                    '#fileupload div.fileupload-buttonbar .disabled'
+                    'div.grid-canvas'
                 )
             )
         )
@@ -680,20 +676,20 @@ class FileTests(unittest.TestCase):
         self.assertEqual(
             len(
                 page.driver.find_elements_by_css_selector(
-                    '#fileupload div.fileupload-buttonbar .disabled'
+                    'div.container h3 a#clickable.dz-clickable'
                 )
             ),
-            2
+            0
         )
 
         # the delete button for the file should also be disabled
         self.assertEqual(
             len(
                 page.driver.find_elements_by_css_selector(
-                    'form.fileDeleteForm button.btn-delete.disabled'
+                    'div.grid-canvas div.slick-cell.l3.r3 button.btn.btn-danger.btn-mini'
                 )
             ),
-            1
+            0
         )
 
         page.close()

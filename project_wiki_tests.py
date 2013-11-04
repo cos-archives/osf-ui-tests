@@ -16,6 +16,7 @@ import base
 import util
 import config
 
+
 class ProjectWikiTests(base.ProjectSmokeTest):
     
     # Utility functions
