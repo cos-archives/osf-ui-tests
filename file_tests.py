@@ -701,6 +701,28 @@ class FileTests(unittest.TestCase):
     def test_component_file_controls_not_present_anonymous(self):
         self._test_file_controls_not_present(self._component())
 
+    #Dashboard file view
+    #####################
+
+    def _test_file_view(self, page):
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        self.assertEqual(
+            len(page.files_view),
+            1
+        )
+
+        page.close()
+
+    def test_project_view_file(self):
+        self._test_file_view(get_new_project())
+
+    def test_subproject_view_file(self):
+        self._test_file_view(self._subproject())
+
+    def test_component_view_file(self):
+        self._test_file_view(self._component())
+
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
@@ -855,3 +877,6 @@ class FileHandlingTests(base.ProjectSmokeTest):
     @skip('Not Implemented')
     def test_access_file_not_found(self):
         raise NotImplementedError
+
+
+
