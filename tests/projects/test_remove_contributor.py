@@ -1,32 +1,24 @@
+import httplib as http
+
 from nose.tools import *
 
-from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture
 from tests.components.fixtures import ComponentOfSubprojectFixture
+from tests.projects.fixtures import RemoveContributorFixture, RemoveContributorAccessFixture
 import datetime as dt
 
 
-class RemoveContributorFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(RemoveContributorFixture, cls).setUpClass()
-
-        cls.users.append(create_user())
-        cls.users.append(create_user())
-
-        cls.page.add_multi_contributor(cls.users[1], cls.users[2])
-
-        cls.page.remove_contributor(cls.users[1])
-
+class RemoveContributorTests(RemoveContributorFixture):
     def test_contributor_removed(self):
         assert_equal(2, len(self.page.contributors))
 
     def test_logged(self):
         assert_equal(
-            u'{} removed {} as a contributor from project {}'.format(
+            u'{} removed {} as a contributor from {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,
@@ -56,41 +48,44 @@ class RemoveContributorFixture(object):
         )
 
 
-class ProjectRemoveContributor(RemoveContributorFixture, ProjectFixture):
+class ProjectRemoveContributor(RemoveContributorTests, ProjectFixture):
     pass
 
 
-class SubprojectRemoveContributor(RemoveContributorFixture, SubprojectFixture):
+class SubprojectRemoveContributor(RemoveContributorTests, SubprojectFixture):
     pass
 
 
 class ComponentOfProjectRemoveContributorTest(
-    RemoveContributorFixture,
+    RemoveContributorTests,
     ComponentOfProjectFixture
 ):
-
-    def test_logged(self):
-        assert_equal(
-            u'{} removed {} as a contributor from component {}'.format(
-                self.users[0].full_name,
-                self.users[1].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
+    pass
 
 
 class ComponentOfSubprojectRemoveContributorTest(
-    RemoveContributorFixture,
+    RemoveContributorTests,
     ComponentOfSubprojectFixture
 ):
+    pass
 
-    def test_logged(self):
-        assert_equal(
-            u'{} removed {} as a contributor from component {}'.format(
-                self.users[0].full_name,
-                self.users[1].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
+
+class RemoveContributorAccessTests(RemoveContributorAccessFixture):
+    def test_removed_contributor_access(self):
+        assert_equal(http.FORBIDDEN, self.cm.exception.code)
+
+
+class ProjectRemoveContributorAccess(RemoveContributorAccessTests, ProjectFixture):
+    pass
+
+
+class SubprojectRemoveContributorAccess(RemoveContributorAccessTests, SubprojectFixture):
+    pass
+
+
+class ComponentOfProjectRemoveContributorAccess(RemoveContributorAccessTests, ComponentOfProjectFixture):
+    pass
+
+
+class ComponentOfSubprojectRemoveContributorAccess(RemoveContributorAccessTests, ComponentOfSubprojectFixture):
+    pass

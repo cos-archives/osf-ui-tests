@@ -35,6 +35,10 @@ class NodePage(OsfPage):
         )
 
     @property
+    def can_edit_title(self):
+        return len(self.driver.find_elements_by_id('node-title-editable')) == 1
+
+    @property
     def contributors(self):
         """ A list of contributors for the node, parsed from the
         header.
@@ -82,6 +86,19 @@ class NodePage(OsfPage):
         return bool(
             len(element_to_hover_over.find_elements_by_css_selector("i"))
         )
+
+    @property
+    def can_view_file(self):
+        if len(self.driver.find_element_by_css_selector(
+            'div.grid-canvas'
+        ). find_element_by_css_selector(
+            'div.ui-widget-content.slick-row.even'
+        ).find_elements_by_css_selector(
+            'span.toggle.expand.nav-filter-item'
+        )) == 0:
+            return False
+
+        return True
 
     def add_multi_contributor(self, user1, user2):
 
@@ -253,10 +270,11 @@ class NodePage(OsfPage):
                 )
             )
         )
+        with WaitForPageReload(self.driver):
 
-        self.driver.find_element_by_css_selector(
-            "div.modal-dialog button[class='btn btn-primary']"
-        ).click()
+            self.driver.find_element_by_css_selector(
+                "div.modal-dialog button[class='btn btn-primary']"
+            ).click()
 
     def add_contributor(self, user):
 
@@ -831,15 +849,15 @@ class NodePage(OsfPage):
             self.driver.get(files_page)
         else:
             _url = None
-w
+
         upload_button_class = self.driver.find_element_by_css_selector(
-            'span.fileinput-button'
-        ).get_attribute('class')
+            'div.container h3 A#clickable.dz-clickable'
+        )
 
         if _url:
             self.driver.get(_url)
 
-        return False if 'disabled' in upload_button_class else True
+        return True if len(upload_button_class) == 0 else False
 
     @property
     def can_delete_files(self):
@@ -855,13 +873,13 @@ w
             _url = None
 
         delete_button_class = self.driver.find_elements_by_css_selector(
-            '.fileDeleteForm button.btn-delete'
-        )[0].get_attribute('class')
+            'button.btn.btn-danger.btn-mini'
+        )
 
         if _url:
             self.driver.get(_url)
 
-        return False if 'disabled' in delete_button_class else True
+        return True if len(delete_button_class) == 0 else False
 
     def add_file(self, f):
         """Add a file to the node."""
@@ -873,21 +891,26 @@ w
             'Files'
         ).click()
 
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.container h3 a#clickable.dz-clickable')
+            )
+        )
+
         self.driver.execute_script('''
-            $('input[type="file"]').offset({left : 50});
+            $('input[type="file"]').attr('style', "");
         ''')
 
-        with WaitForFileUpload(self.driver, wait=5):
-            # Find file input
-            field = self.driver.find_element_by_css_selector('input[type=file]')
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[type="file"]')
+            )
+        )
+        # Find file input
+        field = self.driver.find_element_by_css_selector('input[type="file"]')
 
-            # Enter file into input
-            field.send_keys(f if isinstance(f, basestring) else f.path)
-
-            # Upload files
-            self.driver.find_element_by_css_selector(
-                'div.container h3 A#clickable.dz-clickable'
-            ).click()
+        # Enter file into input
+        field.send_keys(f if isinstance(f, basestring) else f.path)
 
         # refresh the page. Normally this wouldn't be necessary, but BlueImp
         # doesn't work well with Selenium.
@@ -904,9 +927,9 @@ w
         ).click()
 
         WebDriverWait(self.driver, 3).until(
-             EC.visibility_of_element_located(
-                 (By.CSS_SELECTOR, 'div.grid-canvas')
-             )
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.grid-canvas')
+            )
         )
 
         row = [
@@ -921,9 +944,18 @@ w
 
         # row[0].find_element_by_css_selector('button.btn-delete').click()
         self.driver.find_element_by_css_selector(
-            'button.btn.btn-danger.btn-mini'
+            'div.grid-canvas div.slick-cell.l3.r3 button.btn.btn-danger.btn-mini'
         ).click()
-        self.driver.switchTo().alert().accept()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.modal-dialog')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'div.modal-dialog button.btn.btn-primary'
+        ).click()
 
     @property
     def files(self):
@@ -969,8 +1001,48 @@ w
                 'div.slick-cell.l2.r2'
             ).text,
         ) for r in self.driver.find_elements_by_css_selector(
-            'div.grid-canvas'
+            'div.grid-canvas div.ui-widget-content.slick-row.odd'
         )]
+
+    @property
+    def files_view(self):
+        F = namedtuple(
+            'File',
+            ('name',
+             'url')
+        )
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.grid-canvas')
+            )
+        )
+        self.driver.find_element_by_css_selector(
+            'div.grid-canvas'
+        ). find_element_by_css_selector(
+            'div.ui-widget-content.slick-row.even'
+        ).find_element_by_css_selector(
+            'span.toggle.expand.nav-filter-item'
+        ).click()
+
+        return [F(
+            name=r.find_element_by_css_selector(
+                'div.slick-cell.l0.r0.cell-title a'
+            ).text,
+            url=r.find_element_by_css_selector(
+                'div.slick-cell.l0.r0.cell-title a'
+            ).get_attribute('href'),
+        ) for r in self.driver.find_elements_by_css_selector(
+            'div.grid-canvas '
+        )]
+
 
     def _clone(self):
         new_driver = self.driver.__class__()
@@ -985,6 +1057,15 @@ w
 
         # return a copy of this class, with the new driver.
         return self.__class__(driver=new_driver)
+
+    @property
+    def can_access_settings(self):
+        if 'settings' not in str(self.driver.find_elements_by_css_selector(
+                '.nav-pills li:last-child'
+        )):
+            return False
+
+        return True
 
 
 class NodeSettingsPage(NodePage):
@@ -1071,6 +1152,15 @@ class ProjectPage(NodePage):
             del kwargs['id']
 
         super(ProjectPage, self).__init__(*args, **kwargs)
+
+    @property
+    def can_add_component(self):
+
+        add_component_class = self.driver.find_element_by_css_selector(
+            '#Nodes .page-header div'
+        ).find_element_by_link_text('Add Component').get_attribute('class')
+
+        return 'disabled' not in add_component_class
 
     def add_component(self, title, component_type=None):
         """Add a component to the project.
@@ -1256,19 +1346,21 @@ class FilePage(NodePage):
     @property
     def versions(self):
         log = self.driver.find_element_by_css_selector(
-            '#file-version-history tbody'
+            'TABLE#file-version-history.table.table-striped'
         )
 
         L = namedtuple('Log', ('version', 'date_uploaded', 'downloads', 'url'))
 
         return [L(
-            x.find_element_by_css_selector('td:nth-child(1)').text,
+            x.find_elements_by_css_selector('td')[0].text,
             dt.datetime.strptime(
-                x.find_element_by_css_selector('td:nth-child(2)').text,
+                x.find_elements_by_css_selector('td')[1].text,
                 '%Y/%m/%d %I:%M %p',
             ),
-            int(x.find_element_by_css_selector('td:nth-child(3)').text),
-            x.find_element_by_css_selector(
-                'td:nth-child(4) a'
-            ).get_attribute('href'),
-        ) for x in log.find_elements_by_css_selector('tr')]
+            int(x.find_elements_by_css_selector('td')[2].text),
+            x.find_elements_by_css_selector(
+                'td'
+            )[3].find_element_by_css_selector('a').get_attribute('href'),
+        ) for x in log.find_elements_by_css_selector(
+            'table#file-version-history.table.table-striped tbody tr'
+        )]

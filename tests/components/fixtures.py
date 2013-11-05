@@ -16,6 +16,8 @@ class ComponentFixture(object):
             component_type='Other',
         )
 
+        cls.page.type = 'component'
+
 
 class ComponentOfProjectFixture(ComponentFixture, ProjectFixture):
     pass

@@ -23,6 +23,16 @@ Nose offers several benefits, many of which we're not yet utilizing. As the nose
 test runner completely supports `unittest`-based tests, there should be few
 issues supporting legacy tests while we migrate to use node more fully.
 
+####solr
+
+Solr is written in Java and runs as a standalone full-text search server within a 
+servlet container such as Jetty. Solr uses the Lucene Java search library at its 
+core for full-text indexing and search, and has REST-like HTTP/XML and JSON APIs 
+that make it easy to use from virtually any programming language. Solr's powerful 
+external configuration allows it to be tailored to almost any type of application 
+without Java coding, and it has an extensive plugin architecture when more advanced 
+customization is required.
+
 #### Selenium
 
 Selenium is a tool designed to allow the develop to drive a web browser with
@@ -50,6 +60,7 @@ Use the assertion methods in `nose.tools`, instead of those provided by
 * From localhost
     * Point config:osf_home to localhost:5000
     * Start mongod
+    * Invoke solr
     * Start OSF (main.py)
 * From development server
     * Point config:osf_home to dev URL
