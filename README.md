@@ -60,7 +60,7 @@ Use the assertion methods in `nose.tools`, instead of those provided by
 * From localhost
     * Point config:osf_home to localhost:5000
     * Start mongod
-    * invoke solr
+    * Invoke solr
     * Start OSF (main.py)
 * From development server
     * Point config:osf_home to dev URL
