@@ -8,7 +8,8 @@ from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
 from tests.projects.fixtures import PublicProjectFixture, PublicSubprojectFixture, PublicComponentOfProjectFixture, \
     PublicComponentOfSubprojectFixture, SubprojectOfPublicProjectFixture, ComponentOfPublicProjectFixture, \
-    ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, ForkAccessFixture
+    ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, FileFixture, \
+    ForkAccessFixture
 
 
 class PrivateAccessTests(UserAccessFixture):
