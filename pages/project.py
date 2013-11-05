@@ -257,10 +257,11 @@ class NodePage(OsfPage):
                 )
             )
         )
+        with WaitForPageReload(self.driver):
 
-        self.driver.find_element_by_css_selector(
-            "div.modal-dialog button[class='btn btn-primary']"
-        ).click()
+            self.driver.find_element_by_css_selector(
+                "div.modal-dialog button[class='btn btn-primary']"
+            ).click()
 
     def add_contributor(self, user):
 

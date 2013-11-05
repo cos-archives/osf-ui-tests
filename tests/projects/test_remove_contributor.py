@@ -2,26 +2,12 @@ import httplib as http
 
 from nose.tools import *
 
-from pages.exceptions import HttpError
-from pages.helpers import create_user
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture
 from tests.components.fixtures import ComponentOfSubprojectFixture
+from tests.projects.fixtures import RemoveContributorFixture, RemoveContributorAccessFixture
 import datetime as dt
 
-
-class RemoveContributorFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(RemoveContributorFixture, cls).setUpClass()
-
-        cls.users.append(create_user())
-        cls.users.append(create_user())
-
-        cls.page.add_multi_contributor(cls.users[1], cls.users[2])
-
-        cls.page.remove_contributor(cls.users[1])
-        cls.old_id = cls.page.id
 
 class RemoveContributorTests(RemoveContributorFixture):
     def test_contributor_removed(self):
@@ -99,16 +85,6 @@ class ComponentOfSubprojectRemoveContributorTest(
             ),
             self.page.logs[0].text,
         )
-
-
-class RemoveContributorAccessFixture(RemoveContributorFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(RemoveContributorAccessFixture, cls).setUpClass()
-        cls.page.log_out()
-        cls.log_in(cls.users[1])
-        with assert_raises(HttpError) as cls.cm:
-            page = cls.page.node(cls.old_id, cls.project_id)
 
 
 class RemoveContributorAccessTests(RemoveContributorAccessFixture):

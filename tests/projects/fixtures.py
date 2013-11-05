@@ -1,4 +1,7 @@
+from nose.tools import *
+
 from pages import FILES
+from pages.exceptions import HttpError
 from pages.helpers import create_user
 from tests.fixtures import UserFixture, ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentFixture, ComponentOfProjectFixture, ComponentOfSubprojectFixture
@@ -151,6 +154,45 @@ class AddMultiContributorDeleteFixture(object):
         cls.users.append(create_user())
         cls.page.add_multi_contributor_delete(cls.users[-2], cls.users[-1])
         cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
+
+
+class RemoveContributorFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(RemoveContributorFixture, cls).setUpClass()
+
+        cls.users.append(create_user())
+        cls.users.append(create_user())
+
+        cls.page.add_multi_contributor(cls.users[1], cls.users[2])
+
+        cls.page.remove_contributor(cls.users[1])
+        cls.old_id = cls.page.id
+
+
+class RemoveContributorAccessFixture(RemoveContributorFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(RemoveContributorAccessFixture, cls).setUpClass()
+        cls.page.log_out()
+        cls.log_in(cls.users[1])
+        with assert_raises(HttpError) as cls.cm:
+            cls.page = cls.page.node(cls.old_id, cls.project_id)
+
+
+class NonContributorModifyFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(NonContributorModifyFixture, cls).setUpClass()
+
+        old_id = cls.page.id
+        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        cls.page.log_out()
+        cls.users.append(create_user())
+        cls.log_in(cls.users[-1])
+
+        cls.page = cls.page.node(old_id)
 
 
 class ProjectNoDescriptionFixture(UserFixture):

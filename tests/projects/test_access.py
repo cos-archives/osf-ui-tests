@@ -2,16 +2,14 @@ import httplib as http
 
 from nose.tools import *
 
-from pages import FILES
 from pages.exceptions import HttpError
-from pages.helpers import create_user
 from pages.project import ProjectPage, FilePage
 from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
 from tests.projects.fixtures import PublicProjectFixture, PublicSubprojectFixture, PublicComponentOfProjectFixture, \
     PublicComponentOfSubprojectFixture, SubprojectOfPublicProjectFixture, ComponentOfPublicProjectFixture, \
     ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, FileFixture, \
-    ForkAccessFixture
+    ForkAccessFixture, NonContributorModifyFixture
 
 
 class PrivateAccessTests(UserAccessFixture):
@@ -195,21 +193,6 @@ class ForkProjectAccessTestCase(ForkAccessTests, PublicProjectFixture):
 
 class ForkSubprojectAccessTestCase(ForkAccessTests, PublicSubprojectFixture):
     pass
-
-
-class NonContributorModifyFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(NonContributorModifyFixture, cls).setUpClass()
-
-        old_id = cls.page.id
-        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
-
-        cls.page.log_out()
-        cls.users.append(create_user())
-        cls.log_in(cls.users[-1])
-
-        cls.page = cls.page.node(old_id)
 
 
 class NonContributorModifyTests(NonContributorModifyFixture):
