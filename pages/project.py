@@ -83,6 +83,19 @@ class NodePage(OsfPage):
             len(element_to_hover_over.find_elements_by_css_selector("i"))
         )
 
+    @property
+    def can_view_file(self):
+        if len(self.driver.find_element_by_css_selector(
+            'div.grid-canvas'
+        ). find_element_by_css_selector(
+            'div.ui-widget-content.slick-row.even'
+        ).find_elements_by_css_selector(
+            'span.toggle.expand.nav-filter-item'
+        )) == 0:
+            return False
+
+        return True
+
     def add_multi_contributor(self, user1, user2):
 
         # click the "add" link
@@ -985,6 +998,46 @@ class NodePage(OsfPage):
         ) for r in self.driver.find_elements_by_css_selector(
             'div.grid-canvas div.ui-widget-content.slick-row.odd'
         )]
+
+    @property
+    def files_view(self):
+        F = namedtuple(
+            'File',
+            ('name',
+             'url')
+        )
+
+        # Click "Files" in the node's subnav
+        self.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.grid-canvas')
+            )
+        )
+        self.driver.find_element_by_css_selector(
+            'div.grid-canvas'
+        ). find_element_by_css_selector(
+            'div.ui-widget-content.slick-row.even'
+        ).find_element_by_css_selector(
+            'span.toggle.expand.nav-filter-item'
+        ).click()
+
+        return [F(
+            name=r.find_element_by_css_selector(
+                'div.slick-cell.l0.r0.cell-title a'
+            ).text,
+            url=r.find_element_by_css_selector(
+                'div.slick-cell.l0.r0.cell-title a'
+            ).get_attribute('href'),
+        ) for r in self.driver.find_elements_by_css_selector(
+            'div.grid-canvas '
+        )]
+
 
     def _clone(self):
         new_driver = self.driver.__class__()
