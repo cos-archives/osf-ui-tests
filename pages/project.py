@@ -944,7 +944,7 @@ class NodePage(OsfPage):
 
         # row[0].find_element_by_css_selector('button.btn-delete').click()
         self.driver.find_element_by_css_selector(
-            'div.grid-canvas div.slick-cell.l3.r3 button.btn.btn-danger.btn-mini'
+            'div.grid-canvas div.slick-cell.l4.r4 button.btn.btn-danger.btn-mini'
         ).click()
 
         WebDriverWait(self.driver, 3).until(
@@ -992,13 +992,13 @@ class NodePage(OsfPage):
                 '%Y/%m/%d %I:%M %p'
             ),
             file_size=r.find_element_by_css_selector(
-                'div.slick-cell.l1.r2'
+                'div.slick-cell.l2.r2'
             ).text,
             url=r.find_element_by_css_selector(
                 'div.slick-cell.l0.r0.cell-title a'
             ).get_attribute('href'),
             downloads=r.find_element_by_css_selector(
-                'div.slick-cell.l2.r3'
+                'div.slick-cell.l3.r3'
             ).text,
         ) for r in self.driver.find_elements_by_css_selector(
             'div.grid-canvas div.ui-widget-content.slick-row.odd'
