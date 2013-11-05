@@ -723,6 +723,57 @@ class FileTests(unittest.TestCase):
     def test_component_view_file(self):
         self._test_file_view(self._component())
 
+     #Dashboard file acess
+    ######################
+
+    def _test_private_file_view(self, page, title, type):
+        project_url=page.driver.current_url
+
+        page.public = True
+
+        page.add_component(
+            title=title,
+            component_type=type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.log_out()
+
+        page.driver.get(project_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        self.assertTrue(
+            1,
+            len(page.driver.find_elements_by_css_selector(
+                'div.grid-canvas DIV.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0.cell-title SPAN.folder.folder-delete'
+                )
+                )
+        )
+
+        page.close()
+
+    def test_private_subproject_view_file(self):
+        self._test_private_file_view(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_private_component_view_file(self):
+        self._test_private_file_view(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
