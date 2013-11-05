@@ -1,26 +1,8 @@
 from nose.tools import *
 
 from tests.fixtures import ProjectFixture, SubprojectFixture
-
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
-
-
-class WatchFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(WatchFixture, cls).setUpClass()
-        cls.node_logs = cls.page.logs
-        cls.old_num_watchers = cls.page.num_watchers
-        cls.page.watched = True
-
-
-class UnwatchFixture(WatchFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(UnwatchFixture, cls).setUpClass()
-        cls.old_num_watchers = cls.page.num_watchers
-        cls.page.watched = False
-
+from tests.projects.fixtures import WatchFixture, UnwatchFixture
 
 class WatchTests(WatchFixture):
     def test_watched(self):
