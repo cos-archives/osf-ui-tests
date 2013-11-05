@@ -2,71 +2,13 @@ import httplib as http
 
 from nose.tools import *
 
-from pages import FILES
 from pages.exceptions import HttpError
-from pages.helpers import create_user
 from pages.project import ProjectPage, FilePage
 from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
-from tests.components.fixtures import (
-    ComponentOfProjectFixture, ComponentOfSubprojectFixture, ComponentFixture
-)
-
-
-class PublicProjectFixture(ProjectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(PublicProjectFixture, cls).setUpClass()
-        cls.page.public = True
-
-
-class PublicSubprojectFixture(SubprojectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(PublicSubprojectFixture, cls).setUpClass()
-        cls.page.public = True
-
-
-class PublicComponentOfProjectFixture(ComponentOfProjectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(PublicComponentOfProjectFixture, cls).setUpClass()
-        cls.page.public = True
-
-
-class PublicComponentOfSubprojectFixture(ComponentOfSubprojectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(PublicComponentOfSubprojectFixture, cls).setUpClass()
-        cls.page.public = True
-
-
-class SubprojectOfPublicProjectFixture(PublicProjectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(SubprojectOfPublicProjectFixture, cls).setUpClass()
-        cls.page = cls.page.add_component(
-            title='Test Subproject',
-            component_type='Project',
-        )
-
-
-class PublicSubprojectOfPublicProjectFixture(SubprojectOfPublicProjectFixture):
-    @classmethod
-    def setUpClass(cls):
-        super(PublicSubprojectOfPublicProjectFixture, cls).setUpClass()
-        cls.page.public = True
-
-
-class ComponentOfPublicProjectFixture(ComponentFixture, PublicProjectFixture):
-    pass
-
-
-class ComponentOfPublicSubprojectFixture(ComponentFixture, PublicSubprojectFixture):
-    pass
-
-
-class ComponentOfPublicSubprojectOfPublicProjectFixture(ComponentFixture, PublicSubprojectOfPublicProjectFixture):
-    pass
+from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
+from tests.projects.fixtures import PublicProjectFixture, PublicSubprojectFixture, PublicComponentOfProjectFixture, \
+    PublicComponentOfSubprojectFixture, SubprojectOfPublicProjectFixture, ComponentOfPublicProjectFixture, \
+    ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, ForkAccessFixture
 
 
 class PrivateAccessTests(UserAccessFixture):
@@ -177,16 +119,6 @@ class PrivateComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateAccessTes
     pass
 
 
-class FileFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(FileFixture, cls).setUpClass()
-
-        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
-        cls.file_url = '{}{}'.format(cls.page.driver.current_url, 'test.jpg')
-        cls.page.driver.get(cls.file_url)
-
-
 class PrivateFileAccessTests(UserAccessFixture):
     def test_contributor(self):
         self._as_contributor()
@@ -238,46 +170,6 @@ class FileOfComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateFileAccess
                                                                ComponentOfPublicSubprojectOfPublicProjectFixture):
     """Test access to files of a private component of a public subproject of a public project"""
     pass
-
-
-class ForkAccessFixture(object):
-    @classmethod
-    def setUpClass(cls):
-        super(ForkAccessFixture, cls).setUpClass()
-
-        cls.old_id = cls.page.id
-
-        #create public and private subprojects and components
-        cls.page = cls.page.add_component(
-            title='Public Subproject',
-            component_type='Project',
-        )
-        cls.page.public = True
-        cls.page = cls.page.node(cls.old_id)
-
-        cls.page = cls.page.add_component(
-            title='Public Component',
-        )
-        cls.page.public = True
-        cls.page = cls.page.node(cls.old_id)
-
-        cls.page.add_component(
-            title='Private Subproject',
-            component_type='Project',
-        )
-        cls.page = cls.page.node(cls.old_id)
-
-        cls.page.add_component(
-            title='Private Component'
-        )
-        cls.page = cls.page.node(cls.old_id)
-
-        # fork as new user
-        cls.page.log_out()
-        cls.users.append(create_user())
-        cls.log_in(cls.users[-1])
-
-        cls.page = cls.page.node(cls.old_id)
 
 
 class ForkAccessTests(ForkAccessFixture):
