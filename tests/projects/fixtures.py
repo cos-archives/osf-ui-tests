@@ -121,7 +121,6 @@ class AddContributorFixture(object):
 
         cls.users.append(create_user())
         cls.page.add_contributor(cls.users[-1])
-        cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
         cls.old_id = cls.page.id
 
 
@@ -142,7 +141,6 @@ class AddMultiContributorFixture(object):
         cls.users.append(create_user())
         cls.users.append(create_user())
         cls.page.add_multi_contributor(cls.users[1], cls.users[2])
-        cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
 
 
 class AddMultiContributorDeleteFixture(object):
@@ -153,7 +151,6 @@ class AddMultiContributorDeleteFixture(object):
         cls.users.append(create_user())
         cls.users.append(create_user())
         cls.page.add_multi_contributor_delete(cls.users[-2], cls.users[-1])
-        cls.page.type = 'component' if 'node' in cls.page.driver.current_url else 'project'
 
 
 class RemoveContributorFixture(object):

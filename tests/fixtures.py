@@ -85,6 +85,7 @@ class ProjectFixture(UserFixture):
         )
 
         cls.project_id = cls.page.id
+        cls.page.type = 'project'
 
 
 class SubprojectFixture(ProjectFixture):
@@ -96,6 +97,8 @@ class SubprojectFixture(ProjectFixture):
             title='Test Subproject',
             component_type='Project',
         )
+
+        cls.page.type = 'project'
 
 
 class ComplexFixture(object):

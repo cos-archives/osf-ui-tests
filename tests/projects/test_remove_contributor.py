@@ -15,9 +15,10 @@ class RemoveContributorTests(RemoveContributorFixture):
 
     def test_logged(self):
         assert_equal(
-            u'{} removed {} as a contributor from project {}'.format(
+            u'{} removed {} as a contributor from {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,
@@ -59,32 +60,14 @@ class ComponentOfProjectRemoveContributorTest(
     RemoveContributorTests,
     ComponentOfProjectFixture
 ):
-
-    def test_logged(self):
-        assert_equal(
-            u'{} removed {} as a contributor from component {}'.format(
-                self.users[0].full_name,
-                self.users[1].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
+    pass
 
 
 class ComponentOfSubprojectRemoveContributorTest(
     RemoveContributorTests,
     ComponentOfSubprojectFixture
 ):
-
-    def test_logged(self):
-        assert_equal(
-            u'{} removed {} as a contributor from component {}'.format(
-                self.users[0].full_name,
-                self.users[1].full_name,
-                self.page.title,
-            ),
-            self.page.logs[0].text,
-        )
+    pass
 
 
 class RemoveContributorAccessTests(RemoveContributorAccessFixture):
