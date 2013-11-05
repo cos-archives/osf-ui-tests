@@ -987,18 +987,18 @@ class NodePage(OsfPage):
             ).text,
             date_modified=dt.datetime.strptime(
                 r.find_element_by_css_selector(
-                    'td:nth-of-type(2)'
+                    'div.slick-cell.l1.r1'
                 ).text,
                 '%Y/%m/%d %I:%M %p'
             ),
             file_size=r.find_element_by_css_selector(
-                'div.slick-cell.l1.r1'
+                'div.slick-cell.l1.r2'
             ).text,
             url=r.find_element_by_css_selector(
                 'div.slick-cell.l0.r0.cell-title a'
             ).get_attribute('href'),
             downloads=r.find_element_by_css_selector(
-                'div.slick-cell.l2.r2'
+                'div.slick-cell.l2.r3'
             ).text,
         ) for r in self.driver.find_elements_by_css_selector(
             'div.grid-canvas div.ui-widget-content.slick-row.odd'

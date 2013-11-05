@@ -927,6 +927,50 @@ class FileTests(unittest.TestCase):
             'Other'
         )
 
+    #reorder file bar
+    ##############################
+
+    def _test_reorder_file_bar(self, page):
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas div.ui-widget-content.slick-row.odd'
+                )
+            )
+        )
+
+        ac = ActionChains(page.driver)
+        a = page.driver.find_elements_by_css_selector(
+            'DIV.container DIV.slick-header.ui-state-default DIV.slick-header-columns.ui-sortable SPAN.slick-column-name'
+        )[3]
+        b = page.driver.find_elements_by_css_selector(
+            'DIV.container DIV.slick-header.ui-state-default DIV.slick-header-columns.ui-sortable SPAN.slick-column-name'
+        )[0]
+
+        ac.click_and_hold(a).perform()
+        a_chain = ActionChains(page.driver)
+        a_chain.move_to_element(b).perform()
+        a_chain.release(b).perform()
+
+        downloads = page.driver.find_element_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0'
+        ).text
+
+        self.assertIn('0', downloads)
+
+        page.close()
+
+    def test_project_file_bar_reorder(self):
+        self._test_reorder_file_bar(get_new_project())
+
+    def test_subproject_file_bar_reorder(self):
+        self._test_reorder_file_bar(self._subproject())
+
+    def test_component_file_bar_reorder(self):
+        self._test_reorder_file_bar(self._component())
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
