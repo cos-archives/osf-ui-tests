@@ -2,7 +2,9 @@ import httplib as http
 
 from nose.tools import *
 
+from pages import FILES
 from pages.exceptions import HttpError
+from pages.helpers import create_user
 from pages.project import ProjectPage, FilePage
 from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
@@ -192,4 +194,53 @@ class ForkProjectAccessTestCase(ForkAccessTests, PublicProjectFixture):
 
 
 class ForkSubprojectAccessTestCase(ForkAccessTests, PublicSubprojectFixture):
+    pass
+
+
+class NonContributorModifyFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(NonContributorModifyFixture, cls).setUpClass()
+
+        old_id = cls.page.id
+        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        cls.page.log_out()
+        cls.users.append(create_user())
+        cls.log_in(cls.users[-1])
+
+        cls.page = cls.page.node(old_id)
+
+
+class NonContributorModifyTests(NonContributorModifyFixture):
+    def test_can_edit_title(self):
+        assert_false(self.page.can_edit_title)
+
+    def test_can_access_settings(self):
+        assert_false(self.page.can_access_settings)
+
+    def test_can_add_component(self):
+        assert_false(self.page.can_add_component)
+
+    def test_can_edit_wiki(self):
+        assert_false(self.page.can_edit_wiki)
+
+    def test_can_add_file(self):
+        assert_false(self.page.can_add_file)
+
+    def test_can_delete_files(self):
+        assert_false(self.page.can_delete_files)
+
+    def test_can_add_contributors(self):
+        assert_false(self.page.can_add_contributors)
+
+    def test_can_remove_contributors(self):
+        assert_false(self.page.can_remove_contributors)
+
+
+class PublicProjectNonContributorModify(NonContributorModifyTests, PublicProjectFixture):
+    pass
+
+
+class PublicSubprojectNonContributorModify(NonContributorModifyTests, PublicSubprojectFixture):
     pass

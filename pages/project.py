@@ -35,6 +35,10 @@ class NodePage(OsfPage):
         )
 
     @property
+    def can_edit_title(self):
+        return len(self.driver.find_elements_by_id('node-title-editable')) == 1
+
+    @property
     def contributors(self):
         """ A list of contributors for the node, parsed from the
         header.
@@ -986,6 +990,15 @@ class NodePage(OsfPage):
         # return a copy of this class, with the new driver.
         return self.__class__(driver=new_driver)
 
+    @property
+    def can_access_settings(self):
+        if 'settings' not in str(self.driver.find_elements_by_css_selector(
+                '.nav-pills li:last-child'
+        )):
+            return False
+
+        return True
+
 
 class NodeSettingsPage(NodePage):
     @property
@@ -1071,6 +1084,15 @@ class ProjectPage(NodePage):
             del kwargs['id']
 
         super(ProjectPage, self).__init__(*args, **kwargs)
+
+    @property
+    def can_add_component(self):
+
+        add_component_class = self.driver.find_element_by_css_selector(
+            '#Nodes .page-header div'
+        ).find_element_by_link_text('Add Component').get_attribute('class')
+
+        return 'disabled' not in add_component_class
 
     def add_component(self, title, component_type=None):
         """Add a component to the project.
