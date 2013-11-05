@@ -81,3 +81,20 @@ class DeleteProjectwithSubprojectFixture(SubprojectFixture):
         cls.subproject_url = cls.page.driver.current_url
         cls.project_url = cls.page.parent_project().driver.current_url
         cls.page = cls.page.settings.delete()
+
+
+class WatchFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(WatchFixture, cls).setUpClass()
+        cls.node_logs = cls.page.logs
+        cls.old_num_watchers = cls.page.num_watchers
+        cls.page.watched = True
+
+
+class UnwatchFixture(WatchFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(UnwatchFixture, cls).setUpClass()
+        cls.old_num_watchers = cls.page.num_watchers
+        cls.page.watched = False
