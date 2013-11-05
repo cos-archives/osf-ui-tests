@@ -351,7 +351,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_nested_component_delete_file_logged(self):
         # log says "project"; expected "component"
         page = self._subproject_component()
@@ -471,7 +470,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('expected failure')
     def test_nested_component_file_update_logged(self):
         # log says "project"; expected "component"
         page, filename = self._test_file_update_logged(

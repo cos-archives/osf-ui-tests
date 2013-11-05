@@ -367,10 +367,10 @@ class ProjectSmokeTest(UserSmokeTest):
 
         #with WaitForFileUpload(self.driver, wait=5):
 
-        # Upload files
-        self.driver.find_element_by_css_selector(
-            'div.container h3 A#clickable.dz-clickable'
-        ).click()
+        ## Upload files
+        #self.driver.find_element_by_css_selector(
+        #    'div.container h3 A#clickable.dz-clickable'
+        #).click()
 
         wait(self.driver, 3).until(
             ec.visibility_of_element_located(
