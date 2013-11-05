@@ -18,32 +18,6 @@ class ProjectSecurityTest(ProjectSmokeTest):
 
         self.second_user = self.create_user()
 
-    def test_remove_contributor(self):
-
-        # Add a contributor
-        self.goto('dashboard')
-        self.add_contributor(self.second_user)
-
-        # refresh the page
-        self.goto('dashboard')
-
-        # remove the contributor
-        self.remove_contributor(self.second_user)
-
-        # log out and back in as the second user
-        self.log_out()
-        self.log_in(self.second_user)
-
-        self.goto('dashboard')
-
-        # There should be no project list, so just make sure the project title
-        # isn't on the page.
-        self.assert_forbidden()
-
-        # log out and back in as the first user, so teardown will work
-        self.log_out()
-        self.log_in(self.user_data)
-
     def test_public_non_contributor_modify(self):
         """ Users who are not contributors should not have access to the wiki
         edit page of a public project.
