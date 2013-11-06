@@ -12,7 +12,7 @@ from pages.helpers import get_new_project, WebDriverWait
 from pages.project import FilePage
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
-
+from selenium.webdriver import ActionChains
 
 import urlparse
 
@@ -726,14 +726,14 @@ class FileTests(unittest.TestCase):
      #Dashboard file acess
     ######################
 
-    def _test_private_file_view(self, page, title, type):
-        project_url=page.driver.current_url
+    def _test_private_file_view(self, page, title, node_type):
+        project_url = page.driver.current_url
 
         page.public = True
 
         page.add_component(
             title=title,
-            component_type=type,
+            component_type=node_type,
         )
 
         page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
@@ -774,6 +774,159 @@ class FileTests(unittest.TestCase):
             'New Component',
             'Other'
         )
+
+    #filepage file acess
+    ######################
+
+    def _test_private_file_acess(self, page, title, node_type):
+
+        project_url = page.driver.current_url
+
+        page.public = True
+
+        page.add_component(
+            title=title,
+            component_type=node_type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.log_out()
+
+        page.driver.get(project_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        page.driver.find_element_by_css_selector(
+            '#overview div.subnav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        self.assertTrue(
+            1,
+            len(page.driver.find_elements_by_css_selector(
+                'div.grid-canvas DIV.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0.cell-title SPAN.folder.folder-delete'
+                )
+                )
+        )
+
+        page.close()
+
+    def test_private_subproject_acess_file(self):
+        self._test_private_file_acess(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_private_component_acess_file(self):
+        self._test_private_file_acess(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
+
+    #file page directory selection
+    ##############################
+
+    def _test_directory_selection(self, page, title, node_type):
+
+        project_url = page.driver.current_url
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        file_url = page.driver.current_url
+
+        page.driver.get(project_url)
+
+        page.add_component(
+            title=title,
+            component_type=node_type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.gif'][0])
+
+        page.driver.get(file_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        element = page.driver.find_elements_by_css_selector(
+            'DIV.grid-canvas DIV.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector('DIV.slick-cell.l0.r0.cell-title')
+
+        ActionChains(page.driver).double_click(element).perform()
+
+        file_name = page.driver.find_elements_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector(
+            'DIV.slick-cell.l0.r0.cell-title a'
+        ).text
+
+        self.assertEqual(
+            file_name,
+            'test.gif'
+        )
+
+        self.assertEqual(
+            page.driver.current_url,
+            file_url
+        )
+
+        page.driver.find_elements_by_css_selector(
+            'DIV#myGridBreadcrumbs.breadcrumb SPAN.hgrid-breadcrumb'
+        )[0].find_element_by_css_selector('a').click()
+
+        folder = page.driver.find_elements_by_css_selector(
+            'DIV.grid-canvas DIV.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector(
+            'DIV.slick-cell.l0.r0.cell-title'
+        ).text
+
+        self.assertEqual(
+            u' {}'.format(title),
+            folder
+        )
+
+        page.close()
+
+    def test_subproject_directory_selection(self):
+        self._test_directory_selection(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_component_directory_selection(self):
+        self._test_directory_selection(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
+
 
 class FileHandlingTests(base.ProjectSmokeTest):
 

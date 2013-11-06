@@ -968,7 +968,7 @@ class NodePage(OsfPage):
         F = namedtuple(
             'File',
             ('name',
-             #'date_modified',
+             'date_modified',
              'file_size',
              'downloads',
              'url')
@@ -991,12 +991,12 @@ class NodePage(OsfPage):
             name=r.find_element_by_css_selector(
                 'div.slick-cell.l0.r0.cell-title a'
             ).text,
-            #date_modified=dt.datetime.strptime(
-            #    r.find_element_by_css_selector(
-            #        'td:nth-of-type(2)'
-            #    ).text,
-            #    '%Y/%m/%d %I:%M %p'
-            #),
+            date_modified=dt.datetime.strptime(
+                r.find_element_by_css_selector(
+                    'td:nth-of-type(2)'
+                ).text,
+                '%Y/%m/%d %I:%M %p'
+            ),
             file_size=r.find_element_by_css_selector(
                 'div.slick-cell.l1.r1'
             ).text,
