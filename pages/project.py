@@ -244,7 +244,7 @@ class NodePage(OsfPage):
             ).click()
 
     def remove_contributor(self, user):
-        # mouse over to the contribute's name
+        # mouse over to the contributor's name
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (
@@ -272,6 +272,7 @@ class NodePage(OsfPage):
         )
         with WaitForPageReload(self.driver):
 
+            # click the "OK" button
             self.driver.find_element_by_css_selector(
                 "div.modal-dialog button[class='btn btn-primary']"
             ).click()
@@ -409,6 +410,7 @@ class NodePage(OsfPage):
 
     @watched.setter
     def watched(self, value):
+        """Watches or unwatches the node"""
         if self.watched == value:
             return
 
@@ -508,6 +510,10 @@ class NodePage(OsfPage):
 
     @property
     def public(self):
+        """Whether the node is public
+
+        :returns: ``bool``
+        """
         return (
             'disabled' in
             self.driver.find_element_by_css_selector(
@@ -553,7 +559,7 @@ class NodePage(OsfPage):
         return NodeSettingsPage(driver=self.driver)
 
     def parent_project(self):
-        """Navigate to the nodes's parent project.
+        """Navigate to the node's parent project.
 
         :returns: ``ProjectPage``
         """
