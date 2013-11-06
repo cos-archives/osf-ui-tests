@@ -2,6 +2,7 @@ import httplib as http
 
 from nose.tools import *
 
+from pages.exceptions import HttpError
 from tests.fixtures import ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentOfProjectFixture
 from tests.components.fixtures import ComponentOfSubprojectFixture
@@ -72,7 +73,9 @@ class ComponentOfSubprojectRemoveContributorTest(
 
 class RemoveContributorAccessTests(RemoveContributorAccessFixture):
     def test_removed_contributor_access(self):
-        assert_equal(http.FORBIDDEN, self.cm.exception.code)
+        with assert_raises(HttpError) as cm:
+            page = self.page.node(self.old_id, self.project_id)
+        assert_equal(http.FORBIDDEN, cm.exception.code)
 
 
 class ProjectRemoveContributorAccess(RemoveContributorAccessTests, ProjectFixture):

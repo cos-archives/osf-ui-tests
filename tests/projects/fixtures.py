@@ -1,7 +1,4 @@
-from nose.tools import *
-
 from pages import FILES
-from pages.exceptions import HttpError
 from pages.helpers import create_user
 from tests.fixtures import UserFixture, ProjectFixture, SubprojectFixture
 from tests.components.fixtures import ComponentFixture, ComponentOfProjectFixture, ComponentOfSubprojectFixture
@@ -173,8 +170,6 @@ class RemoveContributorAccessFixture(RemoveContributorFixture):
         super(RemoveContributorAccessFixture, cls).setUpClass()
         cls.page.log_out()
         cls.log_in(cls.users[1])
-        with assert_raises(HttpError) as cls.cm:
-            cls.page = cls.page.node(cls.old_id, cls.project_id)
 
 
 class NonContributorModifyFixture(object):
