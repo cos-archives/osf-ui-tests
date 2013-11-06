@@ -25,4 +25,5 @@ def _file(category, filename):
 
 FILES = (
     _file('image', 'test.jpg'),
+    _file('image', 'test.gif'),
 )
