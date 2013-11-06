@@ -181,10 +181,10 @@ class ForkAccessTests(ForkAccessFixture):
         assert_in('Public Component', str(self.page.components))
 
     def test_private_subproject_absent(self):
-        assert_in('Private Subproject', str(self.page.components))
+        assert_not_in('Private Subproject', str(self.page.components))
 
     def test_private_component_absent(self):
-        assert_in('Private Component', str(self.page.components))
+        assert_not_in('Private Component', str(self.page.components))
 
 
 class ForkProjectAccessTestCase(ForkAccessTests, PublicProjectFixture):

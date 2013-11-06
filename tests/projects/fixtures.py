@@ -103,12 +103,14 @@ class ForkAccessFixture(object):
         )
         cls.page = cls.page.node(cls.old_id)
 
-        # fork as new user
+        # log in as second user
         cls.page.log_out()
         cls.users.append(create_user())
         cls.log_in(cls.users[-1])
 
+        # fork project
         cls.page = cls.page.node(cls.old_id)
+        cls.page.fork()
 
 
 class AddContributorFixture(object):
