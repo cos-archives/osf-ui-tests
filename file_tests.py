@@ -972,6 +972,7 @@ class FileTests(unittest.TestCase):
     def test_component_file_bar_reorder(self):
         self._test_reorder_file_bar(self._component())
 
+
 class FileHandlingTests(base.ProjectSmokeTest):
 
     def setUp(self):
