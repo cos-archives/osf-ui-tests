@@ -55,13 +55,13 @@ class OsfPage(object):
         """
         return len(
             self.driver.find_elements_by_css_selector(
-                'ul#navbar-icons a[href="/logout"]'
+                'UL.nav.navbar-nav.navbar-right a[href="/logout"]'
             )
         ) > 0
 
     def log_out(self):
         self.driver.find_element_by_css_selector(
-            'ul#navbar-icons a[href="/logout"]'
+            'UL.nav.navbar-nav.navbar-right a[href="/logout"]'
         ).click()
         return OsfPage(driver=self.driver)
 

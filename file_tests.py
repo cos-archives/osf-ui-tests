@@ -805,7 +805,7 @@ class FileTests(unittest.TestCase):
         )
 
         page.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Files'
         ).click()

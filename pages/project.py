@@ -976,7 +976,8 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.grid-canvas')
+                (By.CSS_SELECTOR,
+                 'DIV.grid-canvas DIV.ui-widget-content.slick-row.even')
             )
         )
 
