@@ -405,8 +405,8 @@ def clear_wiki_text(driver):
 def submit_wiki_text(driver):
     """ Click submit button. """
 
-    driver.find_element_by_xpath(
-        '//div[@class="wmd-panel"]//input[@type="submit"]'
+    driver.find_element_by_css_selector(
+        'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
     ).click()
 
 def get_wiki_version(driver):
