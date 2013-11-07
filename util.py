@@ -64,6 +64,7 @@ def launch_driver(
     # Return driver
     return driver
 
+
 def clear_text(elm):
     """Clear text via backspace. Usually we can skip
     this and clear via elm.clear() directly, but this
@@ -73,6 +74,7 @@ def clear_text(elm):
     
     for _ in range(len(elm.text)):
         elm.send_keys(Keys.BACK_SPACE)
+
 
 def get_alert_boxes(driver, alert_text):
     """Check page for alert boxes. Asserts that there is exactly
@@ -117,6 +119,7 @@ def fill_form(
     # Click submit button
     button_finder(root).click()
 
+
 def login(driver, username, password):
     """Login to OSF
 
@@ -139,6 +142,7 @@ def login(driver, username, password):
         '#password' : password,
     })
 
+
 def gen_user_data(_length=12):
     """ Generate data to create a user account. """
 
@@ -155,6 +159,7 @@ def gen_user_data(_length=12):
         'password2': unique,
         'fullname': unique
     }
+
 
 def create_user(driver=None, user_data=None):
     """Create a new user account.
@@ -193,6 +198,7 @@ def create_user(driver=None, user_data=None):
     # Return user data
     return user_data
 
+
 def goto_dashboard(driver):
 
     """Browse to dashboard page.
@@ -202,6 +208,7 @@ def goto_dashboard(driver):
 
     """
     driver.get('%s/dashboard' % (config.osf_home))
+
 
 def goto_profile(driver):
     """Browse to public profile page. 
@@ -235,6 +242,7 @@ def goto_project(driver, project_title=config.project_title):
     driver.find_element_by_link_text(project_title).click()
     return driver.current_url
 
+
 def goto_files(driver, project_title=config.project_title):
     """ Browse to files page.
 
@@ -247,7 +255,8 @@ def goto_files(driver, project_title=config.project_title):
 
     # Browse to files page
     driver.find_element_by_link_text('Files').click()
-    
+
+
 def goto_settings(driver, project_name=config.project_title):
     """Browse to project settings page.
 
@@ -262,6 +271,7 @@ def goto_settings(driver, project_name=config.project_title):
     # Click Settings button
     driver.find_element_by_link_text('Settings').click()
 
+
 def goto_registrations(driver, project_name=config.project_title):
     
     # Browse to project page
@@ -269,6 +279,7 @@ def goto_registrations(driver, project_name=config.project_title):
     
     # Click Registrations button
     driver.find_element_by_link_text('Registrations').click()
+
 
 def logout(driver):
     """ Log out of OSF.
@@ -286,6 +297,7 @@ def logout(driver):
     except NoSuchElementException:
         # There is no logout link - assume the user is not logged in
         pass
+
 
 def create_project(driver, project_title=config.project_title, project_description=config.project_description):
     """Create new project
@@ -315,6 +327,7 @@ def create_project(driver, project_title=config.project_title, project_descripti
 
     # Return project URL
     return driver.current_url
+
 
 def create_node(
         driver, 
@@ -354,6 +367,7 @@ def create_node(
         }
     )
 
+
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
 
@@ -384,30 +398,36 @@ def select_partial(driver, id, start, stop):
         })(document.getElementById("%s"), %d, %d);
         ''' % (id, start, stop))
 
+
 # Wiki functions
 def edit_wiki(driver):
  
     edit_button = driver.find_element_by_link_text('Edit')
     edit_button.click()
 
+
 def get_wiki_input(driver):
  
     return driver.find_element_by_id('wmd-input')
+
 
 def add_wiki_text(driver, text):
  
     get_wiki_input(driver).send_keys(text)
 
+
 def clear_wiki_text(driver):
  
     clear_text(get_wiki_input(driver))
 
+
 def submit_wiki_text(driver):
     """ Click submit button. """
 
-    driver.find_element_by_xpath(
-        '//div[@class="wmd-panel"]//input[@type="submit"]'
+    driver.find_element_by_css_selector(
+        'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
     ).click()
+
 
 def get_wiki_version(driver):
     """ Get current wiki version. """
@@ -425,6 +445,7 @@ def get_wiki_version(driver):
         return int(version)
     except ValueError:
         return 0
+
 
 def get_wiki_par(driver):
     """ Get <p> containing wiki text. """
@@ -449,6 +470,7 @@ def get_wiki_par(driver):
     # Return element
     return wiki_par
 
+
 def get_wiki_text(driver):
     """ Get text from wiki <p>. """
 
@@ -460,6 +482,7 @@ def get_wiki_text(driver):
         return wiki_par.text
     return ''
 
+
 def get_wiki_preview(driver):
     """
     """
@@ -467,6 +490,7 @@ def get_wiki_preview(driver):
     return driver\
         .find_element_by_id('wmd-preview')\
         .text
+
 
 def forget_password(driver, email):
     """forgotpassword to OSF
