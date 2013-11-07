@@ -128,9 +128,27 @@ class AddContributorChildrenFixture(object):
     def setUpClass(cls):
         super(AddContributorChildrenFixture, cls).setUpClass()
 
+        cls.old_id = cls.page.id
+
+        # create subproject
+        cls.page = cls.page.add_component(
+            title='Test Subproject',
+            component_type='Project',
+        )
+        cls.subproject_id = cls.page.id
+        cls.page = cls.page.node(cls.old_id)
+
+        # create component
+        cls.page = cls.page.add_component(
+            title='Test Component',
+        )
+        cls.component_id = cls.page.id
+        cls.page = cls.page.node(cls.old_id)
+
         cls.users.append(create_user())
         cls.page.add_contributor(cls.users[-1], children=True)
-        cls.old_id = cls.page.id
+
+        cls.page = cls.page.node(cls.old_id)
 
 
 class AddContributorAccessFixture(AddContributorFixture):

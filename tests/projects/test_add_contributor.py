@@ -1,10 +1,10 @@
 from nose.tools import *
 
-from pages.project import ProjectPage
-from tests.fixtures import ProjectFixture, SubprojectFixture
+from pages.project import ProjectPage, NodePage
+from tests.fixtures import ProjectFixture, SubprojectFixture, ComplexProjectFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
 from tests.projects.fixtures import AddContributorFixture, AddContributorAccessFixture, AddMultiContributorFixture, \
-    AddMultiContributorDeleteFixture
+    AddMultiContributorDeleteFixture, AddContributorChildrenFixture
 import datetime as dt
 
 
@@ -223,6 +223,25 @@ class ComponentOfProjectAddMultiContributorDelete(AddMultiContributorDeleteTests
     """Test that contributor deleted from "Add Contributors" page of project component is not added"""
     pass
 
+
 class ComponentOfSubprojectAddMultiContributorDelete(AddMultiContributorDeleteTests, ComponentOfSubprojectFixture):
     """Test that contributor deleted from "Add Contributors" page of subproject component is not added"""
+    pass
+
+
+class AddContributorChildrenTests(AddContributorChildrenFixture):
+    def test_contributor_in_subproject(self):
+        self.page = self.page.node(self.subproject_id, self.old_id)
+        assert_equal(self.users[-1].full_name, self.page.contributors[-1].full_name)
+
+    def test_contributor_in_component(self):
+        self.page = self.page.node(self.component_id, self.old_id)
+        assert_equal(self.users[-1].full_name, self.page.contributors[-1].full_name)
+
+
+class AddContributorChildrenProjectTestCase(AddContributorChildrenTests, ProjectFixture):
+    pass
+
+
+class AddContributorChildrenSubprojectTestCase(AddContributorChildrenTests, SubprojectFixture):
     pass

@@ -173,18 +173,16 @@ class NodePage(OsfPage):
 
         else:
 
-            with WaitForPageReload(self.driver):
-
-                # click the "Next" button
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectWhich"]'
-                ).click()
+            # click the "Next" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind~="click:selectWhich"]'
+            ).click()
 
             if children:
 
                 # click "Select all"
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectNodes"]'
+                self.driver.find_element_by_link_text(
+                    'Select all'
                 ).click()
 
             with WaitForPageReload(self.driver):
@@ -272,18 +270,16 @@ class NodePage(OsfPage):
 
         else:
 
-            with WaitForPageReload(self.driver):
-
-                # click the "Next" button
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectWhich"]'
-                ).click()
+            # click the "Next" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind~="click:selectWhich"]'
+            ).click()
 
             if children:
 
                 # click "Select all"
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectNodes"]'
+                self.driver.find_element_by_link_text(
+                    'Select all'
                 ).click()
 
             with WaitForPageReload(self.driver):
@@ -374,18 +370,16 @@ class NodePage(OsfPage):
 
         else:
 
-            with WaitForPageReload(self.driver):
-
-                # click the "Next" button
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectWhich"]'
-                ).click()
+            # click the "Next" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind~="click:selectWhich"]'
+            ).click()
 
             if children:
 
                 # click "Select all"
-                self.driver.find_element_by_css_selector(
-                    '#addContributors a[data-bind~="click:selectNodes"]'
+                self.driver.find_element_by_link_text(
+                    'Select all'
                 ).click()
 
             with WaitForPageReload(self.driver):
@@ -565,7 +559,7 @@ class NodePage(OsfPage):
         """
         C = namedtuple('Component', ['title', 'url'])
         components = []
-        for elem in self.driver.find_elements_by_css_selector('#Nodes h3 a'):
+        for elem in self.driver.find_elements_by_css_selector('#Nodes h4 a'):
             components.append(
                 C(
                     title=elem.text,
