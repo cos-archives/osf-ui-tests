@@ -76,7 +76,7 @@ class UserDashboardPage(OsfPage):
     def _verify_page(self):
         return True if len(
             self.driver.find_elements_by_css_selector(
-                'div.navbar ul.nav li.active a[href="/dashboard/"]')
+                '.navbar-collapse ul.nav li.active a[href="/dashboard/"]')
         ) == 1 else False
 
     def new_project(self, title, description=None):
