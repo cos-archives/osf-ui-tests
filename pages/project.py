@@ -608,7 +608,7 @@ class NodePage(OsfPage):
 
         # submit it
         self.driver.find_element_by_css_selector(
-            '.wmd-panel input[type="submit"]'
+        'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
         ).click()
 
         # Go back to the project page.
@@ -699,13 +699,13 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'ul.list-group li.project h3')
+                (By.CSS_SELECTOR, 'UL.list-group H4.list-group-item-heading span')
             )
         )
 
         # for each list entry
         for r in self.driver.find_elements_by_css_selector(
-            'ul.list-group li.project h3'
+            'UL.list-group H4.list-group-item-heading span'
         ):
             registrations.append(
                 # build the Registration instance
@@ -1240,23 +1240,41 @@ class ProjectPage(NodePage):
         """
         # Go to the registrations page
         self.driver.find_element_by_css_selector(
-            'div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Registrations'
         ).click()
 
         # Click "New Registration"
-        with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                'div.page-header a.btn'
-            ).click()
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.page-header DIV.pull-right A.btn.btn-default')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.pull-right A.btn.btn-default'
+        ).click()
 
         # Select the registration type
-        with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                '.container select'
-            ).send_keys(registration_type + "\n")
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.container form SELECT#select-registration-template.form-control')
+            )
+        )
 
+        self.driver.find_element_by_css_selector(
+            '.container select'
+        ).send_keys(registration_type + "\n")
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '#registration_template textarea')
+            )
+        )
         # Fill the registration template
         fields = self.driver.find_elements_by_css_selector(
             '#registration_template textarea, '
