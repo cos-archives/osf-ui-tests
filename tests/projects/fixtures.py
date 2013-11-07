@@ -128,7 +128,7 @@ class AddContributorAccessFixture(AddContributorFixture):
     def setUpClass(cls):
         super(AddContributorAccessFixture, cls).setUpClass()
         cls.page.log_out()
-        cls.log_in(cls.users[1])
+        cls.log_in(cls.users[-1])
         cls.page = cls.page.node(cls.old_id, cls.project_id)
 
 

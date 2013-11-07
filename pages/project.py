@@ -100,7 +100,7 @@ class NodePage(OsfPage):
 
         return True
 
-    def add_multi_contributor(self, user1, user2):
+    def add_multi_contributor(self, user1, user2, children=False):
 
         # click the "add" link
         self.driver.find_element_by_css_selector(
@@ -162,14 +162,39 @@ class NodePage(OsfPage):
             '#addContributors a.btn.contrib-button'
         ).click()
 
-        with WaitForPageReload(self.driver):
+        if len(self.components) == 0:
 
-            # click the "Add" button
-            self.driver.find_element_by_css_selector(
-                '#addContributors a[data-bind="click:submit"]'
-            ).click()
+            with WaitForPageReload(self.driver):
 
-    def add_multi_contributor_delete(self, user1, user2):
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
+
+        else:
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Next" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectWhich"]'
+                ).click()
+
+            if children:
+
+                # click "Select all"
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectNodes"]'
+                ).click()
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
+
+    def add_multi_contributor_delete(self, user1, user2, children=False):
 
         # click the "add" link
         self.driver.find_element_by_css_selector(
@@ -236,12 +261,37 @@ class NodePage(OsfPage):
             "#addContributors A.btn.btn-default.contrib-button"
         )[0].click()
 
-        with WaitForPageReload(self.driver):
+        if len(self.components) == 0:
 
-            # click the "Add" button
-            self.driver.find_element_by_css_selector(
-                '#addContributors a[data-bind="click:submit"]'
-            ).click()
+            with WaitForPageReload(self.driver):
+
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
+
+        else:
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Next" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectWhich"]'
+                ).click()
+
+            if children:
+
+                # click "Select all"
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectNodes"]'
+                ).click()
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
 
     def remove_contributor(self, user):
         # mouse over to the contributor's name
@@ -277,7 +327,7 @@ class NodePage(OsfPage):
                 "div.modal-dialog button[class='btn btn-primary']"
             ).click()
 
-    def add_contributor(self, user):
+    def add_contributor(self, user, children=False):
 
         # click the "add" link
         self.driver.find_element_by_css_selector(
@@ -313,12 +363,37 @@ class NodePage(OsfPage):
             '#addContributors a.btn.contrib-button'
         ).click()
 
-        with WaitForPageReload(self.driver):
+        if len(self.components) == 0:
 
-            # click the "Add" button
-            self.driver.find_element_by_css_selector(
-                '#addContributors a[data-bind="click:submit"]'
-            ).click()
+            with WaitForPageReload(self.driver):
+
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
+
+        else:
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Next" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectWhich"]'
+                ).click()
+
+            if children:
+
+                # click "Select all"
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:selectNodes"]'
+                ).click()
+
+            with WaitForPageReload(self.driver):
+
+                # click the "Add" button
+                self.driver.find_element_by_css_selector(
+                    '#addContributors a[data-bind~="click:submit"]'
+                ).click()
 
     @property
     def date_created(self):
@@ -786,18 +861,18 @@ class NodePage(OsfPage):
         :returns: [``Log``, ...]
         """
         return logs.parse_log(
-            container=self.driver.find_element_by_id('main-log')
+            container=self.driver.find_element_by_id('logScope')
         )
 
     def log_user_link(self, user):
         project_url = self.driver.current_url
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div#main-log dd')
+                (By.CSS_SELECTOR, 'div#logScope dd')
             )
         )
         self.driver.find_elements_by_css_selector(
-            'div#main-log dd'
+            'div#logScope dd'
         )[0].find_element_by_link_text(user.full_name).click()
 
         WebDriverWait(self.driver, 3).until(
@@ -1180,7 +1255,7 @@ class ProjectPage(NodePage):
 
         # Click "Add Component" button
         self.driver.find_element_by_css_selector(
-            'a.btn[href="#newComponent"]'
+            '#Nodes [data-target]'
         ).click()
 
         # Wait for the modal to be visible
