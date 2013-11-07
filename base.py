@@ -283,12 +283,15 @@ class ProjectSmokeTest(UserSmokeTest):
 
         if permission == 'public':
             self.get_element('div.btn-toolbar a#publicButton.btn').click()
-            self.get_element('div.modal-dialog button.btn.btn-primary').click()
+            self.get_element(
+                'DIV.bootbox.modal.fade.bootbox-confirm.in button.btn.btn-primary'
+            ).click()
 
         else:
-            self.get_element('div.btn-toolbar a#privateButton.btn').click()
-            self.get_element('div.modal-dialog button.btn.btn-primary').click()
-
+            self.get_element('diset_permissionv.btn-toolbar a#privateButton.btn').click()
+            self.get_element(
+                'DIV.bootbox.modal.fade.bootbox-confirm.in button.btn.btn-primary'
+            ).click()
 
     def make_private(self, url=None):
         """Make a project or component private.
