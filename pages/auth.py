@@ -152,7 +152,9 @@ class UserDashboardPage(OsfPage):
     @property
     def watch_logs(self):
         return logs.parse_log(
-            container=self.driver.find_element_by_css_selector('div.span6:last-child')
+            container=self.driver.find_element_by_css_selector(
+                'div.col-md-6:last-child'
+            )
         )
 
 class UserProfilePage(OsfPage):
@@ -165,7 +167,7 @@ class UserProfilePage(OsfPage):
         self.driver.find_element_by_id('profile-fullname').click()
 
         field = self.driver.find_element_by_css_selector(
-            'div.popover.in input'
+            'DIV.page-header DIV.editable-input INPUT.form-control.input-sm'
         )
 
         field.clear()
@@ -173,7 +175,7 @@ class UserProfilePage(OsfPage):
 
         with WaitForPageReload(self.driver):
             self.driver.find_element_by_css_selector(
-                'div.popover.in button[type="submit"]'
+                'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
             ).click()
 
     @property

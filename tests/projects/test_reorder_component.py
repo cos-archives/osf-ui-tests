@@ -34,7 +34,7 @@ class ReorderComponentTest(ProjectFixture):
     def test_reorder_components(self):
         assert_equal(
             self.page.driver.find_element_by_css_selector(
-                '#Nodes li:first-child h3 span a'
+                '#Nodes li:first-child h4 span a'
             ).text,
             self.title,
         )

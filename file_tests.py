@@ -905,9 +905,15 @@ class FileTests(unittest.TestCase):
         )[0].find_element_by_css_selector(
             'DIV.slick-cell.l0.r0.cell-title'
         ).text
+        type_name = ''
 
-        self.assertEqual(
-            u' {}'.format(title),
+        if node_type == 'Project':
+            type_name = 'Project'
+        else:
+            type_name = 'Component'
+
+        self.assertAlmostEqual(
+            u' {}: {}'.format(type_name, title),
             folder
         )
 

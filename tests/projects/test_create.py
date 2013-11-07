@@ -31,7 +31,11 @@ class Create(object):
 
     def test_logged(self):
         assert_equal(
-            u"{} created project".format(self.users[0].full_name),
+            u"{} created {} {}".format(
+                self.users[0].full_name,
+                self.page.type,
+                self.page.title
+            ),
             self.page.logs[0].text
         )
 

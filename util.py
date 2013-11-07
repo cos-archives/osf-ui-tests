@@ -97,7 +97,7 @@ def get_alert_boxes(driver, alert_text):
     # Return matching alert boxes
     return alerts
     
-find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+find_btn = lambda elm: elm.find_element_by_css_selector('BUTTON.btn.btn-submit.btn-success')
 
 
 def fill_form(
@@ -136,12 +136,15 @@ def login(driver, username, password):
     driver.get('%s/account' % (config.osf_home))
 
     # Get login form
-    login_form = driver.find_element_by_xpath('//form[@name="signin"]')
-    fill_form(login_form, {
-        '#username' : username,
-        '#password' : password,
-    })
-
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked INPUT#username.form-control'
+    ).send_keys(username)
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked INPUT#password.form-control'
+    ).send_keys(password)
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked BUTTON.btn.btn-submit.btn-primary'
+    ).click()
 
 def gen_user_data(_length=12):
     """ Generate data to create a user account. """
