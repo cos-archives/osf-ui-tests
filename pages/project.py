@@ -380,10 +380,16 @@ class NodePage(OsfPage):
         textbox.clear()
         textbox.send_keys(value)
 
-        with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                'DIV.popover-content DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
-            ).click()
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.popover-content DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.popover-content DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
+        ).click()
 
     @property
     def tag(self):
@@ -830,12 +836,17 @@ class NodePage(OsfPage):
 
         # Get the body element, so we know then the page has unloaded
         #body = self.driver.find_element_by_css_selector('body')
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)')
+            )
+        )
 
-        with WaitForPageReload(self.driver):
-            # click the fork icon
-            page.driver.find_element_by_css_selector(
-                '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
-            ).click()
+        # click the fork icon
+        page.driver.find_element_by_css_selector(
+            '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
+        ).click()
 
         # Wait at least until the page has unloaded to continue.
         # TODO: I think this is where the 2-3 second delay is. Fix that.
@@ -899,7 +910,7 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.container h3 a#clickable.dz-clickable')
+                (By.CSS_SELECTOR, 'div.container h3')
             )
         )
 
@@ -1300,11 +1311,16 @@ class ProjectPage(NodePage):
             '.container form input'
         )[-1].send_keys('continue')
 
-        with WaitForPageReload(self.driver):
-            # click "Register"
-            self.driver.find_element_by_css_selector(
-                '#register-submit'
-            ).click()
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '#register-submit')
+            )
+        )
+        # click "Register"
+        self.driver.find_element_by_css_selector(
+            '#register-submit'
+        ).click()
 
         return ProjectRegistrationPage(driver=self.driver)
 
