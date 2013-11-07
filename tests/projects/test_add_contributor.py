@@ -17,9 +17,10 @@ class AddContributorTests(AddContributorFixture):
 
     def test_logged(self):
         assert_equal(
-            u'{} added {} to {}'.format(
+            u'{} added {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,
@@ -39,7 +40,7 @@ class AddContributorTests(AddContributorFixture):
             self.page.logs[0].links[0].url
         )
         assert_in(
-            self.page.log_user_link(self.users[1]),
+            self.page.log_user_link(self.users[-1]),
             self.page.logs[0].links[1].url
         )
 
@@ -103,10 +104,9 @@ class AddMultiContributorTests(AddMultiContributorFixture):
         assert_equal(self.users[1].full_name, self.page.contributors[1].full_name)
         assert_equal(self.users[2].full_name, self.page.contributors[2].full_name)
 
-    @nottest    # format incorrect
     def test_logged(self):
         assert_equal(
-            u'{} added {}, and {} to {} {}'.format(
+            u'{} added {} , {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
                 self.users[2].full_name,
