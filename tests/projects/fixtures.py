@@ -123,6 +123,16 @@ class AddContributorFixture(object):
         cls.old_id = cls.page.id
 
 
+class AddContributorChildrenFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(AddContributorChildrenFixture, cls).setUpClass()
+
+        cls.users.append(create_user())
+        cls.page.add_contributor(cls.users[-1], children=True)
+        cls.old_id = cls.page.id
+
+
 class AddContributorAccessFixture(AddContributorFixture):
     @classmethod
     def setUpClass(cls):
