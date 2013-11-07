@@ -1,10 +1,10 @@
 from nose.tools import *
 
-from pages.project import ProjectPage
-from tests.fixtures import ProjectFixture, SubprojectFixture
+from pages.project import ProjectPage, NodePage
+from tests.fixtures import ProjectFixture, SubprojectFixture, ComplexProjectFixture
 from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubprojectFixture
 from tests.projects.fixtures import AddContributorFixture, AddContributorAccessFixture, AddMultiContributorFixture, \
-    AddMultiContributorDeleteFixture
+    AddMultiContributorDeleteFixture, AddContributorChildrenFixture
 import datetime as dt
 
 
@@ -17,9 +17,10 @@ class AddContributorTests(AddContributorFixture):
 
     def test_logged(self):
         assert_equal(
-            u'{} added {} to {}'.format(
+            u'{} added {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,
@@ -39,7 +40,7 @@ class AddContributorTests(AddContributorFixture):
             self.page.logs[0].links[0].url
         )
         assert_in(
-            self.page.log_user_link(self.users[1]),
+            self.page.log_user_link(self.users[-1]),
             self.page.logs[0].links[1].url
         )
 
@@ -103,10 +104,9 @@ class AddMultiContributorTests(AddMultiContributorFixture):
         assert_equal(self.users[1].full_name, self.page.contributors[1].full_name)
         assert_equal(self.users[2].full_name, self.page.contributors[2].full_name)
 
-    @nottest    # format incorrect
     def test_logged(self):
         assert_equal(
-            u'{} added {}, and {} to {} {}'.format(
+            u'{} added {} , {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
                 self.users[2].full_name,
@@ -223,6 +223,25 @@ class ComponentOfProjectAddMultiContributorDelete(AddMultiContributorDeleteTests
     """Test that contributor deleted from "Add Contributors" page of project component is not added"""
     pass
 
+
 class ComponentOfSubprojectAddMultiContributorDelete(AddMultiContributorDeleteTests, ComponentOfSubprojectFixture):
     """Test that contributor deleted from "Add Contributors" page of subproject component is not added"""
+    pass
+
+
+class AddContributorChildrenTests(AddContributorChildrenFixture):
+    def test_contributor_in_subproject(self):
+        self.page = self.page.node(self.subproject_id, self.old_id)
+        assert_equal(self.users[-1].full_name, self.page.contributors[-1].full_name)
+
+    def test_contributor_in_component(self):
+        self.page = self.page.node(self.component_id, self.old_id)
+        assert_equal(self.users[-1].full_name, self.page.contributors[-1].full_name)
+
+
+class AddContributorChildrenProjectTestCase(AddContributorChildrenTests, ProjectFixture):
+    pass
+
+
+class AddContributorChildrenSubprojectTestCase(AddContributorChildrenTests, SubprojectFixture):
     pass
