@@ -682,7 +682,7 @@ class NodePage(OsfPage):
         """
         # Click "Registrations"
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Registrations'
         ).click()
@@ -726,7 +726,7 @@ class NodePage(OsfPage):
         forks = []
         # Click "Forks"
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Forks'
         ).click()
@@ -780,7 +780,7 @@ class NodePage(OsfPage):
         :returns: [``Log``, ...]
         """
         return logs.parse_log(
-            container=self.driver.find_element_by_id('main-log')
+            container=self.driver.find_element_by_id('logScope')
         )
 
     def log_user_link(self, user):
@@ -886,7 +886,7 @@ class NodePage(OsfPage):
 
         # Click "Files" in the node's subnav
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Files'
         ).click()
@@ -921,7 +921,7 @@ class NodePage(OsfPage):
 
         # Click "Files" in the node's subnav
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Files'
         ).click()
@@ -949,12 +949,11 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.modal-dialog')
+                (By.CSS_SELECTOR, 'DIV.bootbox.modal.fade.bootbox-confirm.in')
             )
         )
-
         self.driver.find_element_by_css_selector(
-            'div.modal-dialog button.btn.btn-primary'
+            'DIV.bootbox.modal.fade.bootbox-confirm.in button.btn.btn-primary'
         ).click()
 
     @property
@@ -970,7 +969,7 @@ class NodePage(OsfPage):
 
         # Click "Files" in the node's subnav
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Files'
         ).click()
@@ -1014,7 +1013,7 @@ class NodePage(OsfPage):
 
         # Click "Files" in the node's subnav
         self.driver.find_element_by_css_selector(
-            '#overview div.subnav'
+            'HEADER#overview.subhead UL.nav.navbar-nav'
         ).find_element_by_link_text(
             'Dashboard'
         ).click()
@@ -1174,7 +1173,7 @@ class ProjectPage(NodePage):
 
         # Click "Add Component" button
         self.driver.find_element_by_css_selector(
-            'a.btn[href="#newComponent"]'
+            'a.btn[data-target="#newComponent"]'
         ).click()
 
         # Wait for the modal to be visible
