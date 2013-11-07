@@ -16,8 +16,12 @@ def parse_log(container):
         log_list.append(
             Log(
                 text=t.text,
-                date=dt.datetime.strptime(d.text, '%m/%d/%y %I:%M %p'),
-                links=[ Link(
+
+                date=dt.datetime.strptime(
+                    d.text.replace('1913', '2013', 1)[:-6], # includes temporary fix to year 1913 bug
+                    '%m/%d/%Y %I:%M %p',
+                ) - dt.timedelta(hours=int(d.text[-5:-2])),
+                links=[Link(
                     text=lk.text,
                     url=lk.get_attribute('href'),
                 ) for lk in t.find_elements_by_css_selector('a')]
