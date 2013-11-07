@@ -375,14 +375,14 @@ class NodePage(OsfPage):
         self.driver.find_element_by_id('node-title-editable').click()
 
         textbox = self.driver.find_element_by_css_selector(
-            'div.editable-popover input[type="text"]'
+            'DIV.popover-content INPUT.form-control.input-sm'
         )
         textbox.clear()
         textbox.send_keys(value)
 
         with WaitForPageReload(self.driver):
             self.driver.find_element_by_css_selector(
-                'div.editable-popover button[type="submit"]'
+                'DIV.popover-content DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
             ).click()
 
     @property
