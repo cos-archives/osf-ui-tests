@@ -61,7 +61,7 @@ class CreateComplex(Create):
     def test_component_links(self):
         """Components of a fork should be copies of the original components"""
         for x, y in zip(self.page.components, self.parent_values['components']):
-            assert_not_equal(x  .url, y.url)
+            assert_not_equal(x.url, y.url)
 
     def test_wiki_content(self):
         assert_equal(

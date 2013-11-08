@@ -226,7 +226,7 @@ class ProjectNoDescriptionFixture(UserFixture):
             title='Test Project',
             description=None
         )
-
+        cls.page.type = 'project'
 
 class DeleteProjectFixture(ProjectFixture):
     @classmethod

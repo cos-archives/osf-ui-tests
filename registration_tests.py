@@ -2,7 +2,9 @@ import datetime as dt
 import unittest
 
 from pages import helpers
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class RegistrationTests(unittest.TestCase):
     """This test case is for testing the act of creating a registration, and
@@ -122,6 +124,12 @@ class RegistrationTests(unittest.TestCase):
             meta=('sample narrative', )
         )
 
+        WebDriverWait(page.driver, 8).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'html body DIV.watermarked DIV.container DIV.alert.alert-info')
+            )
+        )
         self.assertEqual(
             getattr(page, attribute),
             parent_value,

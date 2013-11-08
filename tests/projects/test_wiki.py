@@ -29,7 +29,7 @@ class WikiFixture(object):
 
     def test_project_links(self):
         assert_equal(
-            self.page.driver.current_url + "wiki/home/",
+            self.page.driver.current_url + "wiki/home",
             self.page.logs[0].links[1].url
         )
 

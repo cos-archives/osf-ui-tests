@@ -67,6 +67,13 @@ class NodePage(OsfPage):
 
     @property
     def can_add_contributors(self):
+
+        WebDriverWait(self.driver, 8).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.container DIV.alert.alert-info A.alert-link')
+            )
+        )
         if len(self.driver.find_elements_by_css_selector(
                 '#contributors > a[href="#addContributors"]'
         )) == 0:
@@ -565,7 +572,9 @@ class NodePage(OsfPage):
         """
         C = namedtuple('Component', ['title', 'url'])
         components = []
-        for elem in self.driver.find_elements_by_css_selector('#Nodes h4 a'):
+        for elem in self.driver.find_elements_by_css_selector(
+                'DIV.watermarked DIV.container DIV.row DIV#containment.col-md-7 SECTION#Nodes LI.project.list-group-item.list-group-item-node H4.list-group-item-heading span a'
+        ):
             components.append(
                 C(
                     title=elem.text,
@@ -649,14 +658,21 @@ class NodePage(OsfPage):
     def can_edit_wiki(self):
         _url = self.driver.current_url
 
-        self.driver.get(
-            self.driver.find_element_by_link_text(
-                'Wiki').get_attribute('href') + 'home/'
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Wiki'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'UL.nav.navbar-nav li')
+            )
         )
 
         edit_button_class = self.driver.find_elements_by_css_selector(
-            'ul.nav-pills'
-        )[1].find_element_by_link_text('Edit').get_attribute('class')
+            'DIV.col-md-3 UL.nav.navbar-nav li'
+        )[0].find_element_by_link_text('Edit').get_attribute('class')
 
         self.driver.get(_url)
 
@@ -683,7 +699,7 @@ class NodePage(OsfPage):
 
         # submit it
         self.driver.find_element_by_css_selector(
-        'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
+            'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
         ).click()
 
         # Go back to the project page.
@@ -851,8 +867,8 @@ class NodePage(OsfPage):
         dashboard
         """
         return int(self.driver.find_element_by_css_selector(
-                '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
-            ).text)
+            '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
+        ).text)
 
     @property
     def logs(self):
@@ -861,19 +877,21 @@ class NodePage(OsfPage):
         :returns: [``Log``, ...]
         """
         return logs.parse_log(
-            container=self.driver.find_element_by_id('logScope')
+            container=self.driver.find_element_by_css_selector(
+                'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log')
         )
 
     def log_user_link(self, user):
         project_url = self.driver.current_url
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div#main-log dd')
+                (By.CSS_SELECTOR,
+                 'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log')
             )
         )
-        self.driver.find_elements_by_css_selector(
-            'div#main-log dd'
-        )[0].find_element_by_link_text(user.full_name).click()
+        self.driver.find_element_by_css_selector(
+            'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log DD.log-content span span[data-bind="html: displayContributors"]'
+        ).find_element_by_link_text(user.full_name).click()
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
@@ -917,6 +935,12 @@ class NodePage(OsfPage):
             '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
         ).click()
 
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.watermarked DIV.container DIV#projectScope HEADER#overview.subhead P#contributors A.node-forked-from')
+            )
+        )
         # Wait at least until the page has unloaded to continue.
         # TODO: I think this is where the 2-3 second delay is. Fix that.
         #WebDriverWait(self.driver, 1).until(EC.staleness_of('body'))
@@ -936,14 +960,14 @@ class NodePage(OsfPage):
         else:
             _url = None
 
-        upload_button_class = self.driver.find_element_by_css_selector(
+        upload_button_class = self.driver.find_elements_by_css_selector(
             'div.container h3 A#clickable.dz-clickable'
         )
 
         if _url:
             self.driver.get(_url)
 
-        return True if len(upload_button_class) == 0 else False
+        return False if len(upload_button_class) == 0 else True
 
     @property
     def can_delete_files(self):
@@ -965,7 +989,7 @@ class NodePage(OsfPage):
         if _url:
             self.driver.get(_url)
 
-        return True if len(delete_button_class) == 0 else False
+        return False if len(delete_button_class) == 0 else True
 
     def add_file(self, f):
         """Add a file to the node."""
@@ -1028,9 +1052,6 @@ class NodePage(OsfPage):
                 'div.slick-cell.l0.r0.cell-title a'
             ).text == f
         ]
-        self.driver.execute_script('''
-            $('div.slick-cell.l3.r3 DIV.hGridButton').attr('style', "");
-        ''')
 
         self.driver.find_element_by_css_selector(
             'div.slick-cell.l3.r3 DIV.hGridButton button.btn.btn-danger.btn-mini'
@@ -1449,7 +1470,7 @@ class ProjectRegistrationPage(ProjectPage):
         """ The URL of the node for which this is a registration."""
 
         return self.driver.find_element_by_css_selector(
-            'span.label-important a'
+            'DIV.container DIV.alert.alert-info A.alert-link'
         ).get_attribute('href')
 
 

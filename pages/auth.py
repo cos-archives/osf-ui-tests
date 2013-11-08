@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 
 
 class LoginPage(OsfPage):
-    default_url = '{}/account'.format(config.osf_home)
+    default_url = '{}/account/'.format(config.osf_home)
     page_name = 'account management'
 
     def __init__(self, *args, **kwargs):
@@ -173,10 +173,9 @@ class UserProfilePage(OsfPage):
         field.clear()
         field.send_keys(value)
 
-        with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
-            ).click()
+        self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
+        ).click()
 
     @property
     def profile_shortlink(self):
