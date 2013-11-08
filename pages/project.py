@@ -100,7 +100,7 @@ class NodePage(OsfPage):
 
         return True
 
-   def add_multi_contributor(self, user1, user2, children=False):
+    def add_multi_contributor(self, user1, user2, children=False):
 
         # click the "add" link
         self.driver.find_element_by_css_selector(
@@ -979,7 +979,8 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div.container h3')
+                (By.CSS_SELECTOR,
+                 'div.container div.container h3 A#clickable.dz-clickable')
             )
         )
 

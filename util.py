@@ -97,7 +97,31 @@ def get_alert_boxes(driver, alert_text):
     # Return matching alert boxes
     return alerts
     
-find_btn = lambda elm: elm.find_element_by_css_selector('BUTTON.btn.btn-submit.btn-success')
+find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+
+find_create_btn = lambda elm: elm.find_element_by_css_selector(
+    'BUTTON.btn.btn-submit.btn-success'
+)
+
+
+def fill_creation_form(
+        root,
+        fields,
+        button_finder=find_create_btn):
+    """Fill out form fields and click submit button.
+
+    Args:
+        form : root element
+        fields : dict of id -> value pairs for form
+        button_finder : function to get button from root element
+
+    """
+    # Enter field values
+    for field in fields:
+        root.find_element_by_css_selector(field).send_keys(fields[field])
+
+    # Click submit button
+    button_finder(root).click()
 
 
 def fill_form(
