@@ -42,7 +42,7 @@ class WikiFixture(object):
     def test_date_created(self):
         assert_almost_equal(
             self.page.logs[0].date,
-            dt.datetime.utcnow(),
+            dt.datetime.now(),
             delta=dt.timedelta(minutes=2)
         )
 

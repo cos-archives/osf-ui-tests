@@ -13,7 +13,7 @@ class Create(object):
 
         assert_almost_equal(
             self.page.date_created,
-            dt.datetime.utcnow(),
+            dt.datetime.now(),
             delta=dt.timedelta(minutes=2)
         )
 
