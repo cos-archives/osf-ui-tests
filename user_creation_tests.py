@@ -44,7 +44,7 @@ class UserCreationTests(base.SmokeTest):
         id_form_data = {'#register-%s' % (k) : form_data[k] for k in form_data}
 
         # Submit form
-        util.fill_form(self.driver, id_form_data)
+        util.fill_creation_form(self.driver, id_form_data)
         
         # Get alert boxes
         alerts = util.get_alert_boxes(self.driver, alert_text)
