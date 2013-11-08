@@ -1028,10 +1028,12 @@ class NodePage(OsfPage):
                 'div.slick-cell.l0.r0.cell-title a'
             ).text == f
         ]
+        self.driver.execute_script('''
+            $('div.slick-cell.l3.r3 DIV.hGridButton').attr('style', "");
+        ''')
 
-        # row[0].find_element_by_css_selector('button.btn-delete').click()
         self.driver.find_element_by_css_selector(
-            'div.grid-canvas div.slick-cell.l4.r4 button.btn.btn-danger.btn-mini'
+            'div.slick-cell.l3.r3 DIV.hGridButton button.btn.btn-danger.btn-mini'
         ).click()
 
         WebDriverWait(self.driver, 3).until(
