@@ -19,9 +19,10 @@ class Rename(object):
 
     def test_log_text(self):
         assert_equal(
-            u'{} changed the title from {} to {}'.format(
+            u'{} changed the title from {} to {} {}'.format(
                 self.users[0].full_name,
                 self.old_title,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,

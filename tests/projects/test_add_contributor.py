@@ -106,7 +106,7 @@ class AddMultiContributorTests(AddMultiContributorFixture):
 
     def test_logged(self):
         assert_equal(
-            u'{} added {} , {} to {} {}'.format(
+            u'{} added {} and {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[1].full_name,
                 self.users[2].full_name,
@@ -175,9 +175,10 @@ class AddMultiContributorDeleteTests(AddMultiContributorDeleteFixture):
 
     def test_logged(self):
         assert_equal(
-            u'{} added {} to {}'.format(
+            u'{} added {} to {} {}'.format(
                 self.users[0].full_name,
                 self.users[2].full_name,
+                self.page.type,
                 self.page.title,
             ),
             self.page.logs[0].text,

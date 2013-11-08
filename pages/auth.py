@@ -173,10 +173,9 @@ class UserProfilePage(OsfPage):
         field.clear()
         field.send_keys(value)
 
-        with WaitForPageReload(self.driver):
-            self.driver.find_element_by_css_selector(
-                'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
-            ).click()
+        self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
+        ).click()
 
     @property
     def profile_shortlink(self):

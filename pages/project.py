@@ -565,7 +565,9 @@ class NodePage(OsfPage):
         """
         C = namedtuple('Component', ['title', 'url'])
         components = []
-        for elem in self.driver.find_elements_by_css_selector('#Nodes h4 a'):
+        for elem in self.driver.find_elements_by_css_selector(
+                'SECTION#Nodes UL.list-group.sortable.ui-sortable LI.project.list-group-item.list-group-item-node H4.list-group-item-heading span a'
+        ):
             components.append(
                 C(
                     title=elem.text,
@@ -868,12 +870,13 @@ class NodePage(OsfPage):
         project_url = self.driver.current_url
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'div#main-log dd')
+                (By.CSS_SELECTOR,
+                 'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log')
             )
         )
-        self.driver.find_elements_by_css_selector(
-            'div#main-log dd'
-        )[0].find_element_by_link_text(user.full_name).click()
+        self.driver.find_element_by_css_selector(
+            'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log DD.log-content span span[data-bind="html: displayContributors"]'
+        ).find_element_by_link_text(user.full_name).click()
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
@@ -917,6 +920,12 @@ class NodePage(OsfPage):
             '#overview div.btn-group:nth-of-type(2) a:nth-of-type(2)'
         ).click()
 
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.watermarked DIV.container DIV#projectScope HEADER#overview.subhead P#contributors A.node-forked-from')
+            )
+        )
         # Wait at least until the page has unloaded to continue.
         # TODO: I think this is where the 2-3 second delay is. Fix that.
         #WebDriverWait(self.driver, 1).until(EC.staleness_of('body'))
@@ -943,7 +952,7 @@ class NodePage(OsfPage):
         if _url:
             self.driver.get(_url)
 
-        return True if len(upload_button_class) == 0 else False
+        return False if len(upload_button_class) == 0 else True
 
     @property
     def can_delete_files(self):
@@ -965,7 +974,7 @@ class NodePage(OsfPage):
         if _url:
             self.driver.get(_url)
 
-        return True if len(delete_button_class) == 0 else False
+        return False if len(delete_button_class) == 0 else True
 
     def add_file(self, f):
         """Add a file to the node."""
@@ -1028,9 +1037,6 @@ class NodePage(OsfPage):
                 'div.slick-cell.l0.r0.cell-title a'
             ).text == f
         ]
-        self.driver.execute_script('''
-            $('div.slick-cell.l3.r3 DIV.hGridButton').attr('style', "");
-        ''')
 
         self.driver.find_element_by_css_selector(
             'div.slick-cell.l3.r3 DIV.hGridButton button.btn.btn-danger.btn-mini'
