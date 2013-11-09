@@ -599,8 +599,14 @@ class NodePage(OsfPage):
 
         registrations = []
 
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'ul.list-group li.project h3')
+            )
+        )
+
         # for each list entry
-        for r in  self.driver.find_elements_by_css_selector(
+        for r in self.driver.find_elements_by_css_selector(
             'ul.list-group li.project h3'
         ):
             registrations.append(
