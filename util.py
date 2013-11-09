@@ -458,11 +458,11 @@ def submit_wiki_text(driver):
 
 def get_wiki_version(driver):
     """ Get current wiki version. """
- 
+
     # Extract version text
-    version = driver\
-        .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
-        .text
+    version = str(driver.find_element_by_css_selector(
+        "DIV.container DIV.col-md-3 dl"
+    ).text[-11:])
  
     # Strip (current) from version string
     version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
