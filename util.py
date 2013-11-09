@@ -88,14 +88,15 @@ def get_alert_boxes(driver, alert_text):
 
     # Find alerts
     alerts = driver.find_elements_by_xpath(
-        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' % \
-            (alert_text.upper(), alert_text.lower(), alert_text.lower())
+        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
+        (alert_text.upper(), alert_text.lower(), alert_text.lower())
     )
 
     # Return matching alert boxes
     return alerts
     
 find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+
 
 def fill_form(
         root, 
