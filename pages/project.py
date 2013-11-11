@@ -107,6 +107,41 @@ class NodePage(OsfPage):
 
         return True
 
+    def add_parent_contributor(self):
+
+        # wait for a result to display
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#contributors a[href="#addContributors"]')
+            )
+        )
+        # click the "add" link
+        self.driver.find_element_by_css_selector(
+            '#contributors a[href="#addContributors"]'
+        ).click()
+
+        # wait for the modal to be visible
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.ID, 'addContributors')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            "div.modal-dialog div.modal-content div.modal-body div form div.row div.col-md-6 a"
+        ).click()
+
+        self.driver.find_element_by_css_selector(
+            "div a[data-bind='click:addAll']"
+        ).click()
+
+        with WaitForPageReload(self.driver):
+
+            # click the "Add" button
+            self.driver.find_element_by_css_selector(
+                '#addContributors a[data-bind~="click:submit"]'
+            ).click()
+
     def add_multi_contributor(self, user1, user2, children=False):
 
         # click the "add" link

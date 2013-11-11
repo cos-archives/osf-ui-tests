@@ -270,3 +270,18 @@ class UnwatchFixture(WatchFixture):
         super(UnwatchFixture, cls).setUpClass()
         cls.old_num_watchers = cls.page.num_watchers
         cls.page.watched = False
+
+
+class AddContributorImportFromParentFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(AddContributorImportFromParentFixture, cls).setUpClass()
+        cls.child_url=cls.page.driver.current_url
+        cls.project_url = cls.page.parent_project().driver.current_url
+        cls.page.driver.get(cls.project_url)
+        cls.users.append(create_user())
+        cls.users.append(create_user())
+        cls.page.add_multi_contributor(cls.users[1], cls.users[2])
+        cls.page.driver.get(cls.child_url)
+        cls.page.add_parent_contributor()
+        cls.page.driver.get(cls.child_url)
