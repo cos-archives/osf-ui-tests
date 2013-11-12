@@ -981,7 +981,24 @@ class FileTests(unittest.TestCase):
     def _test_file_download_version_check(self, page):
 
         page.public = True
-        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('first')
+
+        # add the file to the project
+        page.add_file(temp_file_path)
+
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('second')
+
+        page.add_file(temp_file_path)
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
+
+        #page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
 
         WebDriverWait(page.driver, 3).until(
             ec.visibility_of_element_located(
@@ -996,9 +1013,9 @@ class FileTests(unittest.TestCase):
         ).click()
 
         # Get the link to the file's version through Selenium
-        link = page.driver.find_element_by_css_selector(
-            "DIV#file-container.row DIV.col-md-4 TABLE#file-version-history.table.table-striped TBODY TR td a"
-        ).get_attribute('href')
+        link = page.driver.find_elements_by_css_selector(
+            "DIV#file-container.row DIV.col-md-4 TABLE#file-version-history.table.table-striped TBODY TR"
+        )[1].find_element_by_css_selector("td a").get_attribute('href')
 
         # Use Requests to download the file
         response = requests.get(link)
@@ -1024,7 +1041,7 @@ class FileTests(unittest.TestCase):
         # fn is now only the portion of the filename representing a datetime.
         time = dt.datetime.strptime(
             fn,
-            '%Y%m%d%I%M'
+            '%Y%m%d%H%M%S'
         )
 
         self.assertAlmostEqual(
@@ -1035,6 +1052,7 @@ class FileTests(unittest.TestCase):
 
     def test_file_download_version_check(self):
         self._test_file_download_version_check(get_new_project())
+
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
