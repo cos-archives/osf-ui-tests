@@ -978,6 +978,63 @@ class FileTests(unittest.TestCase):
     def test_component_file_bar_reorder(self):
         self._test_reorder_file_bar(self._component())
 
+    def _test_file_download_version_check(self, page):
+
+        page.public = True
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.grid-canvas')
+            )
+        )
+
+        page.driver.find_element_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd'
+        ).find_element_by_css_selector(
+            'div.slick-cell.l0.r0.cell-title a'
+        ).click()
+
+        # Get the link to the file's version through Selenium
+        link = page.driver.find_element_by_css_selector(
+            "DIV#file-container.row DIV.col-md-4 TABLE#file-version-history.table.table-striped TBODY TR td a"
+        ).get_attribute('href')
+
+        # Use Requests to download the file
+        response = requests.get(link)
+
+        # get the "content-disposition" header from the Response object
+        # Should be in the format:
+        #        "attachment;filename=<filename>"
+        h = response.headers.get('content-disposition', '')
+
+        # get only the part containing "filename"
+        h = [x for x in h.split(';') if 'filename' in x][0]
+
+        # split this part on the equal sign to get only the filename
+        filename = h.split('=')[1]
+
+        # parse the filename to get the portioned added that represents a datetime
+
+        # Get the portion of the filename preceeding the last "."
+        fn = filename.split('.')[-2]
+        # Get the portion of that segment following the last "_"
+        fn = fn.split('_')[-1]
+
+        # fn is now only the portion of the filename representing a datetime.
+        time = dt.datetime.strptime(
+            fn,
+            '%Y%m%d%I%M'
+        )
+
+        self.assertAlmostEqual(
+            time,
+            dt.datetime.now(),
+            delta=dt.timedelta(minutes=2)
+        )
+
+    def test_file_download_version_check(self):
+        self._test_file_download_version_check(get_new_project())
 
 class FileHandlingTests(base.ProjectSmokeTest):
 
