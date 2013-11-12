@@ -1046,7 +1046,7 @@ class FileTests(unittest.TestCase):
 
         self.assertAlmostEqual(
             time,
-            dt.datetime.now(),
+            dt.datetime.utcnow(),
             delta=dt.timedelta(minutes=2)
         )
 
