@@ -125,7 +125,7 @@ class PrivateComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateAccessTes
 class PrivateFileAccessTests(UserAccessFixture):
     def test_contributor(self):
         self._as_contributor()
-
+        self.page.driver.refresh()
         page = FilePage(driver=self.page.driver)
 
         assert_is_instance(page, FilePage)
@@ -138,7 +138,7 @@ class PrivateFileAccessTests(UserAccessFixture):
             page = FilePage(driver=self.page.driver)
         assert_equal(http.FORBIDDEN, cm.exception.code)
 
-    def test_the_anonymous(self):
+    def test_anonymous(self):
         self._as_anonymous()
         self.page.driver.refresh()
 
