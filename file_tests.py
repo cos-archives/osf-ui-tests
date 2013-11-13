@@ -1,7 +1,7 @@
 import datetime as dt
 import unittest
 from unittest import skip
-
+import time
 import base
 import os
 import requests
@@ -1127,11 +1127,13 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
         # add the file to the project
         self.add_file(temp_file_path)
+        time.sleep(5)
         self.goto('file', os.path.split(temp_file_path)[-1])
 
         # check that it is not rendered in the browser
         self.assertTrue(
-            'file is too large' in self.get_element('div#file-container').text
+            'file is too large' in self.get_element(
+                'div#file-container.row div.col-md-8').text
         )
 
         # delete the temp file we made
