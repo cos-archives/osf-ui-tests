@@ -1,7 +1,9 @@
 import httplib as http
 
 from nose.tools import *
-
+from pages.helpers import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
 from pages.exceptions import HttpError
 from pages.project import ProjectPage, FilePage
 from tests.fixtures import ProjectFixture, SubprojectFixture, UserAccessFixture
@@ -123,7 +125,6 @@ class PrivateComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateAccessTes
 class PrivateFileAccessTests(UserAccessFixture):
     def test_contributor(self):
         self._as_contributor()
-        self.page.driver.refresh()
 
         page = FilePage(driver=self.page.driver)
 
@@ -137,7 +138,7 @@ class PrivateFileAccessTests(UserAccessFixture):
             page = FilePage(driver=self.page.driver)
         assert_equal(http.FORBIDDEN, cm.exception.code)
 
-    def test_anonymous(self):
+    def test_the_anonymous(self):
         self._as_anonymous()
         self.page.driver.refresh()
 
