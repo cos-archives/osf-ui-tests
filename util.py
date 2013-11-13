@@ -20,10 +20,14 @@ from selenium.common.exceptions import NoSuchElementException
 # Project imports
 import config
 
+caps = webdriver.DesiredCapabilities.CHROME
+caps['platform'] = "Windows 7"
+caps['version'] = ""
+caps['name'] ='osf ui tests in win 7 chrome'
 
 def launch_driver(
         driver_name=None,
-        desired_capabilities={},
+        desired_capabilities=caps,
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
@@ -42,7 +46,7 @@ def launch_driver(
 
         # Set up command executor
         command_executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' \
-            % (os.environ.get('SAUCE_USERNAME'), os.environ.get('SAUCE_ACCESS_KEY'))
+            % ('Alleiluiah', '4f3f591f-e50a-4615-9325-e7dd53559d2a')
 
         driver = driver_cls(
             desired_capabilities=desired_capabilities,
