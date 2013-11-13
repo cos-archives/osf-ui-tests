@@ -868,20 +868,24 @@ class NodePage(OsfPage):
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
-                 'ul.list-group li#projects-widget.project.list-group-item h3'
+                 'ul.list-group LI.project.list-group-item.list-group-item-node'
                 )
             )
         )
 
         # for each list entry
         for f in self.driver.find_elements_by_css_selector(
-            'ul.list-group li#projects-widget.project.list-group-item h3'
+            'ul.list-group LI.project.list-group-item.list-group-item-node'
         ):
             forks.append(
                 # build the Registration instance
                 F(
-                    title=f.find_element_by_css_selector('a').text,
-                    url=f.find_element_by_css_selector('a').get_attribute(
+                    title=f.find_element_by_css_selector(
+                        'H4.list-group-item-heading span a'
+                    ).text,
+                    url=f.find_element_by_css_selector(
+                        'H4.list-group-item-heading span a'
+                    ).get_attribute(
                         'href'
                     ),
                 )
