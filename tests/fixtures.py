@@ -6,7 +6,7 @@ import requests
 import config
 from pages import FILES, helpers, LoginPage
 from pages.generic import OsfPage
-
+from selenium.common.exceptions import WebDriverException
 
 __doc__ = """IMPORTANT!
 
@@ -158,15 +158,21 @@ class UserAccessFixture(object):
 
     def _as_contributor(self):
         self.page.driver.delete_all_cookies()
-        self.page.driver = helpers.load_cookies(
-            self.page.driver, self.cookies.get('contributor')
-        )
-
+        try:
+            self.page.driver = helpers.load_cookies(
+                self.page.driver, self.cookies.get('contributor')
+            )
+        except WebDriverException:
+            pass
     def _as_anonymous(self):
         self.page.driver.delete_all_cookies()
 
     def _as_noncontributor(self):
         self.page.driver.delete_all_cookies()
-        self.page.driver = helpers.load_cookies(
-            self.page.driver, self.cookies.get('noncontributor')
-        )
+
+        try:
+            self.page.driver = helpers.load_cookies(
+                self.page.driver, self.cookies.get('noncontributor')
+            )
+        except WebDriverException:
+            pass
