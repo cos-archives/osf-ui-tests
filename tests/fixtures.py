@@ -171,9 +171,7 @@ class UserAccessFixture(object):
     def _as_noncontributor(self):
         self.page.driver.delete_all_cookies()
 
-        try:
-            self.page.driver = helpers.load_cookies(
-                self.page.driver, self.cookies.get('noncontributor')
-            )
-        except WebDriverException:
-            pass
+        self.page.driver = helpers.load_cookies(
+            self.page.driver, self.cookies.get('noncontributor')
+        )
+        
