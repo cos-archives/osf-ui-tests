@@ -285,3 +285,33 @@ class AddContributorImportFromParentFixture(object):
         cls.page.driver.get(cls.child_url)
         cls.page.add_parent_contributor()
         cls.page.driver.get(cls.child_url)
+        
+class PrivateAccessFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(PrivateAccessFixture, cls).setUpClass()
+        cls.users.append(create_user())
+        cls.users.append(create_user())
+        cls.page.add_contributor(cls.users[1])
+        cls.project_url=cls.page.driver.current_url
+        cls.page.log_out()
+
+class PublicAccessFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(PublicAccessFixture, cls).setUpClass()
+        cls.users.append(create_user())
+        cls.page.public = True
+        cls.project_url=cls.page.driver.current_url
+        cls.page.log_out()
+
+class PrivateFileAccessFixture(object):
+    @classmethod
+    def setUpClass(cls):
+        super(PrivateFileAccessFixture, cls).setUpClass()
+        cls.users.append(create_user())
+        cls.users.append(create_user())
+        cls.page.add_contributor(cls.users[1])
+        cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+        cls.file_url = cls.page.driver.current_url
+        cls.page.log_out()
