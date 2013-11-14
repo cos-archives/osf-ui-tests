@@ -1,7 +1,7 @@
 import datetime as dt
 import urlparse
 from collections import namedtuple
-
+import time
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -68,12 +68,7 @@ class NodePage(OsfPage):
     @property
     def can_add_contributors(self):
 
-        WebDriverWait(self.driver, 8).until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR,
-                 'DIV.container DIV.alert.alert-info A.alert-link')
-            )
-        )
+        time.sleep(3)
         if len(self.driver.find_elements_by_css_selector(
                 '#contributors > a[href="#addContributors"]'
         )) == 0:
