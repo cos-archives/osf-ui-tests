@@ -9,51 +9,47 @@ from tests.components.fixtures import ComponentOfProjectFixture, ComponentOfSubp
 from tests.projects.fixtures import PublicProjectFixture, PublicSubprojectFixture, PublicComponentOfProjectFixture, \
     PublicComponentOfSubprojectFixture, SubprojectOfPublicProjectFixture, ComponentOfPublicProjectFixture, \
     ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, FileFixture, \
-    ForkAccessFixture, NonContributorModifyFixture
+    ForkAccessFixture, NonContributorModifyFixture, PrivateAccessFixture, PublicAccessFixture, \
+    PrivateFileAccessFixture
 
 
-class PrivateAccessTests(UserAccessFixture):
+class PrivateAccessTests(PrivateAccessFixture):
+
     def test_contributor(self):
-        self._as_contributor()
+        self.log_in(self.users[1])
+        self.page.driver.get(self.project_url)
         self.page.driver.refresh()
-
         page = ProjectPage(driver=self.page.driver)
-
         assert_is_instance(page, ProjectPage)
+        self.page.log_out()
 
     def test_non_contributor(self):
-        self._as_noncontributor()
-        self.page.driver.refresh()
-
+        self.log_in(self.users[2])
+        self.page.driver.get(self.project_url)
         with assert_raises(HttpError) as cm:
             page = ProjectPage(driver=self.page.driver)
         assert_equal(http.FORBIDDEN, cm.exception.code)
+        self.page.log_out()
 
     def test_anonymous(self):
-        self._as_anonymous()
-        self.page.driver.refresh()
-
+        self.page.driver.get(self.project_url)
         with assert_raises(HttpError) as cm:
             page = ProjectPage(driver=self.page.driver)
         assert_equal(http.UNAUTHORIZED, cm.exception.code)
 
 
-class PublicAccessTests(PrivateAccessTests):
+class PublicAccessTests(PublicAccessFixture):
     def test_non_contributor(self):
-        self._as_noncontributor()
+        self.log_in(self.users[1])
+        self.page.driver.get(self.project_url)
         self.page.driver.refresh()
-
         page = ProjectPage(driver=self.page.driver)
-
         assert_is_instance(page, ProjectPage)
+        self.page.log_out()
 
     def test_anonymous(self):
-        self._as_anonymous()
-        self.page.driver.refresh()
-
-        page = ProjectPage(driver=self.page.driver)
-
-        assert_is_instance(page, ProjectPage)
+        self.page.driver.get(self.project_url)
+        assert_is_instance(self.page, ProjectPage)
 
 
 class PrivateProjectAccessTestCase(PrivateAccessTests, ProjectFixture):
@@ -120,55 +116,63 @@ class PrivateComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateAccessTes
     pass
 
 
-class PrivateFileAccessTests(UserAccessFixture):
+class PrivateFileAccessTests(PrivateFileAccessFixture):
     def test_contributor(self):
-        self._as_contributor()
+        self.log_in(self.users[1])
+        self.page.driver.get(self.file_url)
         self.page.driver.refresh()
-
-        page = FilePage(driver=self.page.driver)
-
-        assert_is_instance(page, FilePage)
+        page = ProjectPage(driver=self.page.driver)
+        assert_is_instance(page, ProjectPage)
+        self.page.log_out()
 
     def test_non_contributor(self):
-        self._as_noncontributor()
-        self.page.driver.refresh()
-
+        self.log_in(self.users[2])
+        self.page.driver.get(self.file_url)
         with assert_raises(HttpError) as cm:
-            page = FilePage(driver=self.page.driver)
+            page = ProjectPage(driver=self.page.driver)
         assert_equal(http.FORBIDDEN, cm.exception.code)
+        self.page.log_out()
 
     def test_anonymous(self):
-        self._as_anonymous()
-        self.page.driver.refresh()
-
+        self.page.driver.get(self.file_url)
         with assert_raises(HttpError) as cm:
-            page = FilePage(driver=self.page.driver)
+            page = ProjectPage(driver=self.page.driver)
         assert_equal(http.UNAUTHORIZED, cm.exception.code)
 
 
-class FileOfProjectTestCase(PrivateFileAccessTests, FileFixture, ProjectFixture):
+class FileOfProjectTestCase(PrivateFileAccessTests, ProjectFixture):
     """Test access to files of a private project"""
     pass
 
 
-class FileOfSubprojectOfPublicProjectTestCase(PrivateFileAccessTests, FileFixture, SubprojectOfPublicProjectFixture):
+class FileOfSubprojectOfPublicProjectTestCase(
+    PrivateFileAccessTests,
+    SubprojectOfPublicProjectFixture
+):
     """Test access to files of a private subproject of a public project"""
     pass
 
 
-class FileOfComponentOfPublicProjectTestCase(PrivateFileAccessTests, FileFixture, ComponentOfPublicProjectFixture):
+class FileOfComponentOfPublicProjectTestCase(
+    PrivateFileAccessTests,
+    ComponentOfPublicProjectFixture
+):
     """Test access to files of a private component of a public project"""
     pass
 
 
-class FileOfComponentOfPublicSubprojectTestCase(PrivateFileAccessTests, FileFixture,
-                                                ComponentOfPublicSubprojectFixture):
+class FileOfComponentOfPublicSubprojectTestCase(
+    PrivateFileAccessTests,
+    ComponentOfPublicSubprojectFixture
+):
     """Test access to files of a private component of a public subproject of a private project"""
     pass
 
 
-class FileOfComponentOfPublicSubprojectOfPublicProjectTestCase(PrivateFileAccessTests, FileFixture,
-                                                               ComponentOfPublicSubprojectOfPublicProjectFixture):
+class FileOfComponentOfPublicSubprojectOfPublicProjectTestCase(
+    PrivateFileAccessTests,
+    ComponentOfPublicSubprojectOfPublicProjectFixture
+):
     """Test access to files of a private component of a public subproject of a public project"""
     pass
 
