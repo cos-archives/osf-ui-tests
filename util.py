@@ -20,10 +20,14 @@ from selenium.common.exceptions import NoSuchElementException
 # Project imports
 import config
 
+caps = webdriver.DesiredCapabilities.FIREFOX
+caps['platform'] = "Windows 7"
+caps['version'] = "24"
+caps['name'] = ''
 
 def launch_driver(
         driver_name=None,
-        desired_capabilities={},
+        desired_capabilities=caps,
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
