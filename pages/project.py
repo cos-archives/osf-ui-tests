@@ -154,7 +154,7 @@ class NodePage(OsfPage):
         # enter the user1's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
-        ).send_keys(user1.email)
+        ).send_keys(user1.full_name)
 
         # click the search button
         self.driver.find_element_by_css_selector(
@@ -180,7 +180,7 @@ class NodePage(OsfPage):
         # enter the user2's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
-        ).send_keys(user2.email)
+        ).send_keys(user2.full_name)
 
         # click the search button
         self.driver.find_element_by_css_selector(
@@ -246,7 +246,7 @@ class NodePage(OsfPage):
         # enter the user1's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
-        ).send_keys(user1.email)
+        ).send_keys(user1.full_name)
 
         # click the search button
         self.driver.find_element_by_css_selector(
@@ -272,7 +272,7 @@ class NodePage(OsfPage):
         # enter the user2's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
-        ).send_keys(user2.email)
+        ).send_keys(user2.full_name)
 
         # click the search button
         self.driver.find_element_by_css_selector(
@@ -377,7 +377,7 @@ class NodePage(OsfPage):
         # enter the user's email address
         self.driver.find_element_by_css_selector(
             'div#addContributors input[data-bind="value:query"]'
-        ).send_keys(user.email)
+        ).send_keys(user.full_name)
 
         # click the search button
         self.driver.find_element_by_css_selector(
