@@ -780,9 +780,9 @@ class NodePage(OsfPage):
         )
 
         # set the new content
-        version = self.driver.find_element_by_xpath(
-            '//dt[text()="Version"]/following-sibling::*'
-        ).text
+        version = self.driver.find_element_by_css_selector(
+            'div.col-md-3 dl'
+        ).text[-2:]
 
         # Strip (current) from version string
         version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
