@@ -489,8 +489,10 @@ def get_wiki_par(driver):
     # Hack: Wiki text element isn't uniquely labeled,
     # so find its sibling first
     try:
-        wiki_par = driver.find_element_by_xpath(
-            '//div[@id="addContributors"]/following-sibling::div//p'
+        wiki_par = driver.find_elements_by_css_selector(
+            'div.watermarked div.container'
+        )[0].find_element_by_css_selector(
+            'div.col-md-9 p'
         )
     except NoSuchElementException:
         wiki_par = None
