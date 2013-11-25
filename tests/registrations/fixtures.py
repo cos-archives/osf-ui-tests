@@ -79,6 +79,7 @@ class SubprojectRegistrationFixturetype2(
 ):
     pass
 
+
 class RegistrationFixturetype3(object):
     registration_template = 'Brandt Preregistration'
     registration_meta = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
@@ -118,8 +119,9 @@ class SubprojectRegistrationFixturetype3(
         RegistrationFixturetype3, ComplexSubprojectFixture):
     pass
 
+
 class RegistrationFixturetype4(object):
-    registration_template = 'Brandt Preregistration'
+    registration_template = 'AEA Preregistration'
     registration_meta = ()
     @classmethod
     def setUpClass(cls):

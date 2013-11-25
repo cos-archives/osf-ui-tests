@@ -103,20 +103,20 @@ class Create(object):
         )
 
 
-#class FromProjecttype1(Create, ProjectRegistrationFixturetype1):
-#    pass
-#
-#
-#class FromSubprojecttype1(Create, SubprojectRegistrationFixturetype1):
-#    pass
-#
-#
-#class FromProjecttype2(Create, ProjectRegistrationFixturetype2):
-#    pass
-#
-#
-#class FromSubprojecttype2(Create, SubprojectRegistrationFixturetype2):
-#    pass
+class FromProjecttype1(Create, ProjectRegistrationFixturetype1):
+    pass
+
+
+class FromSubprojecttype1(Create, SubprojectRegistrationFixturetype1):
+    pass
+
+
+class FromProjecttype2(Create, ProjectRegistrationFixturetype2):
+    pass
+
+
+class FromSubprojecttype2(Create, SubprojectRegistrationFixturetype2):
+    pass
 
 
 class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
@@ -128,25 +128,25 @@ class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
         )
 
 
-#class FromSubprojecttype3(Create, SubprojectRegistrationFixturetype3):
-#    def test_meta(self):
-#        assert_equal(
-#            self.page.brandt_registration_meta,
-#            self.registration_meta,
-#        )
+class FromSubprojecttype3(Create, SubprojectRegistrationFixturetype3):
+    def test_meta(self):
+        assert_equal(
+            self.page.brandt_registration_meta,
+            self.registration_meta,
+        )
 
 
-#class FromProjecttype4(Create, ProjectRegistrationFixturetype4):
-#    def test_meta(self):
-#        assert_equal(
-#            self.page.registration_meta,
-#            self.registration_meta,
-#        )
-#
-#
-#class FromSubprojecttype4(Create, SubprojectRegistrationFixturetype4):
-#    def test_meta(self):
-#        assert_equal(
-#            self.page.registration_meta,
-#            self.registration_meta,
-#        )
+class FromProjecttype4(Create, ProjectRegistrationFixturetype4):
+    def test_meta(self):
+        assert_equal(
+            self.page.registration_meta,
+            self.registration_meta,
+        )
+
+
+class FromSubprojecttype4(Create, SubprojectRegistrationFixturetype4):
+    def test_meta(self):
+        assert_equal(
+            self.page.registration_meta,
+            self.registration_meta,
+        )

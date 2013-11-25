@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 class RegistrationTests(unittest.TestCase):
     """This test case is for testing the act of creating a registration, and
     consistency between a registration and its original node.
@@ -28,16 +29,31 @@ class RegistrationTests(unittest.TestCase):
             component_type='Project',
         )
 
-    def _test_registration_list(self, page):
+    def _test_registration_list(self, regi_type, page):
         """ Given a project, register it and verify that the new registration is
          in the project's registration list
         """
         _url = page.driver.current_url
-
-        page = page.add_registration(
-            registration_type='Open-Ended Registration',
-            meta=('sample narrative', )
-        )
+        if regi_type == 1:
+            page = page.add_registration(
+                registration_type='Open-Ended Registration',
+                meta=('sample narrative', )
+            )
+        elif regi_type == 2:
+            page = page.add_registration(
+                registration_type='OSF-Standard Pre-Data Collection Registration',
+                meta=('No', 'No', 'sample narrative', )
+            )
+        elif regi_type == 3:
+            page = page.add_registration(
+                registration_type='Brandt Preregistration',
+                meta=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+                      'no', 'j', 'k', 'l', 'm', 'n', 'o',
+                      'Exact', 'Close', 'Different', 'Exact', 'Close', 'Different', 'Exact', 'p', 'q',
+                      'r', 's', 't',
+                      'u',
+                      'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
+            )
 
         page.driver.get(_url)
 
@@ -49,47 +65,111 @@ class RegistrationTests(unittest.TestCase):
 
         return r
 
-    def test_project_registration_listed(self):
+    def test_project_registration_listed_type1(self):
         """ After registering a project, the registration should be listed in
          the project's Registrations pane. """
-        registrations = self._test_registration_list(page=self._project())
+        registrations = self._test_registration_list(
+            regi_type=1,
+            page=self._project(),
+        )
 
         self.assertEqual(len(registrations), 1)
 
-    def test_subproject_registration_listed(self):
+    def test_subproject_registration_listed_type1(self):
         """ Subproject variant of ``self.test_project_registration_listed`` """
-        registrations = self._test_registration_list(page=self._subproject())
+        registrations = self._test_registration_list(
+            regi_type=1,
+            page=self._subproject()
+        )
 
         self.assertEqual(len(registrations), 1)
 
-    def _test_registration_list_title(self, page):
+    def test_project_registration_listed_type2(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        registrations = self._test_registration_list(
+            regi_type=2,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_subproject_registration_listed_type2(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        registrations = self._test_registration_list(
+            regi_type=2,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_project_registration_listed_type3(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        registrations = self._test_registration_list(
+            regi_type=3,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_subproject_registration_listed_type3(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        registrations = self._test_registration_list(
+            regi_type=3,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(registrations), 1)
+
+    def _test_registration_list_title(self, regi_type, page):
         """ Given a project, register it and verify that that registration in
          the project's registration list has the correct title.
         """
         title = page.title
-        registrations = self._test_registration_list(page)
+        registrations = self._test_registration_list(regi_type, page)
 
         self.assertEqual(
             registrations[0].title,
             title
         )
 
-    def test_project_registration_list_title(self):
+    def test_project_registration_list_title_type1(self):
         """ Project variant of ``self._test_registration_list_title``
         """
-        self._test_registration_list_title(self._project())
+        self._test_registration_list_title(1, self._project())
 
-    def test_subproject_registration_list_title(self):
+    def test_subproject_registration_list_title_type1(self):
         """ Subproject variant of ``self._test_registration_list_title``
         """
-        self._test_registration_list_title(self._subproject())
+        self._test_registration_list_title(1, self._subproject())
 
-    def _test_registration_list_date(self, page):
+    def test_project_registration_list_title_type2(self):
+        """ Project variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(2, self._project())
+
+    def test_subproject_registration_list_title_type2(self):
+        """ Subproject variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(2, self._subproject())
+
+    def test_project_registration_list_title_type3(self):
+        """ Project variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(3, self._project())
+
+    def test_subproject_registration_list_title_type3(self):
+        """ Subproject variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(3, self._subproject())
+
+    def _test_registration_list_date(self, regi_type, page):
         """ Given a project, register it and verify that the registration in
          the project's registration list has the correct date.
         """
         date_created = page.date_created
-        registrations = self._test_registration_list(page)
+        registrations = self._test_registration_list(regi_type, page)
 
         self.assertAlmostEqual(
             registrations[0].date,
@@ -97,16 +177,34 @@ class RegistrationTests(unittest.TestCase):
             delta=dt.timedelta(minutes=2)
         )
 
-    def test_project_registration_list_date(self):
+    def test_project_registration_list_date_type1(self):
         """ Project variant of ``self._test_registration_list_date`` """
-        self._test_registration_list_date(self._project())
+        self._test_registration_list_date(1, self._project())
 
-    def test_subproject_registration_list_date(self):
+    def test_subproject_registration_list_date_type1(self):
         """ Subproject variant of ``self._test_registration_list_date``
         """
-        self._test_registration_list_date(self._subproject())
+        self._test_registration_list_date(1, self._subproject())
 
-    def _test_registration_matches(self, page, attribute):
+    def test_project_registration_list_date_type2(self):
+        """ Project variant of ``self._test_registration_list_date`` """
+        self._test_registration_list_date(2, self._project())
+
+    def test_subproject_registration_list_date_type2(self):
+        """ Subproject variant of ``self._test_registration_list_date``
+        """
+        self._test_registration_list_date(2, self._subproject())
+
+    def test_project_registration_list_date_type3(self):
+        """ Project variant of ``self._test_registration_list_date`` """
+        self._test_registration_list_date(3, self._project())
+
+    def test_subproject_registration_list_date_type3(self):
+        """ Subproject variant of ``self._test_registration_list_date``
+        """
+        self._test_registration_list_date(3, self._subproject())
+
+    def _test_registration_matches(self, regi_type, page, attribute):
         """ Given a project, register it and verify that the attribute provided
          matches between the project and its registration.
 
@@ -119,10 +217,26 @@ class RegistrationTests(unittest.TestCase):
         """
         parent_value = getattr(page, attribute)
 
-        page = page.add_registration(
-            registration_type='Open-Ended Registration',
-            meta=('sample narrative', )
-        )
+        if regi_type == 1:
+            page = page.add_registration(
+                registration_type='Open-Ended Registration',
+                meta=('sample narrative', )
+            )
+        elif regi_type == 2:
+            page = page.add_registration(
+                registration_type='OSF-Standard Pre-Data Collection Registration',
+                meta=('No', 'No', 'sample narrative', )
+            )
+        elif regi_type == 3:
+            page = page.add_registration(
+                registration_type='Brandt Preregistration',
+                meta=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+                      'no', 'j', 'k', 'l', 'm', 'n', 'o',
+                      'Exact', 'Close', 'Different', 'Exact', 'Close', 'Different', 'Exact', 'p', 'q',
+                      'r', 's', 't',
+                      'u',
+                      'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
+            )
 
         WebDriverWait(page.driver, 8).until(
             EC.visibility_of_element_located(
@@ -138,67 +252,18 @@ class RegistrationTests(unittest.TestCase):
         page.close()
 
     # NOTE: This test only applies to subprojects
-    def test_subproject_registration_parent_title(self):
+    def test_subproject_registration_parent_title_type1(self):
         """ Verify that a registration's parent project title matches the
         original project """
         # As of 9 Sep 2013, registrations of subprojects do not preserve the
         # parent project in the header.
         self._test_registration_matches(
+            regi_type=1,
             page=self._subproject(),
             attribute='parent_title'
         )
 
-    def test_project_registration_components(self):
-        """ Verify that a registration's (non-empty) component list matches the
-        original project """
-
-        page = self._project()
-
-        # add component
-        page = page.add_component(
-            title='Test Component',
-            component_type='Other',
-        )
-
-        page = page.parent_project()
-
-        # add a subproject
-        page = page.add_component(
-            title='Test Subproject',
-            component_type='Project',
-        )
-
-        page = page.parent_project()
-
-        self._test_registration_matches(
-            page=page,
-            attribute='component_names'
-        )
-
-    def test_subproject_registration_components(self):
-        """ Subproject variant of ``self._test_project_registration_components``
-        """
-        page = self._project()
-
-        page = page.add_component(
-            title='Subproject',
-            component_type='Project',
-        )
-
-        # add component
-        page = page.add_component(
-            title='Test Component',
-            component_type='Other',
-        )
-
-        page = page.parent_project()
-
-        self._test_registration_matches(
-            page=page,
-            attribute='component_names'
-        )
-
-    def test_project_registration_wiki_home(self):
+    def test_project_registration_wiki_home_type1(self):
         """ Verify that a registration's wiki homepage content matches the
         original project """
         page = self._project()
@@ -206,11 +271,12 @@ class RegistrationTests(unittest.TestCase):
         page.set_wiki_content('Test wiki content!')
 
         self._test_registration_matches(
+            regi_type=1,
             page=page,
             attribute='wiki_home_content'
         )
 
-    def test_subproject_registration_wiki_home(self):
+    def test_subproject_registration_wiki_home_type1(self):
         """ Subproject variant of ``self._test_project_registration_wiki_home``
         """
         page = self._subproject()
@@ -218,42 +284,83 @@ class RegistrationTests(unittest.TestCase):
         page.set_wiki_content('Test wiki content!')
 
         self._test_registration_matches(
+            regi_type=1,
             page=page,
             attribute='wiki_home_content'
         )
 
-    def _test_registration_logged(self, page):
-        """ Given a project, register it and verify that the action appears in
-        the original project's logs.
+    # NOTE: This test only applies to subprojects
+    def test_subproject_registration_parent_title_type2(self):
+        """ Verify that a registration's parent project title matches the
+        original project """
+        # As of 9 Sep 2013, registrations of subprojects do not preserve the
+        # parent project in the header.
+        self._test_registration_matches(
+            regi_type=2,
+            page=self._subproject(),
+            attribute='parent_title'
+        )
+
+    def test_project_registration_wiki_home_type2(self):
+        """ Verify that a registration's wiki homepage content matches the
+        original project """
+        page = self._project()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            regi_type=2,
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def test_subproject_registration_wiki_home_type2(self):
+        """ Subproject variant of ``self._test_project_registration_wiki_home``
         """
-        user = page.contributors[0].full_name
+        page = self._subproject()
 
-        _url = page.driver.current_url
+        page.set_wiki_content('Test wiki content!')
 
-        page = page.add_registration(
-            registration_type='Open-Ended Registration',
-            meta=('test narrative', )
+        self._test_registration_matches(
+            regi_type=2,
+            page=page,
+            attribute='wiki_home_content'
         )
 
-        page.driver.get(_url)
-
-        self.assertEqual(
-            page.logs[0].text,
-            u'{user} registered project {title}'.format(
-                user=user,
-                title=page.title
-            )
+    # NOTE: This test only applies to subprojects
+    def test_subproject_registration_parent_title_type3(self):
+        """ Verify that a registration's parent project title matches the
+        original project """
+        # As of 9 Sep 2013, registrations of subprojects do not preserve the
+        # parent project in the header.
+        self._test_registration_matches(
+            regi_type=3,
+            page=self._subproject(),
+            attribute='parent_title'
         )
 
-        page.close()
+    def test_project_registration_wiki_home_type3(self):
+        """ Verify that a registration's wiki homepage content matches the
+        original project """
+        page = self._project()
 
-    def test_project_registration_logged(self):
-        """ Project variant of ``self._test_registration_logged`` """
-        # As of 9 Sep 2013, the log reads "component" here instead of "project"
-        self._test_registration_logged(self._project())
+        page.set_wiki_content('Test wiki content!')
 
-    def test_subproject_registration_logged(self):
-        """ Subproject variant of ``self._test_registration_logged`` """
-        # TODO: This fails right now because a subproject is referred to as a
-        # "node" in the log.
-        self._test_registration_logged(self._subproject())
+        self._test_registration_matches(
+            regi_type=3,
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def test_subproject_registration_wiki_home_type3(self):
+        """ Subproject variant of ``self._test_project_registration_wiki_home``
+        """
+        page = self._subproject()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            regi_type=3,
+            page=page,
+            attribute='wiki_home_content'
+        )
