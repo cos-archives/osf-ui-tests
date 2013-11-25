@@ -30,8 +30,8 @@ class NodePage(OsfPage):
         """ Return True if the current page is the one expected for a
         ``NodePage``."""
         return (
-            len(self.driver.find_elements_by_id('node-title-editable')) == 1 or
-            len(self.driver.find_elements_by_id('node-title')) == 1
+            len(self.driver.find_elements_by_id('nodeTitleEditable')) == 1 or
+            len(self.driver.find_elements_by_id('nodeTitle')) == 1
         )
 
     @property
@@ -435,7 +435,7 @@ class NodePage(OsfPage):
         date_string = self.driver.find_elements_by_css_selector(
             '#contributors span.date')[0].text
 
-        return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
+        return dt.datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
 
     @property
     def last_updated(self):
@@ -446,7 +446,7 @@ class NodePage(OsfPage):
         date_string = self.driver.find_elements_by_css_selector(
             '#contributors span.date')[1].text
 
-        return dt.datetime.strptime(date_string, '%Y/%m/%d %I:%M %p')
+        return dt.datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
 
     @property
     def id(self):

@@ -27,7 +27,7 @@ caps['name'] = ''
 
 def launch_driver(
         driver_name=None,
-        desired_capabilities=caps,
+        desired_capabilities={},
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
     
