@@ -1,8 +1,14 @@
 from nose.tools import *
 
 from tests.registrations.fixtures import (
-    ProjectRegistrationFixture,
-    SubprojectRegistrationFixture,
+    ProjectRegistrationFixturetype1,
+    SubprojectRegistrationFixturetype1,
+    ProjectRegistrationFixturetype2,
+    SubprojectRegistrationFixturetype2,
+    ProjectRegistrationFixturetype3,
+    SubprojectRegistrationFixturetype3,
+    ProjectRegistrationFixturetype4,
+    SubprojectRegistrationFixturetype4,
 )
 
 
@@ -97,9 +103,50 @@ class Create(object):
         )
 
 
-class FromProject(Create, ProjectRegistrationFixture):
-    pass
+#class FromProjecttype1(Create, ProjectRegistrationFixturetype1):
+#    pass
+#
+#
+#class FromSubprojecttype1(Create, SubprojectRegistrationFixturetype1):
+#    pass
+#
+#
+#class FromProjecttype2(Create, ProjectRegistrationFixturetype2):
+#    pass
+#
+#
+#class FromSubprojecttype2(Create, SubprojectRegistrationFixturetype2):
+#    pass
 
 
-class FromSubproject(Create, SubprojectRegistrationFixture):
-    pass
+class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
+    def test_meta(self):
+        print self.page.brandt_registration_meta
+        assert_equal(
+            self.page.brandt_registration_meta,
+            self.registration_meta,
+        )
+
+
+#class FromSubprojecttype3(Create, SubprojectRegistrationFixturetype3):
+#    def test_meta(self):
+#        assert_equal(
+#            self.page.brandt_registration_meta,
+#            self.registration_meta,
+#        )
+
+
+#class FromProjecttype4(Create, ProjectRegistrationFixturetype4):
+#    def test_meta(self):
+#        assert_equal(
+#            self.page.registration_meta,
+#            self.registration_meta,
+#        )
+#
+#
+#class FromSubprojecttype4(Create, SubprojectRegistrationFixturetype4):
+#    def test_meta(self):
+#        assert_equal(
+#            self.page.registration_meta,
+#            self.registration_meta,
+#        )
