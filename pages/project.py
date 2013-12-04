@@ -1530,10 +1530,6 @@ class ProjectPage(NodePage):
 
                 field_length = len(fields)-1
 
-                print field_length
-                print pre_field_length
-                print meta[pre_field_length:][:field_length]
-
                 for field, value in zip(
                         fields,
                         meta[pre_field_length:][:field_length]
@@ -1660,10 +1656,6 @@ class ProjectPage(NodePage):
                 )
 
                 field_length = len(fields)-1
-
-                print field_length
-                print pre_field_length
-                print meta[pre_field_length:][:field_length]
 
                 for field, value in zip(
                         fields,
