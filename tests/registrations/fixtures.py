@@ -81,13 +81,11 @@ class SubprojectRegistrationFixturetype2(
 
 
 class RegistrationFixturetype3(object):
-    registration_template = 'Brandt Preregistration'
+    registration_template = 'Replication Recipe (Brandt et al., 2013): Pre-Registration'
     registration_meta = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
                          'no', 'j', 'k', 'l', 'm', 'n', 'o',
                          'Exact', 'Close', 'Different', 'Exact', 'Close', 'Different', 'Exact', 'p', 'q',
-                         'r', 's', 't',
-                         'u',
-                         'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
+                         'r', 's', 't',)
     @classmethod
     def setUpClass(cls):
         super(RegistrationFixturetype3, cls).setUpClass()
@@ -121,8 +119,9 @@ class SubprojectRegistrationFixturetype3(
 
 
 class RegistrationFixturetype4(object):
-    registration_template = 'AEA Preregistration'
-    registration_meta = ()
+    registration_template = 'Replication Recipe (Brandt et al., 2013): Post-Completion'
+    registration_meta = ('u',
+                         'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
     @classmethod
     def setUpClass(cls):
         super(RegistrationFixturetype4, cls).setUpClass()

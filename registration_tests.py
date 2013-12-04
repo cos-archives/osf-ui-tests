@@ -46,12 +46,16 @@ class RegistrationTests(unittest.TestCase):
             )
         elif regi_type == 3:
             page = page.add_registration(
-                registration_type='Brandt Preregistration',
+                registration_type='Replication Recipe (Brandt et al., 2013): Pre-Registration',
                 meta=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
                       'no', 'j', 'k', 'l', 'm', 'n', 'o',
                       'Exact', 'Close', 'Different', 'Exact', 'Close', 'Different', 'Exact', 'p', 'q',
-                      'r', 's', 't',
-                      'u',
+                      'r', 's', 't',)
+            )
+        elif regi_type == 4:
+            page = page.add_registration(
+                registration_type='Replication Recipe (Brandt et al., 2013): Post-Completion',
+                meta=('u',
                       'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
             )
 
@@ -122,6 +126,25 @@ class RegistrationTests(unittest.TestCase):
 
         self.assertEqual(len(registrations), 1)
 
+    def test_project_registration_listed_type4(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        registrations = self._test_registration_list(
+            regi_type=4,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(registrations), 1)
+
+    def test_subproject_registration_listed_type4(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        registrations = self._test_registration_list(
+            regi_type=4,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(registrations), 1)
+
     def _test_registration_list_title(self, regi_type, page):
         """ Given a project, register it and verify that that registration in
          the project's registration list has the correct title.
@@ -164,6 +187,16 @@ class RegistrationTests(unittest.TestCase):
         """
         self._test_registration_list_title(3, self._subproject())
 
+    def test_project_registration_list_title_type4(self):
+        """ Project variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(4, self._project())
+
+    def test_subproject_registration_list_title_type4(self):
+        """ Subproject variant of ``self._test_registration_list_title``
+        """
+        self._test_registration_list_title(4, self._subproject())
+
     def _test_registration_list_date(self, regi_type, page):
         """ Given a project, register it and verify that the registration in
          the project's registration list has the correct date.
@@ -204,6 +237,15 @@ class RegistrationTests(unittest.TestCase):
         """
         self._test_registration_list_date(3, self._subproject())
 
+    def test_project_registration_list_date_type4(self):
+        """ Project variant of ``self._test_registration_list_date`` """
+        self._test_registration_list_date(4, self._project())
+
+    def test_subproject_registration_list_date_type4(self):
+        """ Subproject variant of ``self._test_registration_list_date``
+        """
+        self._test_registration_list_date(4, self._subproject())
+
     def _test_registration_matches(self, regi_type, page, attribute):
         """ Given a project, register it and verify that the attribute provided
          matches between the project and its registration.
@@ -229,12 +271,16 @@ class RegistrationTests(unittest.TestCase):
             )
         elif regi_type == 3:
             page = page.add_registration(
-                registration_type='Brandt Preregistration',
+                registration_type='Replication Recipe (Brandt et al., 2013): Pre-Registration',
                 meta=('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
                       'no', 'j', 'k', 'l', 'm', 'n', 'o',
                       'Exact', 'Close', 'Different', 'Exact', 'Close', 'Different', 'Exact', 'p', 'q',
-                      'r', 's', 't',
-                      'u',
+                      'r', 's', 't',)
+            )
+        elif regi_type == 4:
+            page = page.add_registration(
+                registration_type='Replication Recipe (Brandt et al., 2013): Post-Completion',
+                meta=('u',
                       'v', 'w', 'significantly different from the original effect size', 'inconclusive', 'x', 'y', 'z', '1',)
             )
 
@@ -361,6 +407,44 @@ class RegistrationTests(unittest.TestCase):
 
         self._test_registration_matches(
             regi_type=3,
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    # NOTE: This test only applies to subprojects
+    def test_subproject_registration_parent_title_type4(self):
+        """ Verify that a registration's parent project title matches the
+        original project """
+        # As of 9 Sep 2013, registrations of subprojects do not preserve the
+        # parent project in the header.
+        self._test_registration_matches(
+            regi_type=4,
+            page=self._subproject(),
+            attribute='parent_title'
+        )
+
+    def test_project_registration_wiki_home_type4(self):
+        """ Verify that a registration's wiki homepage content matches the
+        original project """
+        page = self._project()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            regi_type=4,
+            page=page,
+            attribute='wiki_home_content'
+        )
+
+    def test_subproject_registration_wiki_home_type4(self):
+        """ Subproject variant of ``self._test_project_registration_wiki_home``
+        """
+        page = self._subproject()
+
+        page.set_wiki_content('Test wiki content!')
+
+        self._test_registration_matches(
+            regi_type=4,
             page=page,
             attribute='wiki_home_content'
         )
