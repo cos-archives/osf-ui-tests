@@ -35,7 +35,7 @@ class RegressionTests2(unittest.TestCase):
 
         self.assertEqual(
             page.driver.find_element_by_id(
-                'node-title-editable'
+                'nodeTitleEditable'
             ).get_attribute('innerHTML'),
             'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
         )
@@ -53,7 +53,7 @@ class RegressionTests2(unittest.TestCase):
 
         self.assertEqual(
             page.driver.find_element_by_id(
-                'node-title-editable'
+                'nodeTitleEditable'
             ).get_attribute('innerHTML'),
             'Bad &lt;script&gt;alert("xss");&lt;/script&gt;Project',
         )
