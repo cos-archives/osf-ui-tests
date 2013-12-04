@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as exc
 from selenium.webdriver.common.keys import Keys
-
+from selenium.webdriver.support.ui import Select
 import re
 import config
 import logs
@@ -1402,19 +1402,21 @@ class ProjectPage(NodePage):
                  'DIV.container form SELECT#select-registration-template.form-control')
             )
         )
-
-        self.driver.find_element_by_css_selector(
+        select = Select(self.driver.find_element_by_css_selector(
             '.container select'
-        ).send_keys(registration_type + "\n")
+        ))
+        select.select_by_visible_text(registration_type)
+
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
-                 '#registration_template textarea')
+                 '#registration_template input')
             )
         )
 
-        if registration_type=="OPEN-Ended Registration" or registration_type=="OSF-Standard Pre-Data Collection Registration":
+        if registration_type == "Open-Ended Registration" \
+            or registration_type == "OSF-Standard Pre-Data Collection Registration":
             # Fill the registration template
             fields = self.driver.find_elements_by_css_selector(
                 '#registration_template textarea, '
@@ -1435,12 +1437,23 @@ class ProjectPage(NodePage):
             for field, value in zip(fields, meta):
                 field.send_keys(value)
 
-        elif registration_type == "Brandt Preregistration":
-            #page 1
+        elif registration_type \
+                == "Replication Recipe (Brandt et al., 2013): Pre-Registration" \
+            or registration_type\
+                        =="Replication Recipe (Brandt et al., 2013): Post-Completion":
+
             page = 0
             pre_field_length = 0
+            check_num = 0
 
-            while page < 6:
+            if registration_type \
+                    == "Replication Recipe (Brandt et al., 2013): Pre-Registration":
+                check_num = 4
+            elif registration_type \
+                    == "Replication Recipe (Brandt et al., 2013): Post-Completion":
+                check_num = 2
+
+            while page < check_num:
 
                 fields = self.driver.find_elements_by_css_selector(
                     '#registration_template textarea, '
@@ -1450,6 +1463,10 @@ class ProjectPage(NodePage):
 
                 field_length = len(fields)-1
 
+                print field_length
+                print pre_field_length
+                print meta[pre_field_length:][:field_length]
+
                 for field, value in zip(
                         fields,
                         meta[pre_field_length:][:field_length]
@@ -1457,15 +1474,13 @@ class ProjectPage(NodePage):
                     field.send_keys(value)
 
                 self.driver.find_elements_by_css_selector(
-                    '#registration_template div.control-group div.controls button.btn.btn-default'
+                    '#registration_template div.form-group div.controls button.btn.btn-default'
                 )[1].click()
 
                 pre_field_length += field_length
 
                 page += 1
 
-
-        #elif registration_type=="AEA Preregistration":
         # Enter "continue"
         self.driver.find_elements_by_css_selector(
             '.container form input'
@@ -1525,7 +1540,7 @@ class ProjectRegistrationPage(ProjectPage):
         return tuple(meta)
 
     @property
-    def brandt_registration_meta(self):
+    def pre_brandt_registration_meta(self):
         """ The registration's meta information, parsed from the "Registration
         Supplement" page.
 
@@ -1543,7 +1558,47 @@ class ProjectRegistrationPage(ProjectPage):
 
         meta = []
         page = 0
-        while page < 6:
+        while page < 4:
+
+            for field in self.driver.find_elements_by_css_selector(
+                '#registration_template textarea, '
+                '#registration_template select, '
+                '#registration_template input'
+            ):
+                meta.append(
+                    field.get_attribute('value') or field.text
+                )
+
+            self.driver.find_elements_by_css_selector(
+                '#registration_template div.control-group div.controls button.btn.btn-default'
+            )[1].click()
+
+            page += 1
+
+        self.driver.get(_url)
+
+        return tuple(meta)
+
+    @property
+    def post_brandt_registration_meta(self):
+        """ The registration's meta information, parsed from the "Registration
+        Supplement" page.
+
+        :returns: ``tuple``
+        """
+
+        url = self.driver.find_elements_by_css_selector(
+            '#contributors a'
+        )[-1].get_attribute('href')
+
+        _url = self.driver.current_url
+
+        # go to the registration meta page
+        self.driver.get(url)
+
+        meta = []
+        page = 0
+        while page < 2:
 
             for field in self.driver.find_elements_by_css_selector(
                 '#registration_template textarea, '

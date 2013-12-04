@@ -121,7 +121,6 @@ class FromSubprojecttype2(Create, SubprojectRegistrationFixturetype2):
 
 class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
     def test_meta(self):
-        print self.page.brandt_registration_meta
         assert_equal(
             self.page.brandt_registration_meta,
             self.registration_meta,
@@ -131,7 +130,7 @@ class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
 class FromSubprojecttype3(Create, SubprojectRegistrationFixturetype3):
     def test_meta(self):
         assert_equal(
-            self.page.brandt_registration_meta,
+            self.page.pre_brandt_registration_meta,
             self.registration_meta,
         )
 
@@ -139,7 +138,7 @@ class FromSubprojecttype3(Create, SubprojectRegistrationFixturetype3):
 class FromProjecttype4(Create, ProjectRegistrationFixturetype4):
     def test_meta(self):
         assert_equal(
-            self.page.registration_meta,
+            self.page.post_brandt_registration_meta,
             self.registration_meta,
         )
 
@@ -147,6 +146,6 @@ class FromProjecttype4(Create, ProjectRegistrationFixturetype4):
 class FromSubprojecttype4(Create, SubprojectRegistrationFixturetype4):
     def test_meta(self):
         assert_equal(
-            self.page.registration_meta,
+            self.page.post_brandt_registration_meta,
             self.registration_meta,
         )
