@@ -1209,5 +1209,31 @@ class FileHandlingTests(base.ProjectSmokeTest):
     def test_access_file_not_found(self):
         raise NotImplementedError
 
+    @skip('Selenium failure')
+    def test_uploading_leave_prompt(self):
+        """Make sure very large text files are not rendered in-browser"""
 
+        # generate a 3MB temporary file
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            for _ in xrange(5000000):
+                tmp_file.write('Hello, Open Science Framework!')
 
+        # add the file to the project
+        self.add_file(temp_file_path)
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
+
+        self.driver.find_element_by_css_selector("a.upload_prompt").click()
+        alert = self.driver.switch_to_alert()
+        alert.dismiss()
+
+        log = self.driver.find_element_by_css_selector(
+            'DIV.col-md-5 DIV#logScope DL.dl-horizontal.activity-log'
+        ).find_elements_by_css_selector('dd')[0].text
+
+        self.assertNotIn("added file ", log)
