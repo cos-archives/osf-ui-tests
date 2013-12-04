@@ -58,7 +58,7 @@ class CreationTests(Create, ProjectFixture):
 
 class CreateNoDescriptionTests(Create, ProjectNoDescriptionFixture):
     def test_description(self):
-        assert_equal(None, self.page.description)
+        assert_equal("No description", self.page.description)
 
 
 class CreateNoTitleTests(UserFixture):

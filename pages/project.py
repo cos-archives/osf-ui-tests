@@ -1413,7 +1413,7 @@ class ProjectPage(NodePage):
 
         # get the link from the list of components
         components = [x for x
-                      in self.driver.find_elements_by_css_selector('#Nodes a')
+                      in self.driver.find_elements_by_css_selector('#Nodes ul h4 a')
                       if x.text == title]
 
         # make sure there's only one component by that name.

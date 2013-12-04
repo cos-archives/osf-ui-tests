@@ -403,7 +403,7 @@ class ProjectSmokeTest(UserSmokeTest):
         )
 
         # click "Add Component"
-        self.get_element('a.btn[href="#newComponent"]').click()
+        self.get_element('a.btn[data-target="#newComponent"]').click()
 
         modal = self.get_element('div.modal.fade.in')
 
@@ -424,7 +424,7 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # return url of the component
         return self.get_element(
-            '#Nodes li.project:last-child h3 a'
+            '#Nodes li.project:last-child h4 a'
         ).get_attribute('href')
 
     def delete_component(self, url, project=None):
