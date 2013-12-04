@@ -358,3 +358,29 @@ class ComponentofSubprojectDeleteFixture(SubprojectFixture):
         cls.title = cls.page_delete.title
         cls.type = 'component'
         cls.page = cls.page.settings.delete()
+
+
+class PrivatelabelComponentFixture(ProjectFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(PrivatelabelComponentFixture, cls).setUpClass()
+        cls.page = cls.page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+        cls.component_url = cls.page.driver.current_url
+        cls.page.public = True
+        cls.page.log_out()
+
+
+class PrivatelabelSubprojectFixture(ProjectFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(PrivatelabelSubprojectFixture, cls).setUpClass()
+        cls.page = cls.page.add_component(
+            title='Test Subproject',
+            component_type='Project',
+        )
+        cls.component_url = cls.page.driver.current_url
+        cls.page.public = True
+        cls.page.log_out()
