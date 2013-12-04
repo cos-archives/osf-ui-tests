@@ -1250,7 +1250,12 @@ class NodeSettingsPage(NodePage):
     def delete(self):
         from pages import UserDashboardPage
 
-        title = self.title
+        project_type = "parent"
+
+        if len(self.driver.find_elements_by_css_selector(
+                "DIV#projectScope HEADER#overview.subhead DIV.row DIV.col-md-8 H1.node-parent-title.overflow"
+        )) == 1:
+            project_type = "child"
 
         self.driver.find_element_by_id('delete-node').click()
 
@@ -1259,6 +1264,9 @@ class NodeSettingsPage(NodePage):
                 (By.CSS_SELECTOR, 'div.modal.in')
             )
         )
+        title = self.driver.find_element_by_css_selector(
+            'DIV.modal-dialog DIV.modal-content DIV.modal-header H4.modal-title p strong'
+        ).text
 
         self.driver.find_element_by_css_selector(
             'div.modal.in input.bootbox-input'
@@ -1270,7 +1278,11 @@ class NodeSettingsPage(NodePage):
                 'div.modal.in button.btn-primary'
             ).click()
 
-        return UserDashboardPage(driver=self.driver)
+        if project_type == "child":
+
+            return ProjectPage(driver=self.driver)
+        else:
+            return UserDashboardPage(driver=self.driver)
 
 
 class ProjectPage(NodePage):

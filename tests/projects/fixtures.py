@@ -305,6 +305,7 @@ class PublicAccessFixture(object):
         cls.project_url=cls.page.driver.current_url
         cls.page.log_out()
 
+
 class PrivateFileAccessFixture(object):
     @classmethod
     def setUpClass(cls):
@@ -315,3 +316,45 @@ class PrivateFileAccessFixture(object):
         cls.page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
         cls.file_url = cls.page.driver.current_url
         cls.page.log_out()
+
+
+class SubprojectDeleteFixture(ProjectFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(SubprojectDeleteFixture, cls).setUpClass()
+        cls.project_url = cls.page.driver.current_url
+        cls.page_delete = cls.page.add_component(
+            title='Test Subproject',
+            component_type='Project',
+        )
+        cls.title = cls.page_delete.title
+        cls.type = 'project'
+        cls.page = cls.page.settings.delete()
+
+
+class ComponentDeleteFixture(ProjectFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(ComponentDeleteFixture, cls).setUpClass()
+        cls.project_url = cls.page.driver.current_url
+        cls.page_delete = cls.page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+        cls.title = cls.page_delete.title
+        cls.type = 'component'
+        cls.page = cls.page.settings.delete()
+
+
+class ComponentofSubprojectDeleteFixture(SubprojectFixture):
+    @classmethod
+    def setUpClass(cls):
+        super(ComponentofSubprojectDeleteFixture, cls).setUpClass()
+        cls.project_url = cls.page.driver.current_url
+        cls.page_delete = cls.page.add_component(
+            title='Test Component',
+            component_type='Other',
+        )
+        cls.title = cls.page_delete.title
+        cls.type = 'component'
+        cls.page = cls.page.settings.delete()
