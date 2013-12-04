@@ -122,7 +122,7 @@ class FromSubprojecttype2(Create, SubprojectRegistrationFixturetype2):
 class FromProjecttype3(Create, ProjectRegistrationFixturetype3):
     def test_meta(self):
         assert_equal(
-            self.page.brandt_registration_meta,
+            self.page.pre_brandt_registration_meta,
             self.registration_meta,
         )
 
