@@ -474,11 +474,11 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1.node-title').text
+        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
-        self.driver.find_element_by_id('node-title-editable').click()
+        self.driver.find_element_by_id('nodeTitleEditable').click()
 
         textbox = self.driver.find_element_by_css_selector(
             'DIV.popover-content INPUT.form-control.input-sm'
