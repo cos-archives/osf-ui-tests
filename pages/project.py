@@ -1570,7 +1570,7 @@ class ProjectRegistrationPage(ProjectPage):
                 )
 
             self.driver.find_elements_by_css_selector(
-                '#registration_template div.control-group div.controls button.btn.btn-default'
+                '#registration_template div.form-group div.controls button.btn.btn-default'
             )[1].click()
 
             page += 1
@@ -1610,7 +1610,7 @@ class ProjectRegistrationPage(ProjectPage):
                 )
 
             self.driver.find_elements_by_css_selector(
-                '#registration_template div.control-group div.controls button.btn.btn-default'
+                '#registration_template div.form-group div.controls button.btn.btn-default'
             )[1].click()
 
             page += 1
