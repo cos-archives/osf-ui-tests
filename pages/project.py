@@ -1035,7 +1035,7 @@ class NodePage(OsfPage):
             'Files'
         ).click()
 
-        WebDriverWait(self.driver, 3).until(
+        WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
                  'div.container div.container h3 A#clickable.dz-clickable')
@@ -1338,7 +1338,7 @@ class ProjectPage(NodePage):
         )
         modal.find_element_by_css_selector('button[type="submit"]').click()
 
-        WebDriverWait(self.driver, 3).until(
+        WebDriverWait(self.driver, 10).until(
             EC.invisibility_of_element_located(
                 (By.ID, 'newComponent'),
             )
@@ -1413,26 +1413,59 @@ class ProjectPage(NodePage):
                  '#registration_template textarea')
             )
         )
-        # Fill the registration template
-        fields = self.driver.find_elements_by_css_selector(
-            '#registration_template textarea, '
-            '#registration_template select'
-        )
 
-        # make sure we have the right number of strings in meta
-        if len(fields) != len(meta):
-            raise ValueError(
-                'Length of meta argument ({}) must equal the number of form'
-                'fields in the registration template ({})'.format(
-                    len(meta),
-                    len(fields)
-                )
+        if registration_type=="OPEN-Ended Registration" or registration_type=="OSF-Standard Pre-Data Collection Registration":
+            # Fill the registration template
+            fields = self.driver.find_elements_by_css_selector(
+                '#registration_template textarea, '
+                '#registration_template select'
             )
 
-        # fill the form (arbitrary length)
-        for field, value in zip(fields, meta):
-            field.send_keys(value)
+            # make sure we have the right number of strings in meta
+            if len(fields) != len(meta):
+                raise ValueError(
+                    'Length of meta argument ({}) must equal the number of form'
+                    'fields in the registration template ({})'.format(
+                        len(meta),
+                        len(fields)
+                    )
+                )
 
+            # fill the form (arbitrary length)
+            for field, value in zip(fields, meta):
+                field.send_keys(value)
+
+        elif registration_type == "Brandt Preregistration":
+            #page 1
+            page = 0
+            pre_field_length = 0
+
+            while page < 6:
+
+                fields = self.driver.find_elements_by_css_selector(
+                    '#registration_template textarea, '
+                    '#registration_template input, '
+                    '#registration_template select'
+                )
+
+                field_length = len(fields)-1
+
+                for field, value in zip(
+                        fields,
+                        meta[pre_field_length:][:field_length]
+                ):
+                    field.send_keys(value)
+
+                self.driver.find_elements_by_css_selector(
+                    '#registration_template div.control-group div.controls button.btn.btn-default'
+                )[1].click()
+
+                pre_field_length += field_length
+
+                page += 1
+
+
+        #elif registration_type=="AEA Preregistration":
         # Enter "continue"
         self.driver.find_elements_by_css_selector(
             '.container form input'
@@ -1486,6 +1519,46 @@ class ProjectRegistrationPage(ProjectPage):
             meta.append(
                 field.get_attribute('value') or field.text
             )
+
+        self.driver.get(_url)
+
+        return tuple(meta)
+
+    @property
+    def brandt_registration_meta(self):
+        """ The registration's meta information, parsed from the "Registration
+        Supplement" page.
+
+        :returns: ``tuple``
+        """
+
+        url = self.driver.find_elements_by_css_selector(
+            '#contributors a'
+        )[-1].get_attribute('href')
+
+        _url = self.driver.current_url
+
+        # go to the registration meta page
+        self.driver.get(url)
+
+        meta = []
+        page = 0
+        while page < 6:
+
+            for field in self.driver.find_elements_by_css_selector(
+                '#registration_template textarea, '
+                '#registration_template select, '
+                '#registration_template input'
+            ):
+                meta.append(
+                    field.get_attribute('value') or field.text
+                )
+
+            self.driver.find_elements_by_css_selector(
+                '#registration_template div.control-group div.controls button.btn.btn-default'
+            )[1].click()
+
+            page += 1
 
         self.driver.get(_url)
 
