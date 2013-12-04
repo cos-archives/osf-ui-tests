@@ -1659,3 +1659,4 @@ class FilePage(NodePage):
         ) for x in log.find_elements_by_css_selector(
             'table#file-version-history.table.table-striped tbody tr'
         )]
+
