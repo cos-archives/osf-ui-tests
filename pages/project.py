@@ -1499,6 +1499,126 @@ class ProjectPage(NodePage):
 
         return ProjectRegistrationPage(driver=self.driver)
 
+    def add_registration_regression(self, registration_type=None, meta=None):
+        """Add a component to the project.
+
+        :param registration_type:
+        :param meta: An iterable containing metadata for the registration, in
+            the order it appears in the registration's form.
+
+        :returns ProjectRegistrationPage:
+        """
+        # Go to the registrations page
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Registrations'
+        ).click()
+
+        # Click "New Registration"
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.page-header DIV.pull-right A.btn.btn-default')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.pull-right A.btn.btn-default'
+        ).click()
+
+        # Select the registration type
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.container form SELECT#select-registration-template.form-control')
+            )
+        )
+        select = Select(self.driver.find_element_by_css_selector(
+            '.container select'
+        ))
+        select.select_by_visible_text(registration_type)
+
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '#registration_template input')
+            )
+        )
+
+        if registration_type == "OSF-Standard Pre-Data Collection Registration":
+            # Fill the registration template
+            fields = self.driver.find_elements_by_css_selector(
+                '#registration_template textarea, '
+                '#registration_template select'
+            )
+
+            # make sure we have the right number of strings in meta
+            if len(fields) != len(meta):
+                raise ValueError(
+                    'Length of meta argument ({}) must equal the number of form'
+                    'fields in the registration template ({})'.format(
+                        len(meta),
+                        len(fields)
+                    )
+                )
+
+            # fill the form (arbitrary length)
+            for field, value in zip(fields, meta):
+                field.send_keys(value)
+
+        elif registration_type \
+                == "Replication Recipe (Brandt et al., 2013): Pre-Registration" \
+            or registration_type\
+                        =="Replication Recipe (Brandt et al., 2013): Post-Completion":
+
+            page = 0
+            pre_field_length = 0
+            check_num = 0
+
+            if registration_type \
+                    == "Replication Recipe (Brandt et al., 2013): Pre-Registration":
+                check_num = 4
+            elif registration_type \
+                    == "Replication Recipe (Brandt et al., 2013): Post-Completion":
+                check_num = 2
+
+            while page < check_num:
+
+                fields = self.driver.find_elements_by_css_selector(
+                    '#registration_template textarea, '
+                    '#registration_template input, '
+                    '#registration_template select'
+                )
+
+                field_length = len(fields)-1
+
+                print field_length
+                print pre_field_length
+                print meta[pre_field_length:][:field_length]
+
+                for field, value in zip(
+                        fields,
+                        meta[pre_field_length:][:field_length]
+                ):
+                    field.send_keys(value)
+
+                self.driver.find_elements_by_css_selector(
+                    '#registration_template div.form-group div.controls button.btn.btn-default'
+                )[1].click()
+
+                pre_field_length += field_length
+
+                page += 1
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
+
+        return ProjectPage(driver=self.driver)
 
 class ComponentPage(NodePage):
     """A component page"""

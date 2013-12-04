@@ -69,6 +69,100 @@ class RegistrationTests(unittest.TestCase):
 
         return r
 
+    def _test_registration_list_regression(self, regi_type, page):
+        """ Given a project, register it and verify that the new registration is
+         in the project's registration list
+        """
+
+        if regi_type == 2:
+            page = page.add_registration_regression(
+                registration_type='OSF-Standard Pre-Data Collection Registration',
+                meta=('No', 'No', 'sample narrative', )
+            )
+        elif regi_type == 3:
+            page = page.add_registration_regression(
+                registration_type='Replication Recipe (Brandt et al., 2013): Pre-Registration',
+                meta=('a'+'\n', 'b'+'\n', 'c'+'\n', 'd'+'\n', 'e'+'\n', 'f'+'\n', 'g'+'\n', 'h'+'\n', 'i'+'\n',
+                      'no'+'\n', 'j'+'\n', 'k'+'\n', 'l'+'\n', 'm'+'\n', 'n'+'\n', 'o'+'\n',
+                      'Exact'+'\n', 'Close'+'\n', 'Different'+'\n', 'Exact'+'\n', 'Close'+'\n', 'Different'+'\n', 'Exact'+'\n', 'p'+'\n', 'q'+'\n',
+                      'r'+'\n', 's'+'\n', 't'+'\n',)
+            )
+        elif regi_type == 4:
+            page = page.add_registration_regression(
+                registration_type='Replication Recipe (Brandt et al., 2013): Post-Completion',
+                meta=('u'+'\n',
+                      'v'+'\n', 'w'+'\n', 'significantly different from the original effect size'+'\n', 'inconclusive'+'\n', 'x'+'\n', 'y'+'\n', 'z'+'\n', '1'+'\n',)
+            )
+
+        page.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Registrations'
+        ).click()
+
+        element = page.driver.find_elements_by_css_selector(
+            'div.container'
+        )[1].find_elements_by_link_text('here')
+
+        return element
+
+    def test_project_registration_listed_type2_regression(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        element = self._test_registration_list_regression(
+            regi_type=2,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(element), 1)
+
+    def test_subproject_registration_listed_type2_regression(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        element = self._test_registration_list_regression(
+            regi_type=2,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(element), 1)
+
+    def test_project_registration_listed_type3_regression(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        element = self._test_registration_list_regression(
+            regi_type=3,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(element), 1)
+
+    def test_subproject_registration_listed_type3_regression(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        element = self._test_registration_list_regression(
+            regi_type=3,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(element), 1)
+
+    def test_project_registration_listed_type4_regression(self):
+        """ After registering a project, the registration should be listed in
+         the project's Registrations pane. """
+        element = self._test_registration_list_regression(
+            regi_type=4,
+            page=self._project(),
+        )
+
+        self.assertEqual(len(element), 1)
+
+    def test_subproject_registration_listed_type4_regression(self):
+        """ Subproject variant of ``self.test_project_registration_listed`` """
+        element = self._test_registration_list_regression(
+            regi_type=4,
+            page=self._subproject()
+        )
+
+        self.assertEqual(len(element), 1)
+
     def test_project_registration_listed_type1(self):
         """ After registering a project, the registration should be listed in
          the project's Registrations pane. """
