@@ -735,6 +735,61 @@ class NodePage(OsfPage):
         # Go back to the project page.
         self.driver.get(_url)
 
+    def new_wiki_page(self, page='home', content=""):
+
+        _url = self.driver.current_url
+
+        self.driver.get(
+            '{}/wiki/home'.format(
+                _url.strip('/'),
+            )
+        )
+
+        self.driver.find_elements_by_css_selector(
+            'div.container div.col-md-3 nav li'
+        )[2].find_element_by_css_selector('a').click()
+
+        self.driver.find_element_by_css_selector(
+            'div.modal-dialog form div.modal-body div.form-group input'
+        ).send_keys(page)
+
+        self.driver.find_element_by_css_selector(
+            'button#add-wiki-submit'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#wmd-input')
+            )
+        )
+
+        # clear existing input
+        self.driver.execute_script("$('#wmd-input').val('');")
+
+        # set the new content
+        self.driver.find_element_by_id('wmd-input').send_keys(content)
+
+        # submit it
+        self.driver.find_element_by_css_selector(
+            'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'div.container div.col-md-9 p')
+            )
+        )
+
+        link = self.driver.find_element_by_css_selector(
+            'div.container div.col-md-3 div.osf-sidenav ul'
+        ).find_element_by_link_text(page).get_attribute('href')
+
+        # Go back to the project page.
+        self.driver.get(_url)
+
+        return link
+
     def get_wiki_content(self, page='home'):
         """ Get the content of a wiki page.
 
