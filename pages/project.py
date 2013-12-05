@@ -1413,7 +1413,7 @@ class ProjectPage(NodePage):
 
         # get the link from the list of components
         components = [x for x
-                      in self.driver.find_elements_by_css_selector('#Nodes a')
+                      in self.driver.find_elements_by_css_selector('#Nodes ul h4 a')
                       if x.text == title]
 
         # make sure there's only one component by that name.
@@ -1529,10 +1529,6 @@ class ProjectPage(NodePage):
                 )
 
                 field_length = len(fields)-1
-
-                print field_length
-                print pre_field_length
-                print meta[pre_field_length:][:field_length]
 
                 for field, value in zip(
                         fields,
@@ -1660,10 +1656,6 @@ class ProjectPage(NodePage):
                 )
 
                 field_length = len(fields)-1
-
-                print field_length
-                print pre_field_length
-                print meta[pre_field_length:][:field_length]
 
                 for field, value in zip(
                         fields,
