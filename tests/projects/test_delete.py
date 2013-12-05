@@ -4,8 +4,8 @@ from pages.auth import UserDashboardPage
 from tests.fixtures import ProjectFixture
 from tests.projects.fixtures import DeleteProjectwithComponentFixture
 from tests.projects.fixtures import DeleteProjectwithSubprojectFixture
-from tests.projects.fixtures import DeleteProjectFixture
-
+from tests.projects.fixtures import DeleteProjectFixture, ComponentDeleteFixture
+from tests.projects.fixtures import SubprojectDeleteFixture, ComponentofSubprojectDeleteFixture
 
 class Delete(object):
     def test_on_user_dashboard(self):
@@ -18,7 +18,9 @@ class Delete(object):
         self.page.driver.get(self.project_url)
         assert_in(
             "Resource deleted.",
-            self.page.driver.find_element_by_css_selector('div.span12 h2').text,
+            self.page.driver.find_element_by_css_selector(
+                'div.row div.col-md-12 h2#error'
+            ).text,
         )
 
 
@@ -31,7 +33,9 @@ class DeleteProjectwithComponent(Delete, DeleteProjectwithComponentFixture):
         self.page.driver.get(self.component_url)
         assert_in(
             "Resource deleted.",
-            self.page.driver.find_element_by_css_selector('div.span12 h2').text,
+            self.page.driver.find_element_by_css_selector(
+                'div.row div.col-md-12 h2#error'
+            ).text,
         )
 
 
@@ -39,3 +43,26 @@ class DeleteProjectwithSubproject(Delete, DeleteProjectwithSubprojectFixture):
     def test_deleted(self):
         assert_equal(1, len(self.page.projects))
 
+
+class Deletelog(object):
+    def test_delete_node_log(self):
+        assert_equal(
+            u"{} removed {} {}".format(
+                self.users[0].full_name,
+                self.type,
+                self.title
+            ),
+            self.page.logs[0].text
+        )
+
+
+class ComponentDeletelog(Deletelog, ComponentDeleteFixture):
+    pass
+
+
+class SubprojectDeletelog(Deletelog, SubprojectDeleteFixture):
+    pass
+
+
+class ComponentofSubprojectDeletelog(Deletelog, ComponentofSubprojectDeleteFixture):
+    pass

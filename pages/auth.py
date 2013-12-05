@@ -135,13 +135,13 @@ class UserDashboardPage(OsfPage):
     @property
     def projects(self):
         ul = self.driver.find_element_by_css_selector(
-            'div.row > div.span6:first-child ul.list-group'
+            'div.row div.col-md-6 ul.list-group'
         )
 
         p = []
 
         for li in ul.find_elements_by_css_selector('li.project'):
-            link = li.find_element_by_css_selector('h3 a')
+            link = li.find_element_by_css_selector('h4 span.overflow a')
             p.append(Project(
                 title=link.text,
                 url=link.get_attribute('href')
