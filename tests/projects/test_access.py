@@ -10,7 +10,7 @@ from tests.projects.fixtures import PublicProjectFixture, PublicSubprojectFixtur
     PublicComponentOfSubprojectFixture, SubprojectOfPublicProjectFixture, ComponentOfPublicProjectFixture, \
     ComponentOfPublicSubprojectFixture, ComponentOfPublicSubprojectOfPublicProjectFixture, FileFixture, \
     ForkAccessFixture, NonContributorModifyFixture, PrivateAccessFixture, PublicAccessFixture, \
-    PrivateFileAccessFixture
+    PrivateFileAccessFixture, PrivatelabelComponentFixture, PrivatelabelSubprojectFixture
 
 
 class PrivateAccessTests(PrivateAccessFixture):
@@ -230,4 +230,22 @@ class PublicProjectNonContributorModify(NonContributorModifyTests, PublicProject
 
 
 class PublicSubprojectNonContributorModify(NonContributorModifyTests, PublicSubprojectFixture):
+    pass
+
+
+class Privatelabel(object):
+
+    def test_private_parent(self):
+        self.page.driver.get(self.component_url)
+        label = self.page.driver.find_element_by_css_selector(
+            'div.col-md-8 h1.node-parent-title.overflow span'
+        ).text
+        assert_equal(label, "Private Project")
+
+
+class ComponentPrivatelabelTest(Privatelabel, PrivatelabelComponentFixture):
+    pass
+
+
+class SubprojectPrivatelabelTest(Privatelabel, PrivatelabelSubprojectFixture):
     pass
