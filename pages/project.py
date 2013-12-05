@@ -500,6 +500,8 @@ class NodePage(OsfPage):
             'DIV.popover-content DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
         ).click()
 
+
+
     @property
     def tag(self):
         """The node's title, parsed from the header
