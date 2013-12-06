@@ -8,7 +8,7 @@ driver_name = 'Firefox'
 selenium_wait_time = 5
 
 # Domain to use for all tests.
-osf_home = 'http://localhost:5000'
+osf_home = 'http://staging.openscienceframework.org'
 
 # make sure there is no trailing slash.
 osf_home = osf_home.rstrip('/')

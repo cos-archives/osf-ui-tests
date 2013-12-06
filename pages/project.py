@@ -474,7 +474,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
+        return self.driver.find_element_by_css_selector('h1 span#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
