@@ -94,11 +94,13 @@ class ProjectWikiTests(base.ProjectSmokeTest):
         # Browse to project page
         util.goto_project(self.driver)
         
-        # Get latest version update
-        version = self.driver.find_element_by_tag_name('dd').text
-        
+       # Get latest version update
+        version = self.driver.find_element_by_css_selector(
+            'span[data-bind="text: params.version"]'
+        ).text
+
         # Assert that expected version is in version string
-        self.assertTrue('version %d' % (expected_version) in version)
+        self.assertIn(str(expected_version), version)
 
         # Browse to wiki page
         self.driver.find_element_by_link_text('Wiki').click()
