@@ -221,18 +221,55 @@ class ProjectSmokeTest(UserSmokeTest):
         self.get_element('#addContributors a[data-bind="click:submit"]').click()
 
     def remove_contributor(self, user_data):
-        # mouse over to the contribute's name
-        element_to_hover_over \
-            = self.get_element('#contributors a[data-fullname="'
-                               + user_data["fullname"]+'"]')
-        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
-        hover.perform()
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    '#contributors a[data-fullname="' + user_data["full_name"]+'"]'
+                )
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Contributors'
+        ).click()
+
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.col-md-7 div#contributors'
+                )
+            )
+        )
 
         # click the remove icon
-        element_to_hover_over.find_element_by_css_selector("i").click()
+        self.driver.find_element_by_css_selector(
+            "div.col-md-7 div#contributors li[data-fullname='" + user_data["full_name"]+"']"
+        ).find_element_by_link_text("-").click()
 
-        self.get_element("div.modal-dialog button[class='btn btn-primary']")\
-            .click()
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    "div.modal-dialog button[class='btn btn-primary']"
+                )
+            )
+        )
+        with WaitForPageReload(self.driver):
+
+            # click the "OK" button
+            self.driver.find_element_by_css_selector(
+                "div.modal-dialog button[class='btn btn-primary']"
+            ).click()
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
 
     def get_log(self):
 

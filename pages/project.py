@@ -81,16 +81,14 @@ class NodePage(OsfPage):
 
     @property
     def can_remove_contributors(self):
-        element_to_hover_over = self.driver.find_element_by_css_selector(
-            '#contributors span.contributor a')
-        ActionChains(
-            self.driver
-        ).move_to_element(element_to_hover_over).perform()
+        elem = self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_elements_by_link_text(
+            'Contributors'
+        )
 
         # click the remove icon
-        return bool(
-            len(element_to_hover_over.find_elements_by_css_selector("i"))
-        )
+        return bool(len(elem))
 
     @property
     def can_view_file(self):
@@ -339,14 +337,26 @@ class NodePage(OsfPage):
                 )
             )
         )
-        element_to_hover_over = self.driver.find_element_by_css_selector(
-            '#contributors a[data-fullname="' + user.full_name+'"]'
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Contributors'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.col-md-7 div#contributors'
+                )
+            )
         )
-        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
-        hover.perform()
 
         # click the remove icon
-        element_to_hover_over.find_element_by_css_selector("i").click()
+        self.driver.find_element_by_css_selector(
+            "div.col-md-7 div#contributors li[data-fullname='" + user.full_name+"']"
+        ).find_element_by_link_text("-").click()
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
@@ -362,6 +372,12 @@ class NodePage(OsfPage):
             self.driver.find_element_by_css_selector(
                 "div.modal-dialog button[class='btn btn-primary']"
             ).click()
+
+        self.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Dashboard'
+        ).click()
 
     def add_contributor(self, user, children=False):
 
@@ -477,7 +493,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1 span#nodeTitleEditable').text
+        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
