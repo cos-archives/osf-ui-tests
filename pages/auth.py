@@ -179,8 +179,12 @@ class UserProfilePage(OsfPage):
 
     @property
     def profile_shortlink(self):
-        return self.driver.find_element_by_css_selector(
-            '.container table a'
+        return self.driver.find_elements_by_css_selector(
+            '.container table tbody tr'
+        )[2].find_elements_by_css_selector(
+            "td"
+        )[2].find_element_by_css_selector(
+            'a'
         ).get_attribute('href')
 
 
