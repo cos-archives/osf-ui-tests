@@ -36,7 +36,10 @@ class NodePage(OsfPage):
 
     @property
     def can_edit_title(self):
-        return len(self.driver.find_elements_by_id('node-title-editable')) == 1
+        self.driver.find_elements_by_id('nodeTitleEditable').click()
+        return len(self.driver.find_elements_by_id(
+            'DIV.popover-content INPUT.form-control.input-sm'
+        )) == 1
 
     @property
     def contributors(self):
