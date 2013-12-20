@@ -1828,7 +1828,7 @@ class FilePage(NodePage):
             'TABLE#file-version-history.table.table-striped'
         )
 
-        L = namedtuple('Log', ('version', 'date_uploaded', 'downloads', 'url'))
+        L = namedtuple('Log', ('version', 'date_uploaded', 'User', 'downloads', 'url'))
 
         return [L(
             x.find_elements_by_css_selector('td')[0].text,
@@ -1836,10 +1836,11 @@ class FilePage(NodePage):
                 x.find_elements_by_css_selector('td')[1].text,
                 '%Y/%m/%d %I:%M %p',
             ),
-            int(x.find_elements_by_css_selector('td')[2].text),
+            x.find_elements_by_css_selector('td')[2].text,
+            int(x.find_elements_by_css_selector('td')[3].text),
             x.find_elements_by_css_selector(
                 'td'
-            )[3].find_element_by_css_selector('a').get_attribute('href'),
+            )[4].find_element_by_css_selector('a').get_attribute('href'),
         ) for x in log.find_elements_by_css_selector(
             'table#file-version-history.table.table-striped tbody tr'
         )]
