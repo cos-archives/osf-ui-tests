@@ -94,7 +94,7 @@ class NewWikiPageFixture(object):
 
     def test_wiki_page_link(self):
         assert_equal(
-            self.page.driver.current_url + "wiki/"+self.new_wiki_name,
+            self.page.driver.current_url + "wiki/"+self.new_wiki_name+'/',
             self.link
         )
 
