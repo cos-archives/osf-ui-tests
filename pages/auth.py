@@ -81,6 +81,10 @@ class UserDashboardPage(OsfPage):
 
     def new_project(self, title, description=None):
         # Click "New Project"
+        self.driver.find_element_by_link_text(
+            'My Dashboard'
+        ).click()
+
         with WaitForPageReload(self.driver):
             self.driver.find_element_by_css_selector(
                 'a[href="/project/new"]'
