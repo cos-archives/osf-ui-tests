@@ -108,5 +108,4 @@ class OsfPage(object):
 
         return ProjectPage(driver=self.driver)
 
-
 ApiKey = namedtuple('ApiKey', ('label','key'))

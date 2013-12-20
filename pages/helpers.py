@@ -105,7 +105,7 @@ class WaitForPageReload(object):
         self.driver = driver
 
     def __exit__(self, *args, **kwargs):
-        WebDriverWait(self.driver, 3).until(
+        WebDriverWait(self.driver, 5).until(
             EC.staleness_of(self.body)
         )
 
