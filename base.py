@@ -17,7 +17,7 @@ import unittest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
-
+import time
 # Project imports
 import config
 import util
@@ -421,11 +421,11 @@ class ProjectSmokeTest(UserSmokeTest):
         modal.find_element_by_css_selector(
             '.modal-footer button[type="submit"]'
         ).click()
-
+        time.sleep(3)
         # return url of the component
-        return self.get_element(
-            '#Nodes li.project:last-child h4 a'
-        ).get_attribute('href')
+        return self.driver.find_elements_by_css_selector(
+            '#Nodes UL.list-group.sortable.ui-sortable LI.project.list-group-item.list-group-item-node.cite-container'
+        )[-1].find_element_by_css_selector('h4 span a').get_attribute('href')
 
     def delete_component(self, url, project=None):
         """Deletes the component.
