@@ -5,7 +5,7 @@ import requests
 from base import ProjectSmokeTest
 import config
 from pages import helpers
-
+from urllib2 import HTTPError
 
 class RegressionTests2(unittest.TestCase):
     def test_username_injection_account_creation(self):
@@ -22,7 +22,7 @@ class RegressionTests2(unittest.TestCase):
             verify=False,
         )
         print r
-        self.assertIn("502", r.content)
+        self.assertRaises(HTTPError)
 
     def test_node_title_injection(self):
         """A node's title should allow < and >, but should HTML encode them.
