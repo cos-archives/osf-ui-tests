@@ -50,7 +50,7 @@ class NodePage(OsfPage):
         """
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'p#contributors a[href^="/profile"]')
+                (By.CSS_SELECTOR, 'p#contributors a.user-quickedit')
             )
         )
 
@@ -64,7 +64,7 @@ class NodePage(OsfPage):
                 id=x.get_attribute('href').split('/')[-1],
             )
             for x in self.driver.find_elements_by_css_selector(
-                'p#contributors a[href^="/profile"]'
+                'p#contributors a.user-quickedit'
             )
         ]
 
@@ -477,7 +477,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1 span#nodeTitleEditable').text
+        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
