@@ -128,4 +128,4 @@ class UserCreationTests(base.SmokeTest):
             self.user_data['username'],
             self.user_data['password']
         )
-        self.assertTrue('dashboard' in self.driver.current_url)
+        self.assertTrue('settings' in self.driver.current_url)

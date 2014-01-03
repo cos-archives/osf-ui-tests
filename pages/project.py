@@ -50,7 +50,7 @@ class NodePage(OsfPage):
         """
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'p#contributors a.user-quickedit')
+                (By.CSS_SELECTOR, 'p#contributors span.contributor a')
             )
         )
 
@@ -64,7 +64,7 @@ class NodePage(OsfPage):
                 id=x.get_attribute('href').split('/')[-1],
             )
             for x in self.driver.find_elements_by_css_selector(
-                'p#contributors a.user-quickedit'
+                'p#contributors span.contributor a'
             )
         ]
 
@@ -701,7 +701,7 @@ class NodePage(OsfPage):
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'UL.nav.navbar-nav li')
+                (By.CSS_SELECTOR, 'div.col-md-3 UL.nav.navbar-nav')
             )
         )
 

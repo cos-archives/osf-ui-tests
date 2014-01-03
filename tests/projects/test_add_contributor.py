@@ -126,11 +126,11 @@ class AddMultiContributorTests(AddMultiContributorFixture):
             self.page.logs[0].links[0].url
         )
         assert_in(
-            self.page.log_user_link(self.users[1]),
+            self.page.log_user_link(self.users[1])[-6:],
             self.page.logs[0].links[1].url
         )
         assert_in(
-            self.page.log_user_link(self.users[2]),
+            self.page.log_user_link(self.users[2])[-6:],
             self.page.logs[0].links[2].url
         )
 
