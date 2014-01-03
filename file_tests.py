@@ -1078,7 +1078,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 '#file-container img[src*="{filename}"]'.format(
                     filename=self.image_files[key]['filename']
                 )
-            ).get_attribute('src').strip('/').split('/')[-1]
+            ).get_attribute('src').strip('/').split('/')[-2]
 
             self.assertEqual(
                 src_filename,
@@ -1184,24 +1184,22 @@ class FileHandlingTests(base.ProjectSmokeTest):
 
         # see that the added text is in the current version
         self.assertIn(
-            'Version 1',
-            requests.get(
-                self.get_element(
-                    '#file-version-history tbody tr:first-child a'
-                ).get_attribute('href'),
-                verify=False
-            ).content,
+            '1',
+            self.driver.find_elements_by_css_selector(
+                '#file-version-history tbody tr'
+            )[1].find_elements_by_css_selector(
+                'td'
+            )[0].text,
         )
 
         # ... but isn't in the first version.
-        self.assertNotIn(
-            'Version 1',
-            requests.get(
-                self.get_element(
-                    '#file-version-history tbody tr:last-child a'
-                ).get_attribute('href'),
-                verify=False
-            ).content,
+        self.assertIn(
+            'current',
+            self.driver.find_elements_by_css_selector(
+                '#file-version-history tbody tr'
+            )[0].find_elements_by_css_selector(
+                'td'
+            )[0].text,
         )
 
 

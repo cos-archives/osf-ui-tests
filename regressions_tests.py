@@ -137,7 +137,7 @@ class RegressionTests(ProjectSmokeTest):
 
         # delete the forked project.
         self.goto('settings', node_url=fork_url)
-        self.get_element('button[type="submit"]').click()
+        self.get_element('button[id="delete-node"]').click()
 
         # log back in as the first user so teardown will work.
         self.log_out()
