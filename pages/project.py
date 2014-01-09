@@ -1370,6 +1370,32 @@ class NodeSettingsPage(NodePage):
                 'div.panel-body form#chooseAddonsForm button#settings-submit'
             ).click()
 
+    def addon_deselection(self, add_on, files=True, wiki=True, submit=True):
+        labels = self.driver.find_elements_by_css_selector(
+            'div.col-md-6 div#configureAddons.panel.panel-default '
+            'div.panel-body form#chooseAddonsForm label'
+        )
+        file_check = labels[1].find_element_by_css_selector(
+            "input"
+        )
+        wiki_check = labels[0].find_element_by_css_selector(
+            "input"
+        )
+        if not files == file_check.is_selected():
+            file_check.click()
+        if not wiki == wiki_check.is_selected():
+            wiki_check.click()
+        for l in labels[2:]:
+            if l.text == add_on and l.is_selected():
+                l.find_element_by_css_selector(
+                    "input"
+                ).click()
+        if submit:
+            self.driver.find_elements_by_css_selector(
+                'div.col-md-6 div#configureAddons.panel.panel-default '
+                'div.panel-body form#chooseAddonsForm button#settings-submit'
+            ).click()
+
     def add_multiple_addons(self, add_ons, files=True, wiki=True, submit=True):
         for add_on in add_ons:
             self.addon_selection(add_on, files, wiki, submit=False)
@@ -1403,7 +1429,6 @@ class NodeSettingsPage(NodePage):
             return True
         else:
             return False
-
 
 
 class ProjectPage(NodePage):
