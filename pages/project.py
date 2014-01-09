@@ -1360,7 +1360,7 @@ class NodeSettingsPage(NodePage):
         if not wiki == wiki_check.is_selected():
             wiki_check.click()
         for l in labels[2:]:
-            if l.text == add_on:
+            if l.text == add_on and not l.is_selected():
                 l.find_element_by_css_selector(
                     "input"
                 ).click()
@@ -1386,7 +1386,7 @@ class NodeSettingsPage(NodePage):
         form = self.driver.find_element_by_css_selector(selector)
         form.find_element_by_css_selector("a.btn.btn-primary").click()
 
-    def set_repo(self, add_on, username, reponame):
+    def set_repo(self, add_on, inputs):
         selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
                    'div.panel-body div form.addon-settings[data-addon={0}]'\
             .format(add_on)
@@ -1394,11 +1394,16 @@ class NodeSettingsPage(NodePage):
         fill_in = form.find_elements_by_css_selector(
             "input[type='text']"
         )
-        fill_in[0].clear()
-        fill_in[0].send_keys(username)
-        fill_in[1].clear()
-        fill_in[1].send_keys(reponame)
-        
+        if not len(inputs) > len(fill_in):
+            i = 0
+            for info in inputs:
+                fill_in[i].clear()
+                fill_in[i].send_keys(info)
+                i += 1
+            return True
+        else:
+            return False
+
 
 
 class ProjectPage(NodePage):
