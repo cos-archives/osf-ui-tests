@@ -1364,8 +1364,20 @@ class NodeSettingsPage(NodePage):
                 l.find_element_by_css_selector(
                     "input"
                 ).click()
+                WebDriverWait(self.driver, 3).until(
+                    EC.visibility_of_element_located(
+                        (By.CSS_SELECTOR,
+                         'div.bootbox.modal.fade.bootbox-confirm.in'
+                        )
+                    )
+                )
+                self.driver.find_element_by_css_selector(
+                     'div.bootbox.modal.fade.bootbox-confirm.in '
+                     'div.modal-footer button.btn.btn-primary'
+                ).click()
+
         if submit:
-            self.driver.find_elements_by_css_selector(
+            self.driver.find_element_by_css_selector(
                 'div.col-md-6 div#configureAddons.panel.panel-default '
                 'div.panel-body form#chooseAddonsForm button#settings-submit'
             ).click()
@@ -1405,20 +1417,56 @@ class NodeSettingsPage(NodePage):
                 'div.panel-body form#chooseAddonsForm button#settings-submit'
             ).click()
 
+    def fill_in_form(self):
+        while not(
+                len(self.driver.find_elements_by_css_selector(
+                        "DIV#site-container.context-loader-container "
+                        "DIV#login.auth-form form div.auth-form-body"
+                )) == 0
+        ):
+            login_form = self.driver.find_element_by_css_selector(
+                "DIV#site-container.context-loader-container DIV#login.auth-form "
+                "form div.auth-form-body"
+            )
+            fill_in = login_form.find_elements_by_css_selector(
+                "input"
+            )
+            fill_in[0].send_keys("osftest")
+            fill_in[1].send_keys("cos2014")
+            login_form.find_element_by_css_selector(
+                "input.button"
+            ).click()
+
     def get_token(self, add_on):
+        url = self.driver.current_url
         selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
-                   'div.panel-body div form.addons-settings[data-addons={0}]'\
+                   'div.panel-body div form.addon-settings[data-addon={0}]'\
             .format(add_on)
         form = self.driver.find_element_by_css_selector(selector)
         form.find_element_by_css_selector("a.btn.btn-primary").click()
+        self.fill_in_form()
+        if (
+            len(self.driver.find_elements_by_css_selector(
+                    "DIV.oauth-section.container DIV.access-details "
+                    "DIV.permissions DIV.question BUTTON.button.primary"
+            )) == 1
+        ):
+            self.driver.find_element_by_css_selector(
+                "DIV.oauth-section.container DIV.access-details "
+                "DIV.permissions DIV.question BUTTON.button.primary"
+            ).click()
+        elif self.driver.current_url !=url:
+            self.driver.get(url)
+
+        time.sleep(3)
 
     def set_repo(self, add_on, inputs):
         selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
-                   'div.panel-body div form.addons-settings[data-addons={0}]'\
+                   'div.panel-body div form.addon-settings[data-addon={0}]'\
             .format(add_on)
         form = self.driver.find_element_by_css_selector(selector)
         fill_in = form.find_elements_by_css_selector(
-            "input[type='text']"
+            "input"
         )
         if not len(inputs) > len(fill_in):
             i = 0
@@ -1426,9 +1474,9 @@ class NodeSettingsPage(NodePage):
                 fill_in[i].clear()
                 fill_in[i].send_keys(info)
                 i += 1
-            return True
-        else:
-            return False
+        form.find_element_by_css_selector(
+            'BUTTON#addon-settings-submit.btn.btn-success'
+        ).click()
 
 
 class ProjectPage(NodePage):
@@ -1564,7 +1612,6 @@ class ProjectPage(NodePage):
             '.container select'
         ))
         select.select_by_visible_text(registration_type)
-
 
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
