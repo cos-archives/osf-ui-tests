@@ -9,8 +9,8 @@ class GithubaddonFixture(ProjectFixture):
     def setUpClass(cls):
         super(GithubaddonFixture, cls).setUpClass()
 
-        _url  = cls.page.driver.current_url
+        _url = cls.page.driver.current_url
         cls.page.settings.addon_selection("GitHub")
-        cls.page.
+        cls.page.settings.set_repo()
 
 
