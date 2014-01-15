@@ -1407,14 +1407,14 @@ class NodeSettingsPage(NodePage):
 
     def get_token(self, add_on):
         selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
-                   'div.panel-body div form.addon-settings[data-addon={0}]'\
+                   'div.panel-body div form.addons-settings[data-addons={0}]'\
             .format(add_on)
         form = self.driver.find_element_by_css_selector(selector)
         form.find_element_by_css_selector("a.btn.btn-primary").click()
 
     def set_repo(self, add_on, inputs):
         selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
-                   'div.panel-body div form.addon-settings[data-addon={0}]'\
+                   'div.panel-body div form.addons-settings[data-addons={0}]'\
             .format(add_on)
         form = self.driver.find_element_by_css_selector(selector)
         fill_in = form.find_elements_by_css_selector(
