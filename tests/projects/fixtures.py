@@ -1,7 +1,7 @@
 from pages import FILES
 from pages.helpers import create_user
 from tests.fixtures import UserFixture, ProjectFixture, SubprojectFixture
-from components.fixtures import ComponentFixture, ComponentOfProjectFixture, ComponentOfSubprojectFixture
+from tests.components.fixtures import ComponentFixture, ComponentOfProjectFixture, ComponentOfSubprojectFixture
 
 
 class PublicProjectFixture(ProjectFixture):
