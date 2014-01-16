@@ -1033,7 +1033,21 @@ class NodePage(OsfPage):
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
-                 'DIV.watermarked DIV.container DIV#projectScope HEADER#overview.subhead P#contributors A.node-forked-from')
+                 'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+                 'DIV.modal-footer BUTTON.btn.btn-primary')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+            'DIV.modal-footer BUTTON.btn.btn-primary'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.watermarked DIV.container DIV#projectScope '
+                 'HEADER#overview.subhead P#contributors A.node-forked-from')
             )
         )
         # Wait at least until the page has unloaded to continue.
@@ -1696,6 +1710,19 @@ class ProjectPage(NodePage):
         # click "Register"
         self.driver.find_element_by_css_selector(
             '#register-submit'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+                 'DIV.modal-footer BUTTON.btn.btn-primary')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+            'DIV.modal-footer BUTTON.btn.btn-primary'
         ).click()
 
         return ProjectRegistrationPage(driver=self.driver)
