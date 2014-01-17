@@ -48,7 +48,7 @@ class NodePage(OsfPage):
 
         :returns: [``Contributor``, ...]
         """
-        WebDriverWait(self.driver, 3).until(
+        WebDriverWait(self.driver, 5).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, 'p#contributors span.contributor a')
             )
@@ -352,16 +352,17 @@ class NodePage(OsfPage):
             EC.visibility_of_element_located(
                 (
                     By.CSS_SELECTOR,
-                    "div.modal-dialog button[class='btn btn-primary']"
+                    "DIV.bootbox.modal.fade.bootbox-confirm.in "
+                    "DIV.modal-dialog DIV.modal-footer BUTTON.btn.btn-primary"
                 )
             )
         )
-        with WaitForPageReload(self.driver):
 
-            # click the "OK" button
-            self.driver.find_element_by_css_selector(
-                "div.modal-dialog button[class='btn btn-primary']"
-            ).click()
+        # click the "OK" button
+        self.driver.find_element_by_css_selector(
+            "DIV.bootbox.modal.fade.bootbox-confirm.in "
+            "DIV.modal-dialog DIV.modal-footer BUTTON.btn.btn-primary"
+        ).click()
 
     def add_contributor(self, user, children=False):
 
@@ -477,7 +478,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
+        return self.driver.find_element_by_css_selector('h1 span#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
@@ -1246,7 +1247,6 @@ class NodePage(OsfPage):
         ) for r in self.driver.find_elements_by_css_selector(
             'div.grid-canvas '
         )]
-
 
     def _clone(self):
         new_driver = self.driver.__class__()
