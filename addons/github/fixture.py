@@ -1,7 +1,6 @@
 from pages import FILES
 from pages.helpers import create_user
-from tests.fixtures import UserFixture, ProjectFixture, SubprojectFixture
-from tests.components.fixtures import ComponentFixture, ComponentOfProjectFixture, ComponentOfSubprojectFixture
+from tests.fixtures import ProjectFixture, SubprojectFixture
 
 
 class GithubaddonFixture(ProjectFixture):
@@ -11,6 +10,9 @@ class GithubaddonFixture(ProjectFixture):
 
         _url = cls.page.driver.current_url
         cls.page.settings.addon_selection("GitHub")
-        cls.page.settings.set_repo()
+        cls.page.settings.get_token("github")
+        cls.page.settings.set_repo("github", ['osftest', 'addontesting'])
+        cls.page.driver.get(_url)
+
 
 
