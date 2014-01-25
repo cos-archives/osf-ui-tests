@@ -48,7 +48,7 @@ class NodePage(OsfPage):
 
         :returns: [``Contributor``, ...]
         """
-        WebDriverWait(self.driver, 3).until(
+        WebDriverWait(self.driver, 5).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, 'p#contributors span.contributor a')
             )
@@ -352,16 +352,17 @@ class NodePage(OsfPage):
             EC.visibility_of_element_located(
                 (
                     By.CSS_SELECTOR,
-                    "div.modal-dialog button[class='btn btn-primary']"
+                    "DIV.bootbox.modal.fade.bootbox-confirm.in "
+                    "DIV.modal-dialog DIV.modal-footer BUTTON.btn.btn-primary"
                 )
             )
         )
-        with WaitForPageReload(self.driver):
 
-            # click the "OK" button
-            self.driver.find_element_by_css_selector(
-                "div.modal-dialog button[class='btn btn-primary']"
-            ).click()
+        # click the "OK" button
+        self.driver.find_element_by_css_selector(
+            "DIV.bootbox.modal.fade.bootbox-confirm.in "
+            "DIV.modal-dialog DIV.modal-footer BUTTON.btn.btn-primary"
+        ).click()
 
     def add_contributor(self, user, children=False):
 
@@ -477,7 +478,7 @@ class NodePage(OsfPage):
 
         :returns: ``str``
         """
-        return self.driver.find_element_by_css_selector('h1#nodeTitleEditable').text
+        return self.driver.find_element_by_css_selector('h1 span#nodeTitleEditable').text
 
     @title.setter
     def title(self, value):
@@ -1032,7 +1033,21 @@ class NodePage(OsfPage):
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
-                 'DIV.watermarked DIV.container DIV#projectScope HEADER#overview.subhead P#contributors A.node-forked-from')
+                 'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+                 'DIV.modal-footer BUTTON.btn.btn-primary')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+            'DIV.modal-footer BUTTON.btn.btn-primary'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.watermarked DIV.container DIV#projectScope '
+                 'HEADER#overview.subhead P#contributors A.node-forked-from')
             )
         )
         # Wait at least until the page has unloaded to continue.
@@ -1247,7 +1262,6 @@ class NodePage(OsfPage):
             'div.grid-canvas '
         )]
 
-
     def _clone(self):
         new_driver = self.driver.__class__()
         new_driver.get(config.osf_home)
@@ -1343,6 +1357,140 @@ class NodeSettingsPage(NodePage):
             return ProjectPage(driver=self.driver)
         else:
             return UserDashboardPage(driver=self.driver)
+
+    def addon_selection(self, add_on, files=True, wiki=True, submit=True):
+        labels = self.driver.find_elements_by_css_selector(
+            'div.col-md-6 div#configureAddons.panel.panel-default '
+            'div.panel-body form#chooseAddonsForm label'
+        )
+        file_check = labels[1].find_element_by_css_selector(
+            "input"
+        )
+        wiki_check = labels[0].find_element_by_css_selector(
+            "input"
+        )
+        if not files == file_check.is_selected():
+            file_check.click()
+        if not wiki == wiki_check.is_selected():
+            wiki_check.click()
+        for l in labels[2:]:
+            if l.text == add_on and not l.is_selected():
+                l.find_element_by_css_selector(
+                    "input"
+                ).click()
+                WebDriverWait(self.driver, 3).until(
+                    EC.visibility_of_element_located(
+                        (By.CSS_SELECTOR,
+                         'div.bootbox.modal.fade.bootbox-confirm.in'
+                        )
+                    )
+                )
+                self.driver.find_element_by_css_selector(
+                     'div.bootbox.modal.fade.bootbox-confirm.in '
+                     'div.modal-footer button.btn.btn-primary'
+                ).click()
+
+        if submit:
+            self.driver.find_element_by_css_selector(
+                'div.col-md-6 div#configureAddons.panel.panel-default '
+                'div.panel-body form#chooseAddonsForm button#settings-submit'
+            ).click()
+
+    def addon_deselection(self, add_on, files=True, wiki=True, submit=True):
+        labels = self.driver.find_elements_by_css_selector(
+            'div.col-md-6 div#configureAddons.panel.panel-default '
+            'div.panel-body form#chooseAddonsForm label'
+        )
+        file_check = labels[1].find_element_by_css_selector(
+            "input"
+        )
+        wiki_check = labels[0].find_element_by_css_selector(
+            "input"
+        )
+        if not files == file_check.is_selected():
+            file_check.click()
+        if not wiki == wiki_check.is_selected():
+            wiki_check.click()
+        for l in labels[2:]:
+            if l.text == add_on and l.is_selected():
+                l.find_element_by_css_selector(
+                    "input"
+                ).click()
+        if submit:
+            self.driver.find_elements_by_css_selector(
+                'div.col-md-6 div#configureAddons.panel.panel-default '
+                'div.panel-body form#chooseAddonsForm button#settings-submit'
+            ).click()
+
+    def add_multiple_addons(self, add_ons, files=True, wiki=True, submit=True):
+        for add_on in add_ons:
+            self.addon_selection(add_on, files, wiki, submit=False)
+        if submit:
+            self.driver.find_elements_by_css_selector(
+                'div.col-md-6 div#configureAddons.panel.panel-default '
+                'div.panel-body form#chooseAddonsForm button#settings-submit'
+            ).click()
+
+    def fill_in_form(self):
+        while not(
+                len(self.driver.find_elements_by_css_selector(
+                        "DIV#site-container.context-loader-container "
+                        "DIV#login.auth-form form div.auth-form-body"
+                )) == 0
+        ):
+            login_form = self.driver.find_element_by_css_selector(
+                "DIV#site-container.context-loader-container DIV#login.auth-form "
+                "form div.auth-form-body"
+            )
+            fill_in = login_form.find_elements_by_css_selector(
+                "input"
+            )
+            fill_in[0].send_keys("osftest")
+            fill_in[1].send_keys("cos2014")
+            login_form.find_element_by_css_selector(
+                "input.button"
+            ).click()
+
+    def get_token(self, add_on):
+        url = self.driver.current_url
+        selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
+                   'div.panel-body div form.addon-settings[data-addon={0}]'\
+            .format(add_on)
+        form = self.driver.find_element_by_css_selector(selector)
+        form.find_element_by_css_selector("a.btn.btn-primary").click()
+        self.fill_in_form()
+        if (
+            len(self.driver.find_elements_by_css_selector(
+                    "DIV.oauth-section.container DIV.access-details "
+                    "DIV.permissions DIV.question BUTTON.button.primary"
+            )) == 1
+        ):
+            self.driver.find_element_by_css_selector(
+                "DIV.oauth-section.container DIV.access-details "
+                "DIV.permissions DIV.question BUTTON.button.primary"
+            ).click()
+        elif self.driver.current_url !=url:
+            self.driver.get(url)
+
+        time.sleep(3)
+
+    def set_repo(self, add_on, inputs):
+        selector = 'div.col-md-6 div#configureAddons.panel.panel-default ' \
+                   'div.panel-body div form.addon-settings[data-addon={0}]'\
+            .format(add_on)
+        form = self.driver.find_element_by_css_selector(selector)
+        fill_in = form.find_elements_by_css_selector(
+            "input"
+        )
+        if not len(inputs) > len(fill_in):
+            i = 0
+            for info in inputs:
+                fill_in[i].clear()
+                fill_in[i].send_keys(info)
+                i += 1
+        form.find_element_by_css_selector(
+            'BUTTON#addon-settings-submit.btn.btn-success'
+        ).click()
 
 
 class ProjectPage(NodePage):
@@ -1479,7 +1627,6 @@ class ProjectPage(NodePage):
         ))
         select.select_by_visible_text(registration_type)
 
-
         WebDriverWait(self.driver, 3).until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR,
@@ -1563,6 +1710,19 @@ class ProjectPage(NodePage):
         # click "Register"
         self.driver.find_element_by_css_selector(
             '#register-submit'
+        ).click()
+
+        WebDriverWait(self.driver, 3).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+                 'DIV.modal-footer BUTTON.btn.btn-primary')
+            )
+        )
+
+        self.driver.find_element_by_css_selector(
+            'DIV.bootbox.modal.fade.bootbox-confirm.in DIV.modal-dialog '
+            'DIV.modal-footer BUTTON.btn.btn-primary'
         ).click()
 
         return ProjectRegistrationPage(driver=self.driver)
