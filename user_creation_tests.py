@@ -16,6 +16,7 @@ import base
 import util
 import config
 
+
 class UserCreationTests(base.SmokeTest):
     
     def setUp(self):
@@ -43,7 +44,7 @@ class UserCreationTests(base.SmokeTest):
         id_form_data = {'#register-%s' % (k) : form_data[k] for k in form_data}
 
         # Submit form
-        util.fill_form(self.driver, id_form_data)
+        util.fill_creation_form(self.driver, id_form_data)
         
         # Get alert boxes
         alerts = util.get_alert_boxes(self.driver, alert_text)
@@ -119,7 +120,7 @@ class UserCreationTests(base.SmokeTest):
     def test_valid_account(self):
         
         # Submit original form data
-        self._submit_and_check(self.user_data, 'you may now login')
+        self._submit_and_check(self.user_data, 'You may now log in')
         
         # Make sure we can log in
         util.login(

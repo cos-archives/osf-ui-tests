@@ -21,6 +21,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 # Project imports
 import config
 import util
+import urlparse
 import os
 import shutil
 import tempfile
@@ -29,6 +30,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from pages.helpers import WaitForPageReload
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class SmokeTest(unittest.TestCase):
@@ -205,32 +207,32 @@ class ProjectSmokeTest(UserSmokeTest):
         self.get_element('#contributors a[href="#addContributors"]').click()
 
         # enter the user's email address
-        self.get_element('div#addContributors input[type=text]').send_keys(
+        self.get_element('div#addContributors input[data-bind="value:query"]').send_keys(
             user['username']
         )
 
         # click the search button
-        self.get_element('#addContributors button').click()
+        self.get_element('#addContributors button.btn').click()
 
         # click the radio button for the first result
-        self.get_element('#addContributors input[type=radio]').click()
+        self.get_element('#addContributors a.btn.contrib-button').click()
 
         # click the "Add" button
-        self.get_element('#addContributors button.btn.primary').click()
+        self.get_element('#addContributors a[data-bind="click:submit"]').click()
 
-    def remove_contributor(self, user):
+    def remove_contributor(self, user_data):
+        # mouse over to the contribute's name
+        element_to_hover_over \
+            = self.get_element('#contributors a[data-fullname="'
+                               + user_data["fullname"]+'"]')
+        hover = ActionChains(self.driver).move_to_element(element_to_hover_over)
+        hover.perform()
 
-        self.driver.execute_script(
-            u"""me = $('#contributors a:contains("{fullname}")')
-                .append('<i class="icon-remove"><i>');
-            removeUser(
-                me.attr("data-userid"),
-                me.attr("data-fullname"),
-                me
-            );""".format(fullname=user['fullname'])
-        )
+        # click the remove icon
+        element_to_hover_over.find_element_by_css_selector("i").click()
 
-        self.driver.switch_to_alert().accept()
+        self.get_element("div.modal-dialog button[class='btn btn-primary']")\
+            .click()
 
     def get_log(self):
 
@@ -274,6 +276,23 @@ class ProjectSmokeTest(UserSmokeTest):
             'div.popover-content button.btn.btn-primary'
         ).click()
 
+    def set_permission(self, permission, url=None):
+
+        url = url or self.project_url
+        self.driver.get(url)
+
+        if permission == 'public':
+            self.get_element('div.btn-toolbar a#publicButton.btn').click()
+            self.get_element(
+                'DIV.bootbox.modal.fade.bootbox-confirm.in button.btn.btn-primary'
+            ).click()
+
+        else:
+            self.get_element('diset_permissionv.btn-toolbar a#privateButton.btn').click()
+            self.get_element(
+                'DIV.bootbox.modal.fade.bootbox-confirm.in button.btn.btn-primary'
+            ).click()
+
     def make_private(self, url=None):
         """Make a project or component private.
 
@@ -284,9 +303,7 @@ class ProjectSmokeTest(UserSmokeTest):
         url = url or self.project_url
 
         if self.is_public(url):
-            self.driver.get('{url}/makeprivate'.format(
-                url=url.strip('/') or self.project_url.strip('/'))
-            )
+            self.set_permission('private', url)
 
     def make_public(self, url=None):
         """Make a project or component private.
@@ -298,9 +315,7 @@ class ProjectSmokeTest(UserSmokeTest):
         url = url or self.project_url
 
         if not self.is_public(url):
-            self.driver.get('{url}/makepublic'.format(
-                url=url.strip('/') or self.project_url.strip('/'))
-            )
+            self.set_permission('public', url)
 
     def is_public(self, url=None):
         """Test whether a project or component is public.
@@ -343,20 +358,33 @@ class ProjectSmokeTest(UserSmokeTest):
         node_url = node_url or self.project_url
         self.goto('files', node_url=node_url)
 
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.container h3 a#clickable.dz-clickable')
+            )
+        )
+
         self.driver.execute_script('''
-            $('input[type="file"]').offset({left : 50});
+            $('input[type="file"]').attr('style', "");
         ''')
 
+        #with WaitForFileUpload(self.driver, wait=5):
+
+        ## Upload files
+        #self.driver.find_element_by_css_selector(
+        #    'div.container h3 A#clickable.dz-clickable'
+        #).click()
+
+        wait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[type="file"]')
+            )
+        )
         # Find file input
-        field = self.driver.find_element_by_css_selector('input[type=file]')
+        field = self.driver.find_element_by_css_selector('input[type="file"]')
 
         # Enter file into input
         field.send_keys(path)
-
-        # Upload files
-        self.driver.find_element_by_css_selector(
-            'div.fileupload-buttonbar button.start'
-        ).click()
 
     # Component methods
 
@@ -411,32 +439,40 @@ class ProjectSmokeTest(UserSmokeTest):
         """
         raise NotImplementedError
 
-    def assert_not_authorized(self, url=None):
-        """Navigate to the page, and see if the item is accessible.
-        """
+    def assert_error_page(self, error_msg, url=None):
+        """Optionally navigate to page, then check for provided error
+        message.
 
+        :param error_msg: Error message
+        :param url: Optional URL
+
+        """
         # if a url was provided, go there
         if url:
             self.driver.get(url)
 
-        # should have been redirected to the homepage
-        self.assertEqual(
-            self.driver.current_url.strip('/'),
-            self.site_root.strip('/'),
-        )
-
         # an alert should be present with the error message
         self.assertIn(
-            'not authorized',
-            self.get_element('div#alert-container').text,
+            error_msg,
+            self.get_element('div.span12 h2').text,
         )
+
+    def assert_not_found(self, url=None):
+
+        self.assert_error_page('Page not found.', url)
+
+    def assert_not_authorized(self, url=None):
+        """Navigate to the page, and see if the item is accessible.
+        """
+
+        self.assert_error_page('Unauthorized.', url)
 
     def assert_forbidden(self, url=None):
         """Nav  igate to the resource and verify the 403 (Forbidden) error is
         present.
         """
 
-        self.assert_not_authorized(url=url)
+        self.assert_error_page('Forbidden.', url)
 
     def create_fork(self, url=None):
         """Create a fork, and return its URL
@@ -450,7 +486,7 @@ class ProjectSmokeTest(UserSmokeTest):
         with WaitForPageReload(self.driver):
             # click the fork button
             self.get_element(
-                'div.btn-toolbar div.btn-group:last-child a:last-child'
+                'div.btn-toolbar div.btn-group a.btn.node-fork-btn'
             ).click()
 
         return self.driver.current_url
@@ -485,19 +521,18 @@ class ProjectSmokeTest(UserSmokeTest):
 
         # Fill out the form
         self.get_element(
-            'textarea.ember-view'
+            'textarea[data-bind="value:value, attr:{name:id}, disable:disable"]'
         ).send_keys('Test content for a textarea.')
 
         for elem in self.driver.find_elements_by_css_selector(
                 'div#registration_template select'):
             elem.send_keys('Yes')
 
-
         self.get_element(
-            'form.form-horizontal div.control-group input.ember-view'
+            'form.form-horizontal div.control-group input'
         ).send_keys('continue')
 
-        self.get_element('div.ember-view button.btn.primary').click()
+        self.get_element('button#register-submit.btn').click()
 
         # Hack: Wait for registration label so that we can get the
         # correct URL for the registration

@@ -8,8 +8,20 @@ import requests
 import tempfile
 
 from pages import FILES
-from pages.helpers import get_new_project
+from pages.helpers import get_new_project, WebDriverWait
 from pages.project import FilePage
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
+from selenium.webdriver import ActionChains
+
+import urlparse
+
+
+def prepend_api_url(url):
+
+    parsed_url = urlparse.urlparse(url)
+    prepended_url = parsed_url._replace(path='/api/v1' + parsed_url.path)
+    return urlparse.urlunparse(prepended_url)
 
 
 class FileTests(unittest.TestCase):
@@ -66,7 +78,6 @@ class FileTests(unittest.TestCase):
     def test_component_add_file(self):
         self._test_add_file(self._component())
 
-    @unittest.skip('known failure')
     def test_project_add_file_logged(self):
         # log says "component"; expected "project"
 
@@ -127,7 +138,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_component_add_file_logged(self):
         # log says "project"; expected "component"
 
@@ -162,7 +172,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_nested_component_add_file_logged(self):
         # log says "project"; expected "component"
         page = self._subproject_component()
@@ -189,14 +198,6 @@ class FileTests(unittest.TestCase):
 
         page = page.parent_project()
 
-        self.assertEqual(
-            page.logs[0].text,
-            expected_log
-        )
-
-        page = page.parent_project()
-
-        # Note: tests don't bubble up to this point
         self.assertEqual(
             page.logs[0].text,
             expected_log
@@ -235,7 +236,6 @@ class FileTests(unittest.TestCase):
     def test_component_delete_file(self):
         self._test_delete_file(self._component())
 
-    @unittest.skip('known failure')
     def test_project_delete_file_logged(self):
         # log says "component"; expected "project"
         page = get_new_project()
@@ -310,7 +310,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_component_delete_file_logged(self):
         # log says "project"; expected "component"
         page = self._component()
@@ -352,7 +351,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_nested_component_delete_file_logged(self):
         # log says "project"; expected "component"
         page = self._subproject_component()
@@ -424,7 +422,6 @@ class FileTests(unittest.TestCase):
 
         return page, os.path.basename(temp_file_path)
 
-    @unittest.skip('expected failure')
     def test_project_file_update_logged(self):
         # log says "component", expected "project"
         page, filename = self._test_file_update_logged(get_new_project())
@@ -473,7 +470,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('expected failure')
     def test_nested_component_file_update_logged(self):
         # log says "project"; expected "component"
         page, filename = self._test_file_update_logged(
@@ -504,7 +500,6 @@ class FileTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('expected failure')
     def test_component_file_update_logged(self):
         # expected "component"; got "project"
         page, filename = self._test_file_update_logged(self._component())
@@ -560,8 +555,8 @@ class FileTests(unittest.TestCase):
         os.close(fd)
         os.remove(temp_file_path)
 
-        file_url = '{}files/download/{}/version/1'.format(
-            page_url,
+        file_url = '{}files/download/{}/version/1/'.format(
+            prepend_api_url(page_url),
             os.path.basename(temp_file_path),
         )
 
@@ -627,8 +622,8 @@ class FileTests(unittest.TestCase):
             [0, 0]
         )
 
-        file_url = '{}files/download/{}/version/1'.format(
-            page_url,
+        file_url = '{}files/download/{}/version/1/'.format(
+            prepend_api_url(page_url),
             os.path.basename(temp_file_path),
         )
 
@@ -666,24 +661,33 @@ class FileTests(unittest.TestCase):
 
         page.driver.get(files_url)
 
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
         # all three buttons in the upload header should be disabled
         self.assertEqual(
             len(
                 page.driver.find_elements_by_css_selector(
-                    '#fileupload div.fileupload-buttonbar .disabled'
+                    'div.container h3 a#clickable.dz-clickable'
                 )
             ),
-            2
+            0
         )
 
         # the delete button for the file should also be disabled
         self.assertEqual(
             len(
                 page.driver.find_elements_by_css_selector(
-                    'form.fileDeleteForm button.btn-delete.disabled'
+                    'div.grid-canvas div.slick-cell.l3.r3 button.btn.btn-danger.btn-mini'
                 )
             ),
-            1
+            0
         )
 
         page.close()
@@ -696,6 +700,358 @@ class FileTests(unittest.TestCase):
 
     def test_component_file_controls_not_present_anonymous(self):
         self._test_file_controls_not_present(self._component())
+
+    #Dashboard file view
+    #####################
+
+    def _test_file_view(self, page):
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        self.assertEqual(
+            len(page.files_view),
+            1
+        )
+
+        page.close()
+
+    def test_project_view_file(self):
+        self._test_file_view(get_new_project())
+
+    def test_subproject_view_file(self):
+        self._test_file_view(self._subproject())
+
+    def test_component_view_file(self):
+        self._test_file_view(self._component())
+
+     #Dashboard file acess
+    ######################
+
+    def _test_private_file_view(self, page, title, node_type):
+        project_url = page.driver.current_url
+
+        page.public = True
+
+        page.add_component(
+            title=title,
+            component_type=node_type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.log_out()
+
+        page.driver.get(project_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        self.assertTrue(
+            1,
+            len(page.driver.find_elements_by_css_selector(
+                'div.grid-canvas DIV.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0.cell-title SPAN.folder.folder-delete'
+                )
+                )
+        )
+
+        page.close()
+
+    def test_private_subproject_view_file(self):
+        self._test_private_file_view(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_private_component_view_file(self):
+        self._test_private_file_view(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
+
+    #filepage file acess
+    ######################
+
+    def _test_private_file_acess(self, page, title, node_type):
+
+        project_url = page.driver.current_url
+
+        page.public = True
+
+        page.add_component(
+            title=title,
+            component_type=node_type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        page.log_out()
+
+        page.driver.get(project_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        page.driver.find_element_by_css_selector(
+            'HEADER#overview.subhead UL.nav.navbar-nav'
+        ).find_element_by_link_text(
+            'Files'
+        ).click()
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        self.assertTrue(
+            1,
+            len(page.driver.find_elements_by_css_selector(
+                'div.grid-canvas DIV.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0.cell-title SPAN.folder.folder-delete'
+                )
+                )
+        )
+
+        page.close()
+
+    def test_private_subproject_acess_file(self):
+        self._test_private_file_acess(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_private_component_acess_file(self):
+        self._test_private_file_acess(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
+
+    #file page directory selection
+    ##############################
+
+    def _test_directory_selection(self, page, title, node_type):
+
+        project_url = page.driver.current_url
+
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        file_url = page.driver.current_url
+
+        page.driver.get(project_url)
+
+        page.add_component(
+            title=title,
+            component_type=node_type,
+        )
+
+        page.add_file([x for x in FILES if x.name == 'test.gif'][0])
+
+        page.driver.get(file_url)
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas'
+                )
+            )
+        )
+
+        element = page.driver.find_elements_by_css_selector(
+            'DIV.grid-canvas DIV.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector('DIV.slick-cell.l0.r0.cell-title')
+
+        ActionChains(page.driver).double_click(element).perform()
+
+        file_name = page.driver.find_elements_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector(
+            'DIV.slick-cell.l0.r0.cell-title a'
+        ).text
+
+        self.assertEqual(
+            file_name,
+            'test.gif'
+        )
+
+        self.assertEqual(
+            page.driver.current_url,
+            file_url
+        )
+
+        page.driver.find_elements_by_css_selector(
+            'DIV#myGridBreadcrumbs.breadcrumb SPAN.hgrid-breadcrumb'
+        )[0].find_element_by_css_selector('a').click()
+
+        folder = page.driver.find_elements_by_css_selector(
+            'DIV.grid-canvas DIV.ui-widget-content.slick-row.odd'
+        )[0].find_element_by_css_selector(
+            'DIV.slick-cell.l0.r0.cell-title'
+        ).text
+        type_name = ''
+
+        if node_type == 'Project':
+            type_name = 'Project'
+        else:
+            type_name = 'Component'
+
+        self.assertAlmostEqual(
+            u' {}: {}'.format(type_name, title),
+            folder
+        )
+
+        page.close()
+
+    def test_subproject_directory_selection(self):
+        self._test_directory_selection(
+            get_new_project(),
+            'New Subproject',
+            'Project'
+        )
+
+    def test_component_directory_selection(self):
+        self._test_directory_selection(
+            get_new_project(),
+            'New Component',
+            'Other'
+        )
+
+    #reorder file bar
+    ##############################
+
+    def _test_reorder_file_bar(self, page):
+        page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'div.grid-canvas div.ui-widget-content.slick-row.odd'
+                )
+            )
+        )
+
+        ac = ActionChains(page.driver)
+        a = page.driver.find_elements_by_css_selector(
+            'DIV.container DIV.slick-header.ui-state-default DIV.slick-header-columns.ui-sortable SPAN.slick-column-name'
+        )[3]
+        b = page.driver.find_elements_by_css_selector(
+            'DIV.container DIV.slick-header.ui-state-default DIV.slick-header-columns.ui-sortable SPAN.slick-column-name'
+        )[0]
+
+        ac.click_and_hold(a).perform()
+        a_chain = ActionChains(page.driver)
+        a_chain.move_to_element(b).perform()
+        a_chain.release(b).perform()
+
+        downloads = page.driver.find_element_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd DIV.slick-cell.l0.r0'
+        ).text
+
+        self.assertIn('0', downloads)
+
+        page.close()
+
+    def test_project_file_bar_reorder(self):
+        self._test_reorder_file_bar(get_new_project())
+
+    def test_subproject_file_bar_reorder(self):
+        self._test_reorder_file_bar(self._subproject())
+
+    def test_component_file_bar_reorder(self):
+        self._test_reorder_file_bar(self._component())
+
+    def _test_file_download_version_check(self, page):
+
+        page.public = True
+
+        fd, temp_file_path = tempfile.mkstemp(suffix='.txt', text=True)
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('first')
+
+        # add the file to the project
+        page.add_file(temp_file_path)
+
+        with open(temp_file_path, 'w') as tmp_file:
+            tmp_file.write('second')
+
+        page.add_file(temp_file_path)
+
+        # delete the temp file we made
+        os.close(fd)
+        os.remove(temp_file_path)
+
+        #page.add_file([x for x in FILES if x.name == 'test.jpg'][0])
+
+        WebDriverWait(page.driver, 3).until(
+            ec.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'div.grid-canvas')
+            )
+        )
+
+        page.driver.find_element_by_css_selector(
+            'div.grid-canvas div.ui-widget-content.slick-row.odd'
+        ).find_element_by_css_selector(
+            'div.slick-cell.l0.r0.cell-title a'
+        ).click()
+
+        # Get the link to the file's version through Selenium
+        link = page.driver.find_elements_by_css_selector(
+            "DIV#file-container.row DIV.col-md-4 TABLE#file-version-history.table.table-striped TBODY TR"
+        )[1].find_element_by_css_selector("td a").get_attribute('href')
+
+        # Use Requests to download the file
+        response = requests.get(link)
+
+        # get the "content-disposition" header from the Response object
+        # Should be in the format:
+        #        "attachment;filename=<filename>"
+        h = response.headers.get('content-disposition', '')
+
+        # get only the part containing "filename"
+        h = [x for x in h.split(';') if 'filename' in x][0]
+
+        # split this part on the equal sign to get only the filename
+        filename = h.split('=')[1]
+
+        # parse the filename to get the portioned added that represents a datetime
+
+        # Get the portion of the filename preceeding the last "."
+        fn = filename.split('.')[-2]
+        # Get the portion of that segment following the last "_"
+        fn = fn.split('_')[-1]
+
+        # fn is now only the portion of the filename representing a datetime.
+        time = dt.datetime.strptime(
+            fn,
+            '%Y%m%d%H%M%S'
+        )
+
+        self.assertAlmostEqual(
+            time,
+            dt.datetime.now(),
+            delta=dt.timedelta(minutes=2)
+        )
+
+    def test_file_download_version_check(self):
+        self._test_file_download_version_check(get_new_project())
 
 
 class FileHandlingTests(base.ProjectSmokeTest):
@@ -722,7 +1078,7 @@ class FileHandlingTests(base.ProjectSmokeTest):
                 '#file-container img[src*="{filename}"]'.format(
                     filename=self.image_files[key]['filename']
                 )
-            ).get_attribute('src').split('/')[-1]
+            ).get_attribute('src').strip('/').split('/')[-1]
 
             self.assertEqual(
                 src_filename,
@@ -852,6 +1208,5 @@ class FileHandlingTests(base.ProjectSmokeTest):
     def test_access_file_not_found(self):
         raise NotImplementedError
 
-    @skip('Not Implemented')
-    def test_download_count(self):
-        raise NotImplementedError
+
+

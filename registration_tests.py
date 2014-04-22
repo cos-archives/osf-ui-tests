@@ -2,7 +2,9 @@ import datetime as dt
 import unittest
 
 from pages import helpers
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class RegistrationTests(unittest.TestCase):
     """This test case is for testing the act of creating a registration, and
@@ -122,6 +124,12 @@ class RegistrationTests(unittest.TestCase):
             meta=('sample narrative', )
         )
 
+        WebDriverWait(page.driver, 8).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 'html body DIV.watermarked DIV.container DIV.alert.alert-info')
+            )
+        )
         self.assertEqual(
             getattr(page, attribute),
             parent_value,
@@ -130,7 +138,6 @@ class RegistrationTests(unittest.TestCase):
         page.close()
 
     # NOTE: This test only applies to subprojects
-    @unittest.skip('known failure')
     def test_subproject_registration_parent_title(self):
         """ Verify that a registration's parent project title matches the
         original project """
@@ -240,7 +247,6 @@ class RegistrationTests(unittest.TestCase):
 
         page.close()
 
-    @unittest.skip('known failure')
     def test_project_registration_logged(self):
         """ Project variant of ``self._test_registration_logged`` """
         # As of 9 Sep 2013, the log reads "component" here instead of "project"

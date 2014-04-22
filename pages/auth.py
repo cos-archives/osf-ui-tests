@@ -1,12 +1,15 @@
 import config
+import logs
 from generic import ApiKey, OsfPage
-from helpers import WaitForPageReload
+from helpers import WaitForPageReload, Project, WebDriverWait
 from static import HomePage
 from project import ProjectPage
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
 
 
 class LoginPage(OsfPage):
-    default_url = '{}/account'.format(config.osf_home)
+    default_url = '{}/account/'.format(config.osf_home)
     page_name = 'account management'
 
     def __init__(self, *args, **kwargs):
@@ -34,6 +37,15 @@ class LoginPage(OsfPage):
             form.find_element_by_css_selector('button[type=submit]').click()
 
         return UserDashboardPage(driver=self.driver)
+
+    def log_in_check(self, email, password):
+        with WaitForPageReload(self.driver):
+            form = self.driver.find_element_by_name('signin')
+            form.find_element_by_id('username').send_keys(email)
+            form.find_element_by_id('password').send_keys(password)
+            form.find_element_by_css_selector('button[type=submit]').click()
+        
+        return LoginPage(driver=self.driver)
 
     def register(self, full_name, email, password, email2=None, password2=None):
         form = self.driver.find_element_by_name('registration')
@@ -64,14 +76,15 @@ class UserDashboardPage(OsfPage):
     def _verify_page(self):
         return True if len(
             self.driver.find_elements_by_css_selector(
-                'div.navbar ul.nav li.active a[href="/dashboard"]')
+                'NAV.navbar.navbar-default UL.nav.navbar-nav li.active a[href="/dashboard/"]')
         ) == 1 else False
 
     def new_project(self, title, description=None):
         # Click "New Project"
-        self.driver.find_element_by_css_selector(
-            'a[href="/project/new"]'
-        ).click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'a[href="/project/new"]'
+            ).click()
 
         # Fill the form
         self.driver.find_element_by_id('title').send_keys(title)
@@ -79,19 +92,39 @@ class UserDashboardPage(OsfPage):
             self.driver.find_element_by_id('description').send_keys(description)
 
         # Click "Create New Project"
-        self.driver.find_element_by_css_selector(
-            'form[name="newProject"] button[type="submit"]'
-        ).click()
+        with WaitForPageReload(self.driver):
+            self.driver.find_element_by_css_selector(
+                'form[name="newProject"] button[type="submit"]'
+            ).click()
 
         return ProjectPage(driver=self.driver)
+    
+    def get_alert_boxes(self, alert_text):
+        WebDriverWait(self.driver, 3).until(
+            ec.visibility_of_element_located(
+                (
+                 By.CSS_SELECTOR,
+                 'div.alert.alert-block.alert-warning.fade.in'
+                )
+            )
+        )
+        alerts = self.driver.find_elements_by_xpath(
+            '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
+            (alert_text.upper(), alert_text.lower(), alert_text.lower())
+        )
+        
+        # Return matching alert boxes
+        return alerts
+ 
+    @property
+    def profile_link(self):
+        return self.driver.find_element_by_link_text(
+            'My Public Profile'
+        ).get_attribute('href')
 
     @property
     def profile(self):
-        self.driver.get(
-            self.driver.find_element_by_link_text(
-                'My Public Profile'
-            ).get_attribute('href')
-        )
+        self.driver.get(self.profile_link)
         return UserProfilePage(driver=self.driver)
 
     @property
@@ -99,11 +132,56 @@ class UserDashboardPage(OsfPage):
         self.driver.get('{}/settings'.format(config.osf_home))
         return UserSettingsPage(driver=self.driver)
 
+    @property
+    def projects(self):
+        ul = self.driver.find_element_by_css_selector(
+            'div.row > div.span6:first-child ul.list-group'
+        )
+
+        p = []
+
+        for li in ul.find_elements_by_css_selector('li.project'):
+            link = li.find_element_by_css_selector('h3 a')
+            p.append(Project(
+                title=link.text,
+                url=link.get_attribute('href')
+            ))
+
+        return p
+
+    @property
+    def watch_logs(self):
+        return logs.parse_log(
+            container=self.driver.find_element_by_css_selector(
+                'div.col-md-6:last-child'
+            )
+        )
 
 class UserProfilePage(OsfPage):
     @property
     def full_name(self):
-        return self.driver.find_element_by_id('profile-dfullname').text
+        return self.driver.find_element_by_id('profile-fullname').text
+
+    @full_name.setter
+    def full_name(self, value):
+        self.driver.find_element_by_id('profile-fullname').click()
+
+        field = self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.editable-input INPUT.form-control.input-sm'
+        )
+
+        field.clear()
+        field.send_keys(value)
+
+        self.driver.find_element_by_css_selector(
+            'DIV.page-header DIV.editable-buttons BUTTON.btn.btn-primary.btn-sm.editable-submit'
+        ).click()
+
+    @property
+    def profile_shortlink(self):
+        return self.driver.find_element_by_css_selector(
+            '.container table a'
+        ).get_attribute('href')
 
 
 class UserSettingsPage(OsfPage):

@@ -10,41 +10,19 @@ import requests
 
 # Selenium imports
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait
+
 from selenium.common.exceptions import NoSuchElementException
 
 # Project imports
 import config
 
-def wait_until_visible(elm, ntry=50, delay=0.1):
-    """
-
-    """
-    for _ in range(ntry):
-        if elm.is_displayed():
-            return True
-        time.sleep(delay)
-
-    return False
-
-def wait_until_stable(elm, ntry=50, delay=0.1):
-    """
-
-    """
-    # Set initial size 
-    size = {}
-
-    for _ in range(ntry):
-        if elm.size == size:
-            return True
-        size = elm.size
-        time.sleep(delay)
-    
-    # Fail
-    return False
 
 def launch_driver(
-        driver_name='Firefox',
+        driver_name=None,
         desired_capabilities={},
         wait_time=config.selenium_wait_time):
     """Create and configure a WebDriver.
@@ -54,6 +32,8 @@ def launch_driver(
         wait_time : Time to implicitly wait for element load
 
     """
+
+    driver_name = driver_name or config.driver_name
     
     driver_cls = getattr(webdriver, driver_name)
 
@@ -69,6 +49,11 @@ def launch_driver(
             command_executor=command_executor
         )
 
+    elif driver_name == 'PhantomJS':
+
+        driver = driver_cls('/usr/local/bin/phantomjs')
+
+
     else:
             
         driver = driver_cls()
@@ -79,6 +64,7 @@ def launch_driver(
     # Return driver
     return driver
 
+
 def clear_text(elm):
     """Clear text via backspace. Usually we can skip
     this and clear via elm.clear() directly, but this
@@ -88,6 +74,7 @@ def clear_text(elm):
     
     for _ in range(len(elm.text)):
         elm.send_keys(Keys.BACK_SPACE)
+
 
 def get_alert_boxes(driver, alert_text):
     """Check page for alert boxes. Asserts that there is exactly
@@ -103,14 +90,39 @@ def get_alert_boxes(driver, alert_text):
 
     # Find alerts
     alerts = driver.find_elements_by_xpath(
-        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' % \
-            (alert_text.upper(), alert_text.lower(), alert_text.lower())
+        '//*[text()[contains(translate(., "%s", "%s"), "%s")]]' %
+        (alert_text.upper(), alert_text.lower(), alert_text.lower())
     )
 
     # Return matching alert boxes
     return alerts
     
 find_btn = lambda elm: elm.find_element_by_xpath('.//button')
+
+find_create_btn = lambda elm: elm.find_element_by_css_selector(
+    'BUTTON.btn.btn-submit.btn-success'
+)
+
+
+def fill_creation_form(
+        root,
+        fields,
+        button_finder=find_create_btn):
+    """Fill out form fields and click submit button.
+
+    Args:
+        form : root element
+        fields : dict of id -> value pairs for form
+        button_finder : function to get button from root element
+
+    """
+    # Enter field values
+    for field in fields:
+        root.find_element_by_css_selector(field).send_keys(fields[field])
+
+    # Click submit button
+    button_finder(root).click()
+
 
 def fill_form(
         root, 
@@ -131,6 +143,7 @@ def fill_form(
     # Click submit button
     button_finder(root).click()
 
+
 def login(driver, username, password):
     """Login to OSF
 
@@ -147,11 +160,15 @@ def login(driver, username, password):
     driver.get('%s/account' % (config.osf_home))
 
     # Get login form
-    login_form = driver.find_element_by_xpath('//form[@name="signin"]')
-    fill_form(login_form, {
-        '#username' : username,
-        '#password' : password,
-    })
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked INPUT#username.form-control'
+    ).send_keys(username)
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked INPUT#password.form-control'
+    ).send_keys(password)
+    driver.find_element_by_css_selector(
+        'DIV.col-md-5.col-md-offset-2 FORM#signinForm.form-stacked BUTTON.btn.btn-submit.btn-primary'
+    ).click()
 
 def gen_user_data(_length=12):
     """ Generate data to create a user account. """
@@ -169,6 +186,7 @@ def gen_user_data(_length=12):
         'password2': unique,
         'fullname': unique
     }
+
 
 def create_user(driver=None, user_data=None):
     """Create a new user account.
@@ -193,7 +211,7 @@ def create_user(driver=None, user_data=None):
     user_data = user_data or gen_user_data()
 
     requests.post(
-        url='/'.join((config.osf_home.strip('/'), 'register')),
+        url='/'.join((config.osf_home.strip('/'), 'register/')),
         data={
             'register-fullname': user_data['fullname'],
             'register-username': user_data['username'],
@@ -207,6 +225,7 @@ def create_user(driver=None, user_data=None):
     # Return user data
     return user_data
 
+
 def goto_dashboard(driver):
 
     """Browse to dashboard page.
@@ -216,6 +235,7 @@ def goto_dashboard(driver):
 
     """
     driver.get('%s/dashboard' % (config.osf_home))
+
 
 def goto_profile(driver):
     """Browse to public profile page. 
@@ -229,6 +249,7 @@ def goto_profile(driver):
 
     # Click Public Profile link
     driver.find_element_by_link_text('My Public Profile').click()
+
 
 def goto_project(driver, project_title=config.project_title):
 
@@ -248,6 +269,7 @@ def goto_project(driver, project_title=config.project_title):
     driver.find_element_by_link_text(project_title).click()
     return driver.current_url
 
+
 def goto_files(driver, project_title=config.project_title):
     """ Browse to files page.
 
@@ -260,7 +282,8 @@ def goto_files(driver, project_title=config.project_title):
 
     # Browse to files page
     driver.find_element_by_link_text('Files').click()
-    
+
+
 def goto_settings(driver, project_name=config.project_title):
     """Browse to project settings page.
 
@@ -275,6 +298,7 @@ def goto_settings(driver, project_name=config.project_title):
     # Click Settings button
     driver.find_element_by_link_text('Settings').click()
 
+
 def goto_registrations(driver, project_name=config.project_title):
     
     # Browse to project page
@@ -283,20 +307,6 @@ def goto_registrations(driver, project_name=config.project_title):
     # Click Registrations button
     driver.find_element_by_link_text('Registrations').click()
 
-def delete_project(driver, project_title=config.project_title):
-    """Delete a project. Note: There is no confirmation for
-    project deletion as of this writing, but should be soon.
-
-    Args:
-        driver : webdriver
-        project_title : project title
-
-    """
-    # Browse to project settings
-    goto_settings(driver, project_title)
-
-    # Click Delete button
-    driver.find_element_by_xpath('//button[@type="submit"]').click()
 
 def logout(driver):
     """ Log out of OSF.
@@ -314,6 +324,7 @@ def logout(driver):
     except NoSuchElementException:
         # There is no logout link - assume the user is not logged in
         pass
+
 
 def create_project(driver, project_title=config.project_title, project_description=config.project_description):
     """Create new project
@@ -344,6 +355,7 @@ def create_project(driver, project_title=config.project_title, project_descripti
     # Return project URL
     return driver.current_url
 
+
 def create_node(
         driver, 
         project_title=config.project_title, 
@@ -367,9 +379,9 @@ def create_node(
     )
     
     # Wait for modal to stop moving
-    wait_until_stable(
-        driver.find_element_by_css_selector(
-            'input[name="title"]'
+    WebDriverWait(driver, 3).until(
+        ec.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'input[name="title"]')
         )
     )
     
@@ -382,30 +394,6 @@ def create_node(
         }
     )
 
-
-def make_project_public(driver, url):
-
-    driver.get(url)
-
-    driver.find_element_by_link_text("Make public").click()
-
-    yes_button = driver.find_element_by_xpath(
-        '//button[contains(@class, "modal-confirm")]'
-    )
-    wait_until_stable(yes_button)
-    yes_button.click()
-
-    #driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
-    return driver.current_url
-
-def make_project_private(driver, url):
-
-    driver.get(driver.current_url)
-    link = driver.find_element_by_link_text("Make private")
-    link.click()
-    time.sleep(3) #wait until modal box finishes moving
-    driver.find_element_by_xpath('//button[contains(@class, "modal-confirm")]').click()
-    return driver.current_url
 
 def select_partial(driver, id, start, stop):
     """Select a partial range of text from an element.
@@ -437,38 +425,44 @@ def select_partial(driver, id, start, stop):
         })(document.getElementById("%s"), %d, %d);
         ''' % (id, start, stop))
 
+
 # Wiki functions
 def edit_wiki(driver):
  
     edit_button = driver.find_element_by_link_text('Edit')
     edit_button.click()
 
+
 def get_wiki_input(driver):
  
     return driver.find_element_by_id('wmd-input')
+
 
 def add_wiki_text(driver, text):
  
     get_wiki_input(driver).send_keys(text)
 
+
 def clear_wiki_text(driver):
  
     clear_text(get_wiki_input(driver))
 
+
 def submit_wiki_text(driver):
     """ Click submit button. """
 
-    driver.find_element_by_xpath(
-        '//div[@class="wmd-panel"]//input[@type="submit"]'
+    driver.find_element_by_css_selector(
+        'DIV.col-md-9 INPUT.btn.btn-primary.pull-right'
     ).click()
+
 
 def get_wiki_version(driver):
     """ Get current wiki version. """
- 
+
     # Extract version text
-    version = driver\
-        .find_element_by_xpath('//dt[text()="Version"]/following-sibling::*')\
-        .text
+    version = str(driver.find_element_by_css_selector(
+        "DIV.container DIV.col-md-3 dl"
+    ).text[-11:])
  
     # Strip (current) from version string
     version = re.sub('\s*\(current\)\s*', '', version, flags=re.I)
@@ -478,6 +472,7 @@ def get_wiki_version(driver):
         return int(version)
     except ValueError:
         return 0
+
 
 def get_wiki_par(driver):
     """ Get <p> containing wiki text. """
@@ -502,6 +497,7 @@ def get_wiki_par(driver):
     # Return element
     return wiki_par
 
+
 def get_wiki_text(driver):
     """ Get text from wiki <p>. """
 
@@ -513,6 +509,7 @@ def get_wiki_text(driver):
         return wiki_par.text
     return ''
 
+
 def get_wiki_preview(driver):
     """
     """
@@ -520,6 +517,7 @@ def get_wiki_preview(driver):
     return driver\
         .find_element_by_id('wmd-preview')\
         .text
+
 
 def forget_password(driver, email):
     """forgotpassword to OSF
@@ -543,6 +541,7 @@ def forget_password(driver, email):
 
     })
 
+
 def project_rename(driver, text):
 
         driver.find_element_by_id('node-title-editable').click()
@@ -552,7 +551,8 @@ def project_rename(driver, text):
             '//div[@class="popover-content"]//input[@class="span2"]'
         )
 
-        # delete the current project name
+        # delete the curr
+        # ent project name
         edit_profile_name_field.clear()
 
         # enter the new project name
@@ -563,7 +563,7 @@ def project_rename(driver, text):
             '//div[@class="popover-content"]//button[@class="btn btn-primary"]'
         ).click()
         driver.refresh()
-        goto_project(driver, text)
+
 
 
 

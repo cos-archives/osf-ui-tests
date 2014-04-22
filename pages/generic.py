@@ -3,7 +3,7 @@ from collections import namedtuple
 from selenium import webdriver
 
 import config
-from pages.exceptions import PageException
+from pages.exceptions import HttpError, PageException
 from util import launch_driver
 
 
@@ -17,6 +17,7 @@ class OsfPage(object):
             self.driver = kwargs.get('driver')
         else:
             self.driver = self._make_driver()
+            self.driver.implicitly_wait(0)
 
         if not kwargs.get('driver'):
             # If no driver was passed, go to the url passed or the default
@@ -28,7 +29,19 @@ class OsfPage(object):
         # Verify the page is what you expect it to be.
         if not self._verify_page():
             url = self.driver.current_url
-            self.driver.close()
+
+            # If we've got an error message here, grab it
+            error_heading = self.driver.find_elements_by_css_selector(
+                'h2#error'
+            )
+
+            if error_heading:
+                h = error_heading[0]
+                raise HttpError(
+                    driver=self.driver,
+                    code=h.get_attribute('data-http-status-code'),
+                )
+
             raise PageException('Unexpected page structure: `{}`'.format(
                 url
             ))
@@ -42,13 +55,13 @@ class OsfPage(object):
         """
         return len(
             self.driver.find_elements_by_css_selector(
-                'ul#navbar-icons a[href="/logout"]'
+                'UL.nav.navbar-nav.navbar-right a[href="/logout"]'
             )
         ) > 0
 
     def log_out(self):
         self.driver.find_element_by_css_selector(
-            'ul#navbar-icons a[href="/logout"]'
+            'UL.nav.navbar-nav.navbar-right a[href="/logout"]'
         ).click()
         return OsfPage(driver=self.driver)
 
@@ -77,7 +90,7 @@ class OsfPage(object):
     def user_login(self):
         # TODO: property changes state
         from pages.auth import LoginPage
-        self.driver.get('{}/account'.format(config.osf_home))
+        self.driver.get('{}/account/'.format(config.osf_home))
         return LoginPage(driver=self.driver)
 
     def node(self, node_id, parent_project=None):

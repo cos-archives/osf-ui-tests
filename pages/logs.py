@@ -16,11 +16,17 @@ def parse_log(container):
         log_list.append(
             Log(
                 text=t.text,
-                date=dt.datetime.strptime(d.text, '%m/%d/%y %I:%M %p'),
-                links=[ Link(
+
+                date=dt.datetime.strptime(
+                    d.find_element_by_css_selector('span.date.log-date').text,
+                    '%m/%d/%Y %I:%M %p'
+                ),
+                links=[Link(
                     text=lk.text,
                     url=lk.get_attribute('href'),
-                ) for lk in t.find_elements_by_css_selector('a')]
+                ) for lk in t.find_elements_by_css_selector(
+                    'a'
+                )]
             )
         )
 
